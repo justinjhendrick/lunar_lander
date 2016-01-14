@@ -21,10 +21,16 @@ class Lander {
         float max_thrust; // Newtons (const)
 
         bool thrusting = false;
-        static const int WIDTH = 20;
-        static const int HEIGHT = 30;
+        static const int WIDTH = 21;
+        static const int HEIGHT = 40;
+        static const int COLLISION_HEIGHT = 30;
         float torque;
         SDL_Texture* txtr;
+        SDL_Texture* txtr_fire_low;
+        SDL_Texture* txtr_fire_med;
+        SDL_Texture* txtr_fire_high;
+
+        SDL_Texture* load_texture(SDL_Renderer* r, const char filename[]);
     public:
         Lander(Screen& s);
         Lander(Screen& s,
@@ -41,7 +47,7 @@ class Lander {
                float _thrust,
                float _max_thrust
         );
-        //~Lander();
+        ~Lander();
 
         void draw(Screen& s);
         void handle(SDL_Event* e);

@@ -11,11 +11,11 @@ Lander::Lander(Screen& s) :
            0.,  // y_vel
            0.,  // orientation
            0.,  // spin_rate
-           .1,  // max_torque
+           .08,  // max_torque
            1.,  // fuel
-           1.,  // dry_mass
+           5.,  // dry_mass
            1.,  // init_fuel
-           0.,  // thrust
+           1.,  // thrust
            10. // max_thrust
     ) {
 }
@@ -47,16 +47,23 @@ Lander::Lander(Screen& s,
     thrust = _thrust;
     max_thrust = _max_thrust;
 
-    // load texture(s)
-    SDL_Surface* surf = SDL_LoadBMP("sprites/lander_no_alpha.bmp");
+    txtr = load_texture(s.renderer, "sprites/lander.bmp");
+    txtr_fire_low = load_texture(s.renderer, "sprites/lander_fire_low.bmp");
+    txtr_fire_med = load_texture(s.renderer, "sprites/lander_fire_med.bmp");
+    txtr_fire_high = load_texture(s.renderer, "sprites/lander_fire_high.bmp");
+}
+
+SDL_Texture* Lander::load_texture(SDL_Renderer* r, const char filename[]) {
+    SDL_Surface* surf = SDL_LoadBMP(filename);
     if (surf == NULL) {
-        fprintf(stderr, "no load lander: %s\n", SDL_GetError());
+        fprintf(stderr, "%s\n", SDL_GetError());
     }
-    txtr = SDL_CreateTextureFromSurface(s.renderer, surf);
+    SDL_Texture* result = SDL_CreateTextureFromSurface(r, surf);
     if (txtr == NULL) {
-        fprintf(stderr, "no convert lander to texture: %s\n", SDL_GetError());
+        fprintf(stderr, "no convert to texture: %s\n", SDL_GetError());
     }
     SDL_FreeSurface(surf);
+    return result;
 }
 
 void Lander::handle(SDL_Event* e) {
@@ -115,6 +122,7 @@ void Lander::move() {
         x_vel += x_accel;
         y_vel += y_accel;
     }
+    y_vel += .1; // gravity
 
     x_pos += x_vel;
     y_pos += y_vel;
@@ -122,21 +130,39 @@ void Lander::move() {
 
 void Lander::draw(Screen& s) {
     SDL_Rect dest;
-    dest.x = x_pos;
-    dest.y = y_pos;
+    dest.x = (int) x_pos;
+    dest.y = (int) y_pos;
     dest.w = WIDTH;
     dest.h = HEIGHT;
+
+    SDL_Texture* t = txtr;
+    if (thrusting) {
+        if (thrust < max_thrust / 3) {
+            t = txtr_fire_low;
+        } else if (thrust < 2 * max_thrust / 3) {
+            t = txtr_fire_med;
+        } else {
+            t = txtr_fire_high;
+        }
+    }
 
     //SDL_RenderCopy(s.renderer, txtr, NULL, &dest);
     //SDL_Point rotate_about;
     //rotate_about.x = x_pos + WIDTH / 2;
     //rotate_about.y = y_pos + HEIGHT / 2;
     SDL_RenderCopyEx(s.renderer,
-                     txtr,
+                     t,
                      NULL,
                      &dest,
                      (M_PI_2 + orientation) * 180. / M_PI,
                      NULL,
                      SDL_FLIP_NONE
     );
+}
+
+Lander::~Lander() {
+    SDL_DestroyTexture(txtr);
+    SDL_DestroyTexture(txtr_fire_low);
+    SDL_DestroyTexture(txtr_fire_med);
+    SDL_DestroyTexture(txtr_fire_high);
 }
