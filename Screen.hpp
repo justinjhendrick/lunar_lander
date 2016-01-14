@@ -4,10 +4,9 @@
 #include <SDL2/SDL.h>
 
 class Screen {
-    private:
+    public:
         static const int WIDTH = 640;
         static const int HEIGHT = 480;
-    public:
         SDL_Window* window;
         SDL_Renderer* renderer;
 

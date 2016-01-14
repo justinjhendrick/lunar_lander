@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv) {
     Screen s;
-    Lander l;
+    Lander l(s);
 
     s.clear();
     l.draw(s);
@@ -21,7 +21,15 @@ int main(int argc, char** argv) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
+            l.handle(&e);
         }
+        l.move();
+
+        s.clear();
+        l.draw(s);
+        s.flip();
+
+        SDL_Delay(100);
     }
 
     return 0;
