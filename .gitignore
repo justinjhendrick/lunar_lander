@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+lunar_lander
+
+# vim temp file
+*.swp
