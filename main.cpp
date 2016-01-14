@@ -3,10 +3,14 @@
 #include <cstdio>
 #include <SDL2/SDL.h>
 #include "Screen.hpp"
+#include "Lander.hpp"
 
 int main(int argc, char** argv) {
     Screen s;
+    Lander l;
+
     s.clear();
+    l.draw(s);
     s.flip();
 
     bool quit = false;
