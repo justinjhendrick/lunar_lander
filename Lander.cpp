@@ -3,6 +3,7 @@
 #include "Lander.hpp"
 #include "Screen.hpp"
 #include "constants.hpp"
+#include "Utils.hpp"
 
 Lander::Lander(Screen& s) :
     Lander(s,
@@ -53,23 +54,10 @@ Lander::Lander(Screen& s,
 
     torque = 0.;
     dt = FRAME_TIME / 1000.;
-    txtr = load_texture(s.renderer, "sprites/lander.bmp");
-    txtr_fire_low = load_texture(s.renderer, "sprites/lander_fire_low.bmp");
-    txtr_fire_med = load_texture(s.renderer, "sprites/lander_fire_med.bmp");
-    txtr_fire_high = load_texture(s.renderer, "sprites/lander_fire_high.bmp");
-}
-
-SDL_Texture* Lander::load_texture(SDL_Renderer* r, const char filename[]) {
-    SDL_Surface* surf = SDL_LoadBMP(filename);
-    if (surf == NULL) {
-        fprintf(stderr, "%s\n", SDL_GetError());
-    }
-    SDL_Texture* result = SDL_CreateTextureFromSurface(r, surf);
-    if (txtr == NULL) {
-        fprintf(stderr, "no convert to texture: %s\n", SDL_GetError());
-    }
-    SDL_FreeSurface(surf);
-    return result;
+    txtr = Utils::load_texture(s.renderer, "sprites/lander.bmp");
+    txtr_fire_low = Utils::load_texture(s.renderer, "sprites/lander_fire_low.bmp");
+    txtr_fire_med = Utils::load_texture(s.renderer, "sprites/lander_fire_med.bmp");
+    txtr_fire_high = Utils::load_texture(s.renderer, "sprites/lander_fire_high.bmp");
 }
 
 void Lander::handle(SDL_Event* e) {
@@ -94,7 +82,7 @@ void Lander::handle(SDL_Event* e) {
                 torque = max_torque;
                 break;
             case SDLK_SPACE:
-                if (fuel > 0.) {
+                if (fuel > 0. && thrust > 0.) {
                     thrusting = true;
                 }
                 break;
@@ -128,7 +116,7 @@ void Lander::move() {
     }
 
     float x_accel = 0.;
-    float y_accel = 1.62; // gravity
+    float y_accel = 0.;
     if (thrusting) {
         // compute acceleration
         x_accel = thrust * cos(orientation) / (dry_mass + fuel);
@@ -141,15 +129,13 @@ void Lander::move() {
         float dmdt = ((dry_mass + fuel) * sqrt(pow(new_x_vel - x_vel, 2) +
                      pow(new_y_vel - y_vel, 2) / dt) - thrust) / exhaust_vel;
         fuel += dmdt * dt;
-        printf("%f\n", fuel);
     }
     x_vel += x_accel;
-    y_vel += y_accel;
+    y_vel += y_accel + 1.62; // gravity
 
     // calculate new position
     x_pos += x_vel * dt + .5 * x_accel * dt * dt;
     y_pos += y_vel * dt + .5 * y_accel * dt * dt;
-    printf("%f, %f\n", x_pos, y_pos);
 }
 
 void Lander::draw(Screen& s) {
@@ -170,14 +156,25 @@ void Lander::draw(Screen& s) {
         }
     }
 
+    SDL_Point rot_abt;
+    rot_abt.x = WIDTH / 2;
+    rot_abt.y = COLLISION_HEIGHT;
     SDL_RenderCopyEx(s.renderer,
                      t,
                      NULL,
                      &dest,
                      (M_PI_2 + orientation) * 180. / M_PI,
-                     NULL,
+                     &rot_abt,
                      SDL_FLIP_NONE
     );
+
+    // rectangle for debugging
+    Uint8 old_r, old_g, old_b, old_a;
+    SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
+    SDL_SetRenderDrawColor(s.renderer, 0xff, 0x00, 0x00, 0xFF);
+    SDL_RenderDrawRect(s.renderer, &dest);
+    SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
+
 }
 
 Lander::~Lander() {

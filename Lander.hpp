@@ -7,11 +7,8 @@
 class Lander {
     private:
         // initialized by constructor
-        float x_pos; // meters
-        float y_pos;
         float x_vel; // meters/second
         float y_vel;
-        float orientation; // radians cw from x axis
         float spin_rate; // radians/frame. positive is cw, negative is ccw
         float max_torque; // radians/frame^2 (const)
         float fuel; // kg
@@ -22,9 +19,6 @@ class Lander {
         float exhaust_vel; // m/s
 
         bool thrusting = false;
-        static const int WIDTH = 21;
-        static const int HEIGHT = 40;
-        static const int COLLISION_HEIGHT = 30;
         float torque;
         float dt;
         SDL_Texture* txtr;
@@ -34,6 +28,14 @@ class Lander {
 
         SDL_Texture* load_texture(SDL_Renderer* r, const char filename[]);
     public:
+        float x_pos; // meters
+        float y_pos;
+        float orientation; // radians cw from x axis
+
+        static const int WIDTH = 21;
+        static const int HEIGHT = 40;
+        static const int COLLISION_HEIGHT = 30;
+
         Lander(Screen& s);
         Lander(Screen& s,
                float _x_pos,
