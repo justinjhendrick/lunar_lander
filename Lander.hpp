@@ -9,7 +9,7 @@ class Lander {
         // initialized by constructor
         float x_pos; // meters
         float y_pos;
-        float x_vel; // meters/frame
+        float x_vel; // meters/second
         float y_vel;
         float orientation; // radians cw from x axis
         float spin_rate; // radians/frame. positive is cw, negative is ccw
@@ -25,6 +25,7 @@ class Lander {
         static const int HEIGHT = 40;
         static const int COLLISION_HEIGHT = 30;
         float torque;
+        float dt;
         SDL_Texture* txtr;
         SDL_Texture* txtr_fire_low;
         SDL_Texture* txtr_fire_med;
@@ -41,7 +42,6 @@ class Lander {
                float _orientation,
                float _spin_rate,
                float _max_torque,
-               float _fuel,
                float _dry_mass,
                float _init_fuel,
                float _thrust,
