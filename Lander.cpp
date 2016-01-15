@@ -106,6 +106,19 @@ void Lander::handle(SDL_Event* e) {
     }
 }
 
+void Lander::craft_to_sdl_coords() {
+    float s = sin(3 * M_PI_2 + orientation);
+    float c = cos(3 * M_PI_2 + orientation);
+    p1x = c * sc_p1x - s * sc_p1y + WIDTH / 2 + x_pos;
+    p1y = s * sc_p1x + c * sc_p1y + COLLISION_HEIGHT + y_pos;
+
+    p2x = c * sc_p2x - s * sc_p2y + WIDTH / 2 + x_pos;
+    p2y = s * sc_p2x + c * sc_p2y + COLLISION_HEIGHT + y_pos;
+
+    p3x = c * sc_p3x - s * sc_p3y + WIDTH / 2 + x_pos;
+    p3y = s * sc_p3x + c * sc_p3y + COLLISION_HEIGHT + y_pos;
+}
+
 void Lander::move() {
     spin_rate += torque;
     orientation += spin_rate;
@@ -131,11 +144,14 @@ void Lander::move() {
         fuel += dmdt * dt;
     }
     x_vel += x_accel;
-    y_vel += y_accel + 1.62; // gravity
+    y_vel += y_accel;// + 1.62; // gravity
 
     // calculate new position
     x_pos += x_vel * dt + .5 * x_accel * dt * dt;
     y_pos += y_vel * dt + .5 * y_accel * dt * dt;
+
+    // recalculate collision points
+    craft_to_sdl_coords();
 }
 
 void Lander::draw(Screen& s) {
@@ -172,7 +188,20 @@ void Lander::draw(Screen& s) {
     Uint8 old_r, old_g, old_b, old_a;
     SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
     SDL_SetRenderDrawColor(s.renderer, 0xff, 0x00, 0x00, 0xFF);
-    SDL_RenderDrawRect(s.renderer, &dest);
+    SDL_Rect r;
+    r.x = (int) p1x;
+    r.y = (int) p1y;
+    r.w = 2;
+    r.h = 2;
+    SDL_RenderDrawRect(s.renderer, &r);
+
+    r.x = (int) p2x;
+    r.y = (int) p2y;
+    SDL_RenderDrawRect(s.renderer, &r);
+
+    r.x = (int) p3x;
+    r.y = (int) p3y;
+    SDL_RenderDrawRect(s.renderer, &r);
     SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
 
 }

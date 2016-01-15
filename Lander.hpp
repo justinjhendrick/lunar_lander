@@ -26,7 +26,7 @@ class Lander {
         SDL_Texture* txtr_fire_med;
         SDL_Texture* txtr_fire_high;
 
-        SDL_Texture* load_texture(SDL_Renderer* r, const char filename[]);
+        void craft_to_sdl_coords();
     public:
         float x_pos; // meters
         float y_pos;
@@ -35,6 +35,25 @@ class Lander {
         static const int WIDTH = 21;
         static const int HEIGHT = 40;
         static const int COLLISION_HEIGHT = 30;
+
+        // collision points of triangle
+        // in sc coords (rot_abt is center)
+        // Looking at the SC right side up
+        // 1 is bottom left
+        // 2 is top
+        // 3 is bottom right
+        const float sc_p1x = -WIDTH / 2.;
+        const float sc_p1y = 0.;
+        const float sc_p2x = 0.;
+        const float sc_p2y = (float) COLLISION_HEIGHT;
+        const float sc_p3x = WIDTH / 2.;
+        const float sc_p3y = 0.;
+        float p1x;
+        float p1y;
+        float p2x;
+        float p2y;
+        float p3x;
+        float p3y;
 
         Lander(Screen& s);
         Lander(Screen& s,
