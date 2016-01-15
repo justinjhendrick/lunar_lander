@@ -6,14 +6,23 @@ Ground::Ground(bool _is_pad, int x1, int y1, int x2, int y2) :
 }
 
 bool Ground::is_colliding(const Lander& l) {
-    Vector bot_a(l.p1x, l.p1y);
-    Vector bot_b(l.p3x - l.p1x, l.p3y - l.p1y);
-    bool bot_collide = Vector::segments_intersect(bot_a, bot_b, begin, segment);
-    if (bot_collide) {
+    Vector p1(l.p1x, l.p1y);
+    Vector p2(l.p2x, l.p2y);
+    Vector p3(l.p3x, l.p3y);
+
+    Vector p1_to_p2 = Vector::minus(p2, p1);
+    Vector p2_to_p3 = Vector::minus(p3, p2);
+    Vector p3_to_p1 = Vector::minus(p1, p3);
+
+    bool left_collide = Vector::segments_intersect(p1, p1_to_p2, begin, segment);
+    bool right_collide = Vector::segments_intersect(p2, p2_to_p3, begin, segment);
+    bool bot_collide = Vector::segments_intersect(p3, p3_to_p1, begin, segment);
+    if (left_collide || right_collide || bot_collide) {
         return true;
     }
     return false;
 }
+
 void Ground::draw(Screen& s) {
     // save old color
     Uint8 old_r, old_g, old_b, old_a;

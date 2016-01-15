@@ -144,7 +144,7 @@ void Lander::move() {
         fuel += dmdt * dt;
     }
     x_vel += x_accel;
-    y_vel += y_accel;// + 1.62; // gravity
+    y_vel += y_accel + 1.62; // gravity
 
     // calculate new position
     x_pos += x_vel * dt + .5 * x_accel * dt * dt;

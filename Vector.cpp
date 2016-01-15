@@ -31,18 +31,15 @@ bool Vector::segments_intersect(const Vector& p,
     float qpr = cross_mag(qp, r);
     if (fabs(rs) < eps && fabs(qpr) < eps) {
         // collinear
-        printf("collinear");
         return true;
     } else if (fabs(rs) < eps) {
         // parallel
-        printf("parallel\n");
         return false;
     }
 
     float t = cross_mag(qp, s) / rs;
     float u = qpr / rs;
     if (0. <= t && t <= 1. && 0. <= u && u <= 1.) {
-        printf("cross");
         return true;
     }
     return false;

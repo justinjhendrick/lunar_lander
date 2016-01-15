@@ -8,7 +8,7 @@
 #include "constants.hpp"
 #include "Ground.hpp"
 
-int main(int argc, char** argv) {
+int main() {
     Screen s;
     Lander l(s);
     Ground pad(true, Screen::WIDTH / 2 - 20, Screen::HEIGHT - 10,
