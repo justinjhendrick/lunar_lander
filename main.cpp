@@ -6,14 +6,17 @@
 #include "Screen.hpp"
 #include "Lander.hpp"
 #include "constants.hpp"
+#include "Ground.hpp"
 
 int main(int argc, char** argv) {
     Screen s;
     Lander l(s);
-
-    s.clear();
-    l.draw(s);
-    s.flip();
+    Ground pad(true, Screen::WIDTH / 2 - 20, Screen::HEIGHT - 10,
+                     Screen::WIDTH / 2 + 20, Screen::HEIGHT - 10);
+    Ground top(false, 0, 0, Screen::WIDTH, 0);
+    Ground left(false, 0, 0, 0, Screen::HEIGHT);
+    Ground right(false, Screen::WIDTH, 0, Screen::WIDTH, Screen::HEIGHT);
+    Ground bot(false, 0, Screen::HEIGHT, Screen::WIDTH, Screen::HEIGHT);
 
     bool quit = false;
     SDL_Event e;
@@ -28,8 +31,18 @@ int main(int argc, char** argv) {
         }
         l.move();
 
+        if (pad.is_colliding(l)) {
+            printf("You win\n");
+            return 0;
+        } else if (top.is_colliding(l) || left.is_colliding(l) ||
+                   right.is_colliding(l) || bot.is_colliding(l)) {
+            printf("You lose\n");
+            return 0;
+        }
+
         s.clear();
         l.draw(s);
+        pad.draw(s);
         s.flip();
 
         time_t now = time(NULL);

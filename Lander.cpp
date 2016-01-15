@@ -203,7 +203,6 @@ void Lander::draw(Screen& s) {
     r.y = (int) p3y;
     SDL_RenderDrawRect(s.renderer, &r);
     SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
-
 }
 
 Lander::~Lander() {

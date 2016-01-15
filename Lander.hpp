@@ -7,8 +7,11 @@
 class Lander {
     private:
         // initialized by constructor
+        float x_pos; // meters
+        float y_pos;
         float x_vel; // meters/second
         float y_vel;
+        float orientation; // radians cw from x axis
         float spin_rate; // radians/frame. positive is cw, negative is ccw
         float max_torque; // radians/frame^2 (const)
         float fuel; // kg
@@ -28,10 +31,6 @@ class Lander {
 
         void craft_to_sdl_coords();
     public:
-        float x_pos; // meters
-        float y_pos;
-        float orientation; // radians cw from x axis
-
         static const int WIDTH = 21;
         static const int HEIGHT = 40;
         static const int COLLISION_HEIGHT = 30;
