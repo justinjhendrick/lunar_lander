@@ -19,6 +19,7 @@ class Lander {
         float init_fuel; // kg (const)
         float thrust; // Newtons
         float max_thrust; // Newtons (const)
+        float exhaust_vel; // m/s
 
         bool thrusting = false;
         static const int WIDTH = 21;
@@ -45,7 +46,8 @@ class Lander {
                float _dry_mass,
                float _init_fuel,
                float _thrust,
-               float _max_thrust
+               float _max_thrust,
+               float _exhaust_vel
         );
         ~Lander();
 

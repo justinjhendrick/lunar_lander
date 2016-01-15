@@ -7,17 +7,20 @@
 Lander::Lander(Screen& s) :
     Lander(s,
            Screen::WIDTH / 2,  // x_pos
-           Screen::HEIGHT / 2,  // y_pos
-           0.,  // x_vel
-           0.,  // y_vel
-           0.,  // orientation
-           0.,  // spin_rate
-           .08,  // max_torque
-           1.,  // dry_mass
-           1.,  // init_fuel
-           1.,  // thrust
-           1000. // max_thrust
+           Screen::HEIGHT / 2, // y_pos
+           0.,     // x_vel
+           0.,     // y_vel
+           0.,     // orientation
+           0.,     // spin_rate
+           .08,    // max_torque
+           2150.,  // dry_mass
+           2353.,  // init_fuel
+           0.,     // thrust
+           16000., // max_thrust
+           3050.   // exhaust velocity
     ) {
+    // values above from the Apollo lunar module
+    // https://en.wikipedia.org/wiki/Apollo_Lunar_Module
 }
 
 Lander::Lander(Screen& s,
@@ -31,7 +34,8 @@ Lander::Lander(Screen& s,
        float _dry_mass,
        float _init_fuel,
        float _thrust,
-       float _max_thrust) {
+       float _max_thrust,
+       float _exhaust_vel) {
     // set init vals
     x_pos = _x_pos;
     y_pos = _y_pos;
@@ -45,12 +49,14 @@ Lander::Lander(Screen& s,
     init_fuel = _init_fuel;
     thrust = _thrust;
     max_thrust = _max_thrust;
+    exhaust_vel = _exhaust_vel;
 
+    torque = 0.;
+    dt = FRAME_TIME / 1000.;
     txtr = load_texture(s.renderer, "sprites/lander.bmp");
     txtr_fire_low = load_texture(s.renderer, "sprites/lander_fire_low.bmp");
     txtr_fire_med = load_texture(s.renderer, "sprites/lander_fire_med.bmp");
     txtr_fire_high = load_texture(s.renderer, "sprites/lander_fire_high.bmp");
-    dt = FRAME_TIME / 1000.;
 }
 
 SDL_Texture* Lander::load_texture(SDL_Renderer* r, const char filename[]) {
@@ -98,10 +104,10 @@ void Lander::handle(SDL_Event* e) {
     } else if (e->type == SDL_KEYUP) {
         switch (e->key.keysym.sym) {
             case SDLK_LEFT:
-                torque = 0;
+                torque = 0.;
                 break;
             case SDLK_RIGHT:
-                torque = 0;
+                torque = 0.;
                 break;
             case SDLK_SPACE:
                 thrusting = false;
@@ -115,39 +121,35 @@ void Lander::handle(SDL_Event* e) {
 void Lander::move() {
     spin_rate += torque;
     orientation += spin_rate;
+    if (orientation > 2 * M_PI) {
+        orientation -= 2 * M_PI;
+    } else if (orientation < 0) {
+        orientation += 2 * M_PI;
+    }
 
+    float x_accel = 0.;
+    float y_accel = 1.62; // gravity
     if (thrusting) {
         // compute acceleration
-        float x_accel = thrust * cos(orientation) / (dry_mass + fuel);
-        float y_accel = thrust * sin(orientation) / (dry_mass + fuel);
+        x_accel = thrust * cos(orientation) / (dry_mass + fuel);
+        y_accel += thrust * sin(orientation) / (dry_mass + fuel);
 
         float new_x_vel = x_vel + x_accel * dt;
         float new_y_vel = y_vel + y_accel * dt;
         
         // calculate mass change
-        //float vel = sqrt(x_vel * x_vel + y_vel * y_vel);
-        //float new_vel = sqrt(new_x_vel * new_x_vel + new_y_vel * new_y_vel);
-        //printf("v = %f -> %f\n", vel, new_vel);
-        //printf("%f / %f = ", dt * thrust + (dry_mass + fuel) * vel, new_vel);
-        //float new_mass = (dt * thrust + (dry_mass + fuel) * vel) /
-        //                 new_vel;
-        //printf("%f\n", new_mass);
-        //fuel -= (dry_mass + fuel) - new_mass;
-        float exhaust_vel = 100.;
         float dmdt = ((dry_mass + fuel) * sqrt(pow(new_x_vel - x_vel, 2) +
-                     pow(new_y_vel - y_vel, 2)) - thrust) / exhaust_vel;
-        printf("dmdt = %f\n", dmdt);
+                     pow(new_y_vel - y_vel, 2) / dt) - thrust) / exhaust_vel;
         fuel += dmdt * dt;
         printf("%f\n", fuel);
-
-        // apply acceleration
-        x_vel = new_x_vel;
-        y_vel = new_y_vel;
     }
-    //y_vel += .1; // gravity
+    x_vel += x_accel;
+    y_vel += y_accel;
 
-    x_pos += x_vel * dt;
-    y_pos += y_vel * dt;
+    // calculate new position
+    x_pos += x_vel * dt + .5 * x_accel * dt * dt;
+    y_pos += y_vel * dt + .5 * y_accel * dt * dt;
+    printf("%f, %f\n", x_pos, y_pos);
 }
 
 void Lander::draw(Screen& s) {
@@ -168,10 +170,6 @@ void Lander::draw(Screen& s) {
         }
     }
 
-    //SDL_RenderCopy(s.renderer, txtr, NULL, &dest);
-    //SDL_Point rotate_about;
-    //rotate_about.x = x_pos + WIDTH / 2;
-    //rotate_about.y = y_pos + HEIGHT / 2;
     SDL_RenderCopyEx(s.renderer,
                      t,
                      NULL,
