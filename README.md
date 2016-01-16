@@ -9,3 +9,8 @@ clang 3.3 or later (or a version of gcc that supports c++11), libsdl2-dev
 $ make
 $ ./lunar_lander
 ```
+
+## How to play
+Left and right apply torque to your spacecraft.
+Up and down increase and decrease thrust.
+Spacebar turns on your thruster.
