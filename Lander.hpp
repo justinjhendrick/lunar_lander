@@ -25,7 +25,7 @@ class Lander {
         float torque;
         float dt;
         float vel; // magnitude
-        const float safe_vel = 10.;
+        const float safe_vel = 15.;
         const float max_vel = 100.; // only cosmetic
         SDL_Texture* txtr;
         SDL_Texture* txtr_fire_low;
@@ -34,6 +34,7 @@ class Lander {
         SDL_Texture* fuel_txtr;
         SDL_Texture* thrust_txtr;
         SDL_Texture* vel_txtr;
+        SDL_Texture* vel_txtr_green;
 
         void craft_to_sdl_coords();
         void draw_status(Screen& s);

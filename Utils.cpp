@@ -14,9 +14,14 @@ SDL_Texture* Utils::load_texture(SDL_Renderer* r, const char filename[]) {
     return result;
 }
 
-SDL_Texture* Utils::create_text_texture(Screen& s, const char text[]) {
+SDL_Texture* Utils::create_text_texture(Screen& s,
+                                        const char text[],
+                                        SDL_Color* color) {
     SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SDL_Surface* surf = TTF_RenderText_Solid(s.font, text, white);
+    if (color == NULL) {
+        color = &white;
+    }
+    SDL_Surface* surf = TTF_RenderText_Solid(s.font, text, *color);
     if (surf == NULL) {
         fprintf(stderr, "%s\n", SDL_GetError());
         return NULL;

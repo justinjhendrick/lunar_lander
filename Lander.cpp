@@ -59,9 +59,11 @@ Lander::Lander(Screen& s,
     txtr_fire_low = Utils::load_texture(s.renderer, "sprites/lander_fire_low.bmp");
     txtr_fire_med = Utils::load_texture(s.renderer, "sprites/lander_fire_med.bmp");
     txtr_fire_high = Utils::load_texture(s.renderer, "sprites/lander_fire_high.bmp");
-    fuel_txtr = Utils::create_text_texture(s, "FUEL ");
-    thrust_txtr = Utils::create_text_texture(s, "THRUST ");
-    vel_txtr = Utils::create_text_texture(s, "VEL ");
+    fuel_txtr = Utils::create_text_texture(s, "FUEL ", NULL);
+    thrust_txtr = Utils::create_text_texture(s, "THRUST ", NULL);
+    vel_txtr = Utils::create_text_texture(s, "VEL ", NULL);
+    SDL_Color green = {0x33, 0xFF, 0x33, 0xFF};
+    vel_txtr_green = Utils::create_text_texture(s, "VEL ", &green);
 }
 
 void Lander::handle(SDL_Event* e) {
@@ -216,7 +218,11 @@ void Lander::draw_status(Screen& s) {
 
     // write words
     SDL_RenderCopy(s.renderer, thrust_txtr, NULL, &thrust_text);
-    SDL_RenderCopy(s.renderer, vel_txtr, NULL, &vel_text);
+    if (vel <= safe_vel) {
+        SDL_RenderCopy(s.renderer, vel_txtr_green, NULL, &vel_text);
+    } else {
+        SDL_RenderCopy(s.renderer, vel_txtr, NULL, &vel_text);
+    }
     SDL_RenderCopy(s.renderer, fuel_txtr, NULL, &fuel_text);
 
     // save old color
@@ -235,22 +241,25 @@ void Lander::draw_status(Screen& s) {
     SDL_RenderFillRect(s.renderer, &fuel_bar);
 
     // velocity bar
+    // if we're in the safe zone, make bar green
+    if (vel <= safe_vel) {
+        SDL_SetRenderDrawColor(s.renderer, 0x33, 0xFF, 0x33, 0xFF);
+    }
     SDL_RenderDrawRect(s.renderer, &vel_bar);
     vel_bar.w = (int) (vel * ((float) bar_width) / max_vel);
     if (vel_bar.w > bar_width) {
         vel_bar.w = bar_width; // don't go past end of bar
     }
-
-    // if we're in the safe zone, make bar green
-    if (vel <= safe_vel) {
-        SDL_SetRenderDrawColor(s.renderer, 0x55, 0xFF, 0x55, 0xFF);
-    }
     SDL_RenderFillRect(s.renderer, &vel_bar);
 
-    // outline safe zone in green
-    SDL_SetRenderDrawColor(s.renderer, 0x55, 0xFF, 0x55, 0xFF);
+    // fill or outline safe zone in green
+    SDL_SetRenderDrawColor(s.renderer, 0x33, 0xFF, 0x33, 0xFF);
     vel_bar.w = (int) (safe_vel * ((float) bar_width) / max_vel);
     SDL_RenderDrawRect(s.renderer, &vel_bar);
+
+    // add a notch to make it clearer where the safe zone ends
+    SDL_RenderDrawLine(s.renderer, vel_bar.x + vel_bar.w - 1, 9,
+                                   vel_bar.x + vel_bar.w - 1, 26);
 
     // reset old color
     SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
@@ -294,7 +303,8 @@ void Lander::draw(Screen& s) {
 }
 
 bool Lander::safe_speed() {
-    return vel < safe_vel;
+    printf("%f <= %f\n", vel, safe_vel);
+    return vel <= safe_vel;
 }
 
 Lander::~Lander() {
@@ -305,4 +315,5 @@ Lander::~Lander() {
     SDL_DestroyTexture(fuel_txtr);
     SDL_DestroyTexture(thrust_txtr);
     SDL_DestroyTexture(vel_txtr);
+    SDL_DestroyTexture(vel_txtr_green);
 }
