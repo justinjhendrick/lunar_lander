@@ -61,6 +61,7 @@ Lander::Lander(Screen& s,
     txtr_fire_high = Utils::load_texture(s.renderer, "sprites/lander_fire_high.bmp");
     fuel_txtr = Utils::create_text_texture(s, "FUEL ");
     thrust_txtr = Utils::create_text_texture(s, "THRUST ");
+    vel_txtr = Utils::create_text_texture(s, "VEL ");
 }
 
 void Lander::handle(SDL_Event* e) {
@@ -149,6 +150,8 @@ void Lander::move() {
     x_vel += x_accel;
     y_vel += y_accel + 1.62; // gravity
 
+    vel = sqrt(x_vel * x_vel + y_vel * y_vel);
+
     // calculate new position
     x_pos += x_vel * dt + .5 * x_accel * dt * dt;
     y_pos += y_vel * dt + .5 * y_accel * dt * dt;
@@ -177,6 +180,23 @@ void Lander::draw_status(Screen& s) {
     thrust_text.w = thrust_text_width;
     thrust_text.h = 16;
 
+    // the box there velocity goes
+    int vel_text_width = 24;
+    SDL_Rect vel_bar;
+    vel_bar.x = Screen::WIDTH / 2 -
+            (vel_text_width + bar_width) / 2 +
+            vel_text_width;
+    vel_bar.y = 13;
+    vel_bar.w = bar_width;
+    vel_bar.h = 10;
+
+    // the box where the text "vel" goes
+    SDL_Rect vel_text;
+    vel_text.x = Screen::WIDTH / 2 - (vel_text_width + bar_width) / 2;
+    vel_text.y = 10;
+    vel_text.w = vel_text_width;
+    vel_text.h = 16;
+
     // the box where the fuel level bar goes
     int fuel_text_width = 30;
     SDL_Rect fuel_bar;
@@ -194,9 +214,9 @@ void Lander::draw_status(Screen& s) {
     fuel_text.w = fuel_text_width;
     fuel_text.h = 16;
 
-    // write "thrust"
+    // write words
     SDL_RenderCopy(s.renderer, thrust_txtr, NULL, &thrust_text);
-    // write "fuel"
+    SDL_RenderCopy(s.renderer, vel_txtr, NULL, &vel_text);
     SDL_RenderCopy(s.renderer, fuel_txtr, NULL, &fuel_text);
 
     // save old color
@@ -204,15 +224,33 @@ void Lander::draw_status(Screen& s) {
     SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
     SDL_SetRenderDrawColor(s.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-    // outline init_thrust, fill current thrust level
+    // thrust bar
     SDL_RenderDrawRect(s.renderer, &thrust_bar);
     thrust_bar.w = (int) (thrust * ((float) bar_width) / max_thrust);
     SDL_RenderFillRect(s.renderer, &thrust_bar);
 
-    // outline init_fuel, fill current fuel level
+    // fuel bar
     SDL_RenderDrawRect(s.renderer, &fuel_bar);
     fuel_bar.w = (int) (fuel * ((float) bar_width) / init_fuel);
     SDL_RenderFillRect(s.renderer, &fuel_bar);
+
+    // velocity bar
+    SDL_RenderDrawRect(s.renderer, &vel_bar);
+    vel_bar.w = (int) (vel * ((float) bar_width) / max_vel);
+    if (vel_bar.w > bar_width) {
+        vel_bar.w = bar_width; // don't go past end of bar
+    }
+
+    // if we're in the safe zone, make bar green
+    if (vel <= safe_vel) {
+        SDL_SetRenderDrawColor(s.renderer, 0x55, 0xFF, 0x55, 0xFF);
+    }
+    SDL_RenderFillRect(s.renderer, &vel_bar);
+
+    // outline safe zone in green
+    SDL_SetRenderDrawColor(s.renderer, 0x55, 0xFF, 0x55, 0xFF);
+    vel_bar.w = (int) (safe_vel * ((float) bar_width) / max_vel);
+    SDL_RenderDrawRect(s.renderer, &vel_bar);
 
     // reset old color
     SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
@@ -255,6 +293,10 @@ void Lander::draw(Screen& s) {
     );
 }
 
+bool Lander::safe_speed() {
+    return vel < safe_vel;
+}
+
 Lander::~Lander() {
     SDL_DestroyTexture(txtr);
     SDL_DestroyTexture(txtr_fire_low);
@@ -262,4 +304,5 @@ Lander::~Lander() {
     SDL_DestroyTexture(txtr_fire_high);
     SDL_DestroyTexture(fuel_txtr);
     SDL_DestroyTexture(thrust_txtr);
+    SDL_DestroyTexture(vel_txtr);
 }

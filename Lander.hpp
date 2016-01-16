@@ -24,12 +24,16 @@ class Lander {
         bool thrusting = false;
         float torque;
         float dt;
+        float vel; // magnitude
+        const float safe_vel = 10.;
+        const float max_vel = 100.; // only cosmetic
         SDL_Texture* txtr;
         SDL_Texture* txtr_fire_low;
         SDL_Texture* txtr_fire_med;
         SDL_Texture* txtr_fire_high;
         SDL_Texture* fuel_txtr;
         SDL_Texture* thrust_txtr;
+        SDL_Texture* vel_txtr;
 
         void craft_to_sdl_coords();
         void draw_status(Screen& s);
@@ -77,6 +81,7 @@ class Lander {
         void draw(Screen& s);
         void handle(SDL_Event* e);
         void move();
+        bool safe_speed();
 };
 
 #endif

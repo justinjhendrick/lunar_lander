@@ -32,7 +32,11 @@ int main() {
         l.move();
 
         if (pad.is_colliding(l)) {
-            printf("You win\n");
+            if (l.safe_speed()) {
+                printf("You win\n");
+            } else {
+                printf("You lose\n");
+            }
             return 0;
         } else if (top.is_colliding(l) || left.is_colliding(l) ||
                    right.is_colliding(l) || bot.is_colliding(l)) {
