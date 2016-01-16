@@ -9,6 +9,7 @@ class Vector {
         static float cross_mag(const Vector& a, const Vector& b);
         static Vector minus(const Vector& a, const Vector& b);
         static Vector plus(const Vector& a, const Vector& b);
+        static float dot(const Vector& a, const Vector& b);
 
         // Does p + r intersect q + s?
         // http://stackoverflow.com/questions/563198/

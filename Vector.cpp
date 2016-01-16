@@ -21,6 +21,10 @@ Vector Vector::plus(const Vector & a, const Vector& b) {
     return result;
 }
 
+float Vector::dot(const Vector& a, const Vector& b) {
+    return a.x * b.x + a.y * b.y;
+}
+
 bool Vector::segments_intersect(const Vector& p,
                                 const Vector& r,
                                 const Vector& q,
@@ -31,7 +35,22 @@ bool Vector::segments_intersect(const Vector& p,
     float qpr = cross_mag(qp, r);
     if (fabs(rs) < eps && fabs(qpr) < eps) {
         // collinear
-        return true;
+        float rr = dot(r, r);
+        float t0 = dot(qp, r) / rr;
+        float t1 = dot(minus(plus(q, s), p), r) / rr;
+        if (t0 > t1) {
+            // make [t0, t1] well formed
+            float tmp = t0;
+            t0 = t1;
+            t1 = tmp;
+        }
+        // does [t0, t1] intersect [0, 1]?
+        if (t0 <= 1. && t1 >= 0.) {
+            // collinear and overlapping
+            return true;
+        }
+        // collinear but disjoint
+        return false;
     } else if (fabs(rs) < eps) {
         // parallel
         return false;

@@ -7,11 +7,11 @@
 
 Lander::Lander(Screen& s) :
     Lander(s,
-           Screen::WIDTH / 2,  // x_pos
+           Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
            Screen::HEIGHT / 2, // y_pos
            0.,     // x_vel
            0.,     // y_vel
-           0.,     // orientation
+           3 *  M_PI_2,     // orientation
            0.,     // spin_rate
            .08,    // max_torque
            2150.,  // dry_mass
@@ -82,7 +82,7 @@ void Lander::handle(SDL_Event* e) {
                 torque = max_torque;
                 break;
             case SDLK_SPACE:
-                if (fuel > 0. && thrust > 0.) {
+                if (fuel > 0.) {
                     thrusting = true;
                 }
                 break;
@@ -130,7 +130,7 @@ void Lander::move() {
 
     float x_accel = 0.;
     float y_accel = 0.;
-    if (thrusting) {
+    if (thrusting && thrust > 0.) {
         // compute acceleration
         x_accel = thrust * cos(orientation) / (dry_mass + fuel);
         y_accel += thrust * sin(orientation) / (dry_mass + fuel);
@@ -162,7 +162,7 @@ void Lander::draw(Screen& s) {
     dest.h = HEIGHT;
 
     SDL_Texture* t = txtr;
-    if (thrusting) {
+    if (thrusting && thrust > 0.) {
         if (thrust < max_thrust / 3) {
             t = txtr_fire_low;
         } else if (thrust < 2 * max_thrust / 3) {
