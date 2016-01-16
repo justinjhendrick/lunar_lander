@@ -28,8 +28,11 @@ class Lander {
         SDL_Texture* txtr_fire_low;
         SDL_Texture* txtr_fire_med;
         SDL_Texture* txtr_fire_high;
+        SDL_Texture* fuel_txtr;
+        SDL_Texture* thrust_txtr;
 
         void craft_to_sdl_coords();
+        void draw_status(Screen& s);
     public:
         static const int WIDTH = 21;
         static const int HEIGHT = 40;

@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <cmath>
 #include "Lander.hpp"
 #include "Screen.hpp"
@@ -8,16 +9,16 @@
 Lander::Lander(Screen& s) :
     Lander(s,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
-           Screen::HEIGHT / 2, // y_pos
+           Screen::HEIGHT / 4, // y_pos
            0.,     // x_vel
            0.,     // y_vel
-           3 *  M_PI_2,     // orientation
+           3 * M_PI_2,     // orientation
            0.,     // spin_rate
            .08,    // max_torque
            2150.,  // dry_mass
-           2353.,  // init_fuel
+           400.,   //2353.,  // init_fuel
            0.,     // thrust
-           16000., // max_thrust
+           30000., //16000., // max_thrust
            3050.   // exhaust velocity
     ) {
     // values above from the Apollo lunar module
@@ -58,6 +59,8 @@ Lander::Lander(Screen& s,
     txtr_fire_low = Utils::load_texture(s.renderer, "sprites/lander_fire_low.bmp");
     txtr_fire_med = Utils::load_texture(s.renderer, "sprites/lander_fire_med.bmp");
     txtr_fire_high = Utils::load_texture(s.renderer, "sprites/lander_fire_high.bmp");
+    fuel_txtr = Utils::create_text_texture(s, "FUEL ");
+    thrust_txtr = Utils::create_text_texture(s, "THRUST ");
 }
 
 void Lander::handle(SDL_Event* e) {
@@ -154,13 +157,78 @@ void Lander::move() {
     craft_to_sdl_coords();
 }
 
+void Lander::draw_status(Screen& s) {
+    int bar_width = 100;
+
+    // the box where the thrust level bar goes
+    int thrust_text_width = 42;
+    SDL_Rect thrust_bar;
+    thrust_bar.x = Screen::WIDTH / 4 -
+            (thrust_text_width + bar_width) / 2 +
+            thrust_text_width;
+    thrust_bar.y = 13;
+    thrust_bar.w = bar_width;
+    thrust_bar.h = 10;
+
+    // the box where the text "thrust" goes
+    SDL_Rect thrust_text;
+    thrust_text.x = Screen::WIDTH / 4 - (thrust_text_width + bar_width) / 2;
+    thrust_text.y = 10;
+    thrust_text.w = thrust_text_width;
+    thrust_text.h = 16;
+
+    // the box where the fuel level bar goes
+    int fuel_text_width = 30;
+    SDL_Rect fuel_bar;
+    fuel_bar.x = 3 * Screen::WIDTH / 4 -
+            (fuel_text_width + bar_width) / 2 +
+            fuel_text_width;
+    fuel_bar.y = 13;
+    fuel_bar.w = bar_width;
+    fuel_bar.h = 10;
+
+    // the box where the text "fuel" goes
+    SDL_Rect fuel_text;
+    fuel_text.x = 3 * Screen::WIDTH / 4 - (fuel_text_width + bar_width) / 2;
+    fuel_text.y = 10;
+    fuel_text.w = fuel_text_width;
+    fuel_text.h = 16;
+
+    // write "thrust"
+    SDL_RenderCopy(s.renderer, thrust_txtr, NULL, &thrust_text);
+    // write "fuel"
+    SDL_RenderCopy(s.renderer, fuel_txtr, NULL, &fuel_text);
+
+    // save old color
+    Uint8 old_r, old_g, old_b, old_a;
+    SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
+    SDL_SetRenderDrawColor(s.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+    // outline init_thrust, fill current thrust level
+    SDL_RenderDrawRect(s.renderer, &thrust_bar);
+    thrust_bar.w = (int) (thrust * ((float) bar_width) / max_thrust);
+    SDL_RenderFillRect(s.renderer, &thrust_bar);
+
+    // outline init_fuel, fill current fuel level
+    SDL_RenderDrawRect(s.renderer, &fuel_bar);
+    fuel_bar.w = (int) (fuel * ((float) bar_width) / init_fuel);
+    SDL_RenderFillRect(s.renderer, &fuel_bar);
+
+    // reset old color
+    SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
+}
+
 void Lander::draw(Screen& s) {
+    draw_status(s);
+
+    // draw lander itself
     SDL_Rect dest;
     dest.x = (int) x_pos;
     dest.y = (int) y_pos;
     dest.w = WIDTH;
     dest.h = HEIGHT;
 
+    // choose texture based on thrust level
     SDL_Texture* t = txtr;
     if (thrusting && thrust > 0.) {
         if (thrust < max_thrust / 3) {
@@ -172,9 +240,11 @@ void Lander::draw(Screen& s) {
         }
     }
 
+    // rotate about middle of thruster (at bottom of craft)
     SDL_Point rot_abt;
     rot_abt.x = WIDTH / 2;
     rot_abt.y = COLLISION_HEIGHT;
+    // draw to dest, rotated by orientation
     SDL_RenderCopyEx(s.renderer,
                      t,
                      NULL,
@@ -183,26 +253,6 @@ void Lander::draw(Screen& s) {
                      &rot_abt,
                      SDL_FLIP_NONE
     );
-
-    // rectangle for debugging
-    Uint8 old_r, old_g, old_b, old_a;
-    SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
-    SDL_SetRenderDrawColor(s.renderer, 0xff, 0x00, 0x00, 0xFF);
-    SDL_Rect r;
-    r.x = (int) p1x;
-    r.y = (int) p1y;
-    r.w = 2;
-    r.h = 2;
-    SDL_RenderDrawRect(s.renderer, &r);
-
-    r.x = (int) p2x;
-    r.y = (int) p2y;
-    SDL_RenderDrawRect(s.renderer, &r);
-
-    r.x = (int) p3x;
-    r.y = (int) p3y;
-    SDL_RenderDrawRect(s.renderer, &r);
-    SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
 }
 
 Lander::~Lander() {
@@ -210,4 +260,6 @@ Lander::~Lander() {
     SDL_DestroyTexture(txtr_fire_low);
     SDL_DestroyTexture(txtr_fire_med);
     SDL_DestroyTexture(txtr_fire_high);
+    SDL_DestroyTexture(fuel_txtr);
+    SDL_DestroyTexture(thrust_txtr);
 }
