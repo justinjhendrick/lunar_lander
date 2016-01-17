@@ -7,7 +7,7 @@
 class Lander {
     private:
         // initialized by constructor
-        float x_pos; // meters
+        float x_pos; // pixels
         float y_pos;
         float x_vel; // meters/second
         float y_vel;
@@ -24,9 +24,10 @@ class Lander {
         bool thrusting = false;
         float torque;
         float dt;
-        float vel; // magnitude
-        const float safe_vel = 15.;
-        const float max_vel = 100.; // only cosmetic
+        float vel; // magnitude. pixels/s
+        const float safe_vel = 15.; // pixels/s
+        const float max_vel = 100.; // pixels/s. only cosmetic
+        const int pixels_per_meter = 10;
         SDL_Texture* txtr;
         SDL_Texture* txtr_fire_low;
         SDL_Texture* txtr_fire_med;
@@ -82,7 +83,7 @@ class Lander {
         void draw(Screen& s);
         void handle(SDL_Event* e);
         void move();
-        bool safe_speed();
+        bool safe_landing();
 };
 
 #endif

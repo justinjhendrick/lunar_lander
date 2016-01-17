@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "Utils.hpp"
 
 SDL_Texture* Utils::load_texture(SDL_Renderer* r, const char filename[]) {
@@ -32,4 +33,8 @@ SDL_Texture* Utils::create_text_texture(Screen& s,
     }
     SDL_FreeSurface(surf);
     return result;
+}
+
+float Utils::rand_float(float lower_bd, float upper_bd) {
+    return ((float)rand() / (float)(RAND_MAX)) * (upper_bd - lower_bd) + lower_bd;
 }

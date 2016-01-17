@@ -10,6 +10,7 @@ namespace Utils {
     SDL_Texture* create_text_texture(Screen& s,
                                      const char text[],
                                      SDL_Color* color);
+    float rand_float(float lower_bd, float upper_bd);
 }
 
 #endif

@@ -32,7 +32,7 @@ int main() {
         l.move();
 
         if (pad.is_colliding(l)) {
-            if (l.safe_speed()) {
+            if (l.safe_landing()) {
                 printf("You win\n");
             } else {
                 printf("You lose\n");

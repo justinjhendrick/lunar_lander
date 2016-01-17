@@ -10,13 +10,13 @@ Lander::Lander(Screen& s) :
     Lander(s,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
            Screen::HEIGHT / 4, // y_pos
-           0.,     // x_vel
+           Utils::rand_float(-5., 5.),     // x_vel
            0.,     // y_vel
            3 * M_PI_2,     // orientation
            0.,     // spin_rate
            .08,    // max_torque
            2150.,  // dry_mass
-           400.,   //2353.,  // init_fuel
+           100.,   //2353.,  // init_fuel
            0.,     // thrust
            30000., //16000., // max_thrust
            3050.   // exhaust velocity
@@ -139,7 +139,7 @@ void Lander::move() {
     if (thrusting && thrust > 0.) {
         // compute acceleration
         x_accel = thrust * cos(orientation) / (dry_mass + fuel);
-        y_accel += thrust * sin(orientation) / (dry_mass + fuel);
+        y_accel = thrust * sin(orientation) / (dry_mass + fuel);
 
         float new_x_vel = x_vel + x_accel * dt;
         float new_y_vel = y_vel + y_accel * dt;
@@ -149,14 +149,14 @@ void Lander::move() {
                      pow(new_y_vel - y_vel, 2) / dt) - thrust) / exhaust_vel;
         fuel += dmdt * dt;
     }
-    x_vel += x_accel;
-    y_vel += y_accel + 1.62; // gravity
+    x_vel += x_accel * dt;
+    y_vel += (y_accel + 1.62) * dt; // gravity
 
-    vel = sqrt(x_vel * x_vel + y_vel * y_vel);
+    vel = sqrt(x_vel * x_vel + y_vel * y_vel) * pixels_per_meter;
 
     // calculate new position
-    x_pos += x_vel * dt + .5 * x_accel * dt * dt;
-    y_pos += y_vel * dt + .5 * y_accel * dt * dt;
+    x_pos += (x_vel * dt + .5 * x_accel * dt * dt) * pixels_per_meter;
+    y_pos += (y_vel * dt + .5 * y_accel * dt * dt) * pixels_per_meter;
 
     // recalculate collision points
     craft_to_sdl_coords();
@@ -252,7 +252,7 @@ void Lander::draw_status(Screen& s) {
     }
     SDL_RenderFillRect(s.renderer, &vel_bar);
 
-    // fill or outline safe zone in green
+    // outline safe zone in green
     SDL_SetRenderDrawColor(s.renderer, 0x33, 0xFF, 0x33, 0xFF);
     vel_bar.w = (int) (safe_vel * ((float) bar_width) / max_vel);
     SDL_RenderDrawRect(s.renderer, &vel_bar);
@@ -302,9 +302,10 @@ void Lander::draw(Screen& s) {
     );
 }
 
-bool Lander::safe_speed() {
-    printf("%f <= %f\n", vel, safe_vel);
-    return vel <= safe_vel;
+bool Lander::safe_landing() {
+    printf("velocity:    %f <= %f pixels per second\norientation: %f < %f radians\n",
+           vel, safe_vel, fabs(orientation - 3 * M_PI_2), M_PI / 8);
+    return vel <= safe_vel && fabs(orientation - 3 * M_PI_2) < M_PI / 8;
 }
 
 Lander::~Lander() {
