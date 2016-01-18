@@ -5,6 +5,7 @@
 #include "Screen.hpp"
 #include "constants.hpp"
 #include "Utils.hpp"
+#include "World.hpp"
 
 Lander::Lander(Screen& s) :
     Lander(s,
@@ -334,6 +335,19 @@ bool Lander::is_colliding(const Ground& ground) {
     return false;
 }
 
+World::CollisionResult Lander::check_collision(World& w) {
+    for (int i = 0; i < w.grounds.size(); i++) {
+        Ground& g = w.grounds[i];
+        if (is_colliding(g)) {
+            if (g.is_pad && safe_landing()) {
+                return World::WIN;
+            } else {
+                return World::LOSE;
+            }
+        }
+    }
+    return World::NO_COLLISION;
+}
 
 Lander::~Lander() {
     SDL_DestroyTexture(txtr);

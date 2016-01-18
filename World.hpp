@@ -5,7 +5,6 @@
 #include <SDL2/SDL.h>
 #include "Screen.hpp"
 #include "Ground.hpp"
-#include "Lander.hpp"
 
 class World {
     public:
@@ -16,15 +15,11 @@ class World {
         };
         // list of all collidable surfaces. Starting with pad(s)
         std::vector<Ground> grounds;
-        Lander* l;
 
-        World(Screen& s, bool human_player);
-        ~World();
+        World();
         
         CollisionResult check_collision();
         void draw(Screen& s);
-        void move();
-        void handle(SDL_Event* e);
 };
 
 #endif

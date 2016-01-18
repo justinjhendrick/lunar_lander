@@ -4,7 +4,9 @@
 #include <stdint.h>
 #include "Screen.hpp"
 #include "Ground.hpp"
-//#include "Pilot.hpp"
+#include "World.hpp"
+
+class Pilot;
 
 class Lander {
     protected:
@@ -77,6 +79,8 @@ class Lander {
         float p3x;
         float p3y;
 
+        bool safe_landing();
+        bool is_colliding(const Ground& ground);
     public:
         Lander(Screen& s);
         Lander(Screen& s,
@@ -98,10 +102,8 @@ class Lander {
         void draw(Screen& s);
         void handle(SDL_Event* e);
         void move();
-        bool safe_landing();
-        bool is_colliding(const Ground& ground);
-        void fly_self(Ground& pad);
-        //friend void Pilot::fly(World& world);
+        World::CollisionResult check_collision(World& w);
+        friend Pilot;
 };
 
 #endif

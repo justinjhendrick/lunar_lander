@@ -10,9 +10,10 @@
 #include "World.hpp"
 #include "Pilot.hpp"
 
-unsigned long play(bool human_player) {
+unsigned long play(Pilot* pilot) {
     Screen s;
-    World world(s, human_player);
+    World world;
+    Lander lander(s);
 
     bool quit = false;
     SDL_Event e;
@@ -26,11 +27,17 @@ unsigned long play(bool human_player) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
-            world.handle(&e);
+            if (pilot == NULL) {
+                lander.handle(&e);
+            }
         }
-        world.move();
+        if (pilot != NULL) {
+            pilot->fly(lander, world);
+        }
 
-        World::CollisionResult r = world.check_collision();
+        lander.move();
+
+        World::CollisionResult r = lander.check_collision(world);
         if (r == World::CollisionResult::WIN) {
             printf("You win\n");
             return frame;
@@ -40,6 +47,7 @@ unsigned long play(bool human_player) {
         }
 
         s.clear();
+        lander.draw(s);
         world.draw(s);
         s.flip();
 
@@ -59,11 +67,12 @@ unsigned long play(bool human_player) {
 }
 
 int main(int argc, char** argv) {
-    bool human_player = false;
+    Pilot* p = NULL;
     if (argc == 2 && strcmp(argv[1], "-c") == 0) {
-        human_player = true;
+        p = new Pilot;
     }
-    unsigned long frames = play(human_player);
+    unsigned long frames = play(p);
     //printf("elapsed %lu.%lu\n", frames * FRAME_TIME / 1000, frames * 100);
+    delete p;
 }
 

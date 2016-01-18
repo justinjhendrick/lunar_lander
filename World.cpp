@@ -1,12 +1,6 @@
 #include "World.hpp"
 
-World::World(Screen& s, human_player) {
-    if (human_player) {
-        l = new Lander(s);
-    } else {
-        l = new Pilot(s);
-    }
-
+World::World () {
     Ground pad(true, Screen::WIDTH / 2 - 20, Screen::HEIGHT - 10,
                      Screen::WIDTH / 2 + 20, Screen::HEIGHT - 10);
     Ground top(false, 0, 0, Screen::WIDTH, 0);
@@ -20,35 +14,8 @@ World::World(Screen& s, human_player) {
     grounds.push_back(bot);
 }
 
-World::CollisionResult World::check_collision() {
-    for (int i = 0; i < grounds.size(); i++) {
-        Ground& g = grounds[i];
-        if (l.is_colliding(g)) {
-            if (g.is_pad && l.safe_landing()) {
-                return WIN;
-            } else {
-                return LOSE;
-            }
-        }
-    }
-    return NO_COLLISION;
-}
-
 void World::draw(Screen& s) {
-    l.draw(s);
     for (int i = 0; i < grounds.size(); i++) {
         grounds[i].draw(s);
     }
-}
-
-void World::move() {
-    l.move();
-}
-
-void World::handle(SDL_Event* e) {
-    l.handle(e);
-}
-
-World::~World() {
-    delete l;
 }
