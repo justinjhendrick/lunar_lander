@@ -13,8 +13,8 @@ class Lander {
         float x_vel; // meters/second
         float y_vel;
         float orientation; // radians cw from x axis
-        float spin_rate; // radians/frame. positive is cw, negative is ccw
-        float max_torque; // radians/frame^2 (const)
+        float spin_rate; // radians/second. positive is cw, negative is ccw
+        float max_torque; // radians/second^2 (const)
         float fuel; // kg
         float dry_mass; // kg (const)
         float init_fuel; // kg (const)
@@ -23,7 +23,7 @@ class Lander {
         float exhaust_vel; // m/s
 
         bool thrusting = false;
-        float torque;
+        float torque; // radians / second^2
         float dt;
         float vel; // magnitude. pixels/s
         float g = 1.62; // gravitational acceleration

@@ -14,7 +14,7 @@ Lander::Lander(Screen& s) :
            0.,     // y_vel
            3 * M_PI_2,     // orientation
            0.,     // spin_rate
-           .08,    // max_torque
+           5.,    // max_torque
            2150.,  // dry_mass
            100.,   //2353.,  // init_fuel
            0.,     // thrust
@@ -126,8 +126,8 @@ void Lander::craft_to_sdl_coords() {
 }
 
 void Lander::move() {
-    spin_rate += torque;
-    orientation += spin_rate;
+    spin_rate += torque * dt;
+    orientation += spin_rate * dt;
     if (orientation > 2 * M_PI) {
         orientation -= 2 * M_PI;
     } else if (orientation < 0) {
