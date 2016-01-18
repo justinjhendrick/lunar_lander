@@ -15,7 +15,7 @@ World::World () {
 }
 
 void World::draw(Screen& s) {
-    for (int i = 0; i < grounds.size(); i++) {
+    for (unsigned int i = 0; i < grounds.size(); i++) {
         grounds[i].draw(s);
     }
 }

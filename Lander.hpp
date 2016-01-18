@@ -29,7 +29,6 @@ class Lander {
         float torque;                // radians / second^2
         float dt;                    // seconds
         float vel;                   // magnitude in pixels/s
-        const float g = 1.62;        // gravitational acceleration
         const float safe_vel = 15.;  // pixels/s
         const float max_vel = 100.;  // pixels/s. only cosmetic
         const int pixels_per_meter = 10;

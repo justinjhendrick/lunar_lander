@@ -155,7 +155,7 @@ void Lander::move() {
         fuel += dmdt * dt;
     }
     x_vel += x_accel * dt;
-    y_vel += (y_accel + g) * dt; // gravity
+    y_vel += (y_accel + World::g) * dt; // gravity
 
     vel = sqrt(x_vel * x_vel + y_vel * y_vel) * pixels_per_meter;
 
@@ -336,10 +336,10 @@ bool Lander::is_colliding(const Ground& ground) {
 }
 
 World::CollisionResult Lander::check_collision(World& w) {
-    for (int i = 0; i < w.grounds.size(); i++) {
-        Ground& g = w.grounds[i];
-        if (is_colliding(g)) {
-            if (g.is_pad && safe_landing()) {
+    for (unsigned int i = 0; i < w.grounds.size(); i++) {
+        Ground& gd = w.grounds[i];
+        if (is_colliding(gd)) {
+            if (gd.is_pad && safe_landing()) {
                 return World::WIN;
             } else {
                 return World::LOSE;

@@ -15,6 +15,7 @@ class World {
         };
         // list of all collidable surfaces. Starting with pad(s)
         std::vector<Ground> grounds;
+        constexpr static const float g = 1.62; // gravitational acceleration
 
         World();
         

@@ -58,7 +58,7 @@ unsigned long play(Pilot* pilot) {
         timersub(&now, &start, &diff);
         unsigned int sleep_time = FRAME_TIME - ((unsigned int) diff.tv_usec / 1000);
         if (FRAME_TIME > diff.tv_usec / 1000) {
-            SDL_Delay(FRAME_TIME - diff.tv_usec / 1000);
+            SDL_Delay(sleep_time);
         }
         frame++;
     }

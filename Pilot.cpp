@@ -13,7 +13,7 @@ void Pilot::fly(Lander& l, World& world) {
     float dist_to_pad = (pad.begin.y - (l.y_pos + l.COLLISION_HEIGHT)) /
                         l.pixels_per_meter;
 
-    float net_accel = l.g - l.thrust / (l.dry_mass + l.fuel);
+    float net_accel = World::g - l.thrust / (l.dry_mass + l.fuel);
     float thrust_time = fabs(l.y_vel / net_accel);
     float thrust_distance = l.y_vel * thrust_time +
         .5 * net_accel * thrust_time * thrust_time;
