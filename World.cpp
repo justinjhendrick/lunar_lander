@@ -2,10 +2,9 @@
 
 World::World(Screen& s, human_player) {
     if (human_player) {
-        // cpp, you suck at constructors. this is what I want
-        // l = Lander(s)
+        l = new Lander(s);
     } else {
-        // l = Pilot(s)
+        l = new Pilot(s);
     }
 
     Ground pad(true, Screen::WIDTH / 2 - 20, Screen::HEIGHT - 10,
@@ -48,4 +47,8 @@ void World::move() {
 
 void World::handle(SDL_Event* e) {
     l.handle(e);
+}
+
+World::~World() {
+    delete l;
 }

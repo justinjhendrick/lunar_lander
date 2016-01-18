@@ -26,12 +26,7 @@ unsigned long play(bool human_player) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
-            if (pilot == NULL) {
-                world.handle(&e);
-            }
-        }
-        if (pilot != NULL) {
-            pilot->fly(world);
+            world.handle(&e);
         }
         world.move();
 

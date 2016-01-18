@@ -17,10 +17,9 @@ class World {
         // list of all collidable surfaces. Starting with pad(s)
         std::vector<Ground> grounds;
         Lander* l;
-        Lander player;
-        Pilot computer;
 
         World(Screen& s, bool human_player);
+        ~World();
         
         CollisionResult check_collision();
         void draw(Screen& s);
