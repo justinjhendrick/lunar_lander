@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "Screen.hpp"
+#include "Ground.hpp"
 
 class Lander {
     private:
@@ -25,6 +26,7 @@ class Lander {
         float torque;
         float dt;
         float vel; // magnitude. pixels/s
+        float g = 1.62; // gravitational acceleration
         const float safe_vel = 15.; // pixels/s
         const float max_vel = 100.; // pixels/s. only cosmetic
         const int pixels_per_meter = 10;
@@ -84,6 +86,8 @@ class Lander {
         void handle(SDL_Event* e);
         void move();
         bool safe_landing();
+        bool is_colliding(const Ground& ground);
+        void fly_self(Ground& pad);
 };
 
 #endif

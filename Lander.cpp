@@ -10,7 +10,7 @@ Lander::Lander(Screen& s) :
     Lander(s,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
            Screen::HEIGHT / 4, // y_pos
-           Utils::rand_float(-5., 5.),     // x_vel
+           0.,//Utils::rand_float(-5., 5.),     // x_vel
            0.,     // y_vel
            3 * M_PI_2,     // orientation
            0.,     // spin_rate
@@ -150,7 +150,7 @@ void Lander::move() {
         fuel += dmdt * dt;
     }
     x_vel += x_accel * dt;
-    y_vel += (y_accel + 1.62) * dt; // gravity
+    y_vel += (y_accel + g) * dt; // gravity
 
     vel = sqrt(x_vel * x_vel + y_vel * y_vel) * pixels_per_meter;
 
@@ -160,6 +160,27 @@ void Lander::move() {
 
     // recalculate collision points
     craft_to_sdl_coords();
+}
+
+void Lander::fly_self(Ground& pad) {
+    thrust = max_thrust / 10;
+
+    float dist_to_pad = (pad.begin.y - (y_pos + COLLISION_HEIGHT)) /
+                        pixels_per_meter;
+
+    float net_accel = g - thrust / (dry_mass + fuel);
+    float thrust_time = fabs(y_vel / net_accel);
+    float thrust_distance = y_vel * thrust_time +
+        .5 * net_accel * thrust_time * thrust_time;
+    //printf("dt = %f, a = %f, %f <= %f\n", thrust_time, net_accel, dist_to_pad, thrust_distance);
+
+    if (!thrusting && dist_to_pad <= thrust_distance) {
+        thrusting = true;
+    }
+
+    if (thrusting && y_vel * pixels_per_meter < safe_vel * .5) {
+        thrusting = false;
+    }
 }
 
 void Lander::draw_status(Screen& s) {
@@ -307,6 +328,34 @@ bool Lander::safe_landing() {
            vel, safe_vel, fabs(orientation - 3 * M_PI_2), M_PI / 8);
     return vel <= safe_vel && fabs(orientation - 3 * M_PI_2) < M_PI / 8;
 }
+
+bool Lander::is_colliding(const Ground& ground) {
+    Vector p1(p1x, p1y);
+    Vector p2(p2x, p2y);
+    Vector p3(p3x, p3y);
+
+    Vector p1_to_p2 = Vector::minus(p2, p1);
+    Vector p2_to_p3 = Vector::minus(p3, p2);
+    Vector p3_to_p1 = Vector::minus(p1, p3);
+
+    bool left_collide = Vector::segments_intersect(p1,
+                                                   p1_to_p2,
+                                                   ground.begin,
+                                                   ground.segment);
+    bool right_collide = Vector::segments_intersect(p2,
+                                                    p2_to_p3,
+                                                    ground.begin,
+                                                    ground.segment);
+    bool bot_collide = Vector::segments_intersect(p3,
+                                                  p3_to_p1,
+                                                  ground.begin,
+                                                  ground.segment);
+    if (left_collide || right_collide || bot_collide) {
+        return true;
+    }
+    return false;
+}
+
 
 Lander::~Lander() {
     SDL_DestroyTexture(txtr);
