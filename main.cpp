@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
         human_player = false;
     }
     unsigned long frames = play(human_player);
-    printf("elapsed %lu.%lu\n", frames * FRAME_TIME / 1000, frames * 100);
+    //printf("elapsed %lu.%lu\n", frames * FRAME_TIME / 1000, frames * 100);
 }
 
 int play(bool human_player) {

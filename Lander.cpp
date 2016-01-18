@@ -163,7 +163,7 @@ void Lander::move() {
 }
 
 void Lander::fly_self(Ground& pad) {
-    thrust = max_thrust / 10;
+    thrust = max_thrust;
 
     float dist_to_pad = (pad.begin.y - (y_pos + COLLISION_HEIGHT)) /
                         pixels_per_meter;
