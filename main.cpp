@@ -7,27 +7,12 @@
 #include "Lander.hpp"
 #include "constants.hpp"
 #include "Ground.hpp"
+#include "World.hpp"
+#include "Pilot.hpp"
 
-int play(bool);
-
-int main(int argc, char** argv) {
-    bool human_player = true;
-    if (argc == 2 && strcmp(argv[1], "-c") == 0) {
-        human_player = false;
-    }
-    unsigned long frames = play(human_player);
-    //printf("elapsed %lu.%lu\n", frames * FRAME_TIME / 1000, frames * 100);
-}
-
-int play(bool human_player) {
+unsigned long play(bool human_player) {
     Screen s;
-    Lander l(s);
-    Ground pad(true, Screen::WIDTH / 2 - 20, Screen::HEIGHT - 10,
-                     Screen::WIDTH / 2 + 20, Screen::HEIGHT - 10);
-    Ground top(false, 0, 0, Screen::WIDTH, 0);
-    Ground left(false, 0, 0, 0, Screen::HEIGHT);
-    Ground right(false, Screen::WIDTH, 0, Screen::WIDTH, Screen::HEIGHT);
-    Ground bot(false, 0, Screen::HEIGHT, Screen::WIDTH, Screen::HEIGHT);
+    World world(s, human_player);
 
     bool quit = false;
     SDL_Event e;
@@ -41,33 +26,29 @@ int play(bool human_player) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
-            if (human_player) {
-                l.handle(&e);
+            if (pilot == NULL) {
+                world.handle(&e);
             }
         }
-        if (!human_player) {
-            l.fly_self(pad);
+        if (pilot != NULL) {
+            pilot->fly(world);
         }
-        l.move();
+        world.move();
 
-        if (l.is_colliding(pad)) {
-            if (l.safe_landing()) {
-                printf("You win\n");
-            } else {
-                printf("You lose\n");
-            }
+        World::CollisionResult r = world.check_collision();
+        if (r == World::CollisionResult::WIN) {
+            printf("You win\n");
             return frame;
-        } else if (l.is_colliding(top) || l.is_colliding(left) ||
-                   l.is_colliding(right) || l.is_colliding(bot)) {
+        } else if (r == World::CollisionResult::LOSE) {
             printf("You lose\n");
             return frame;
         }
 
         s.clear();
-        l.draw(s);
-        pad.draw(s);
+        world.draw(s);
         s.flip();
 
+        // sleep so that a frame takes FRAME_TIME
         struct timeval now = {0, 0};
         gettimeofday(&now, NULL);
         struct timeval diff = {0, 0};
@@ -81,3 +62,13 @@ int play(bool human_player) {
 
     return frame;
 }
+
+int main(int argc, char** argv) {
+    bool human_player = false;
+    if (argc == 2 && strcmp(argv[1], "-c") == 0) {
+        human_player = true;
+    }
+    unsigned long frames = play(human_player);
+    //printf("elapsed %lu.%lu\n", frames * FRAME_TIME / 1000, frames * 100);
+}
+

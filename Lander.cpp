@@ -55,6 +55,10 @@ Lander::Lander(Screen& s,
 
     torque = 0.;
     dt = FRAME_TIME / 1000.;
+    // rotate about middle of thruster (at bottom of craft)
+    rot_abt.x = WIDTH / 2;
+    rot_abt.y = COLLISION_HEIGHT;
+
     txtr = Utils::load_texture(s.renderer, "sprites/lander.bmp");
     txtr_fire_low = Utils::load_texture(s.renderer, "sprites/lander_fire_low.bmp");
     txtr_fire_med = Utils::load_texture(s.renderer, "sprites/lander_fire_med.bmp");
@@ -112,7 +116,7 @@ void Lander::handle(SDL_Event* e) {
     }
 }
 
-void Lander::craft_to_sdl_coords() {
+void Lander::update_corners() {
     float s = sin(3 * M_PI_2 + orientation);
     float c = cos(3 * M_PI_2 + orientation);
     p1x = c * sc_p1x - s * sc_p1y + WIDTH / 2 + x_pos;
@@ -159,28 +163,7 @@ void Lander::move() {
     y_pos += (y_vel * dt + .5 * y_accel * dt * dt) * pixels_per_meter;
 
     // recalculate collision points
-    craft_to_sdl_coords();
-}
-
-void Lander::fly_self(Ground& pad) {
-    thrust = max_thrust;
-
-    float dist_to_pad = (pad.begin.y - (y_pos + COLLISION_HEIGHT)) /
-                        pixels_per_meter;
-
-    float net_accel = g - thrust / (dry_mass + fuel);
-    float thrust_time = fabs(y_vel / net_accel);
-    float thrust_distance = y_vel * thrust_time +
-        .5 * net_accel * thrust_time * thrust_time;
-    //printf("dt = %f, a = %f, %f <= %f\n", thrust_time, net_accel, dist_to_pad, thrust_distance);
-
-    if (!thrusting && dist_to_pad <= thrust_distance) {
-        thrusting = true;
-    }
-
-    if (thrusting && y_vel * pixels_per_meter < safe_vel * .5) {
-        thrusting = false;
-    }
+    update_corners();
 }
 
 void Lander::draw_status(Screen& s) {
@@ -289,7 +272,6 @@ void Lander::draw_status(Screen& s) {
 void Lander::draw(Screen& s) {
     draw_status(s);
 
-    // draw lander itself
     SDL_Rect dest;
     dest.x = (int) x_pos;
     dest.y = (int) y_pos;
@@ -308,10 +290,6 @@ void Lander::draw(Screen& s) {
         }
     }
 
-    // rotate about middle of thruster (at bottom of craft)
-    SDL_Point rot_abt;
-    rot_abt.x = WIDTH / 2;
-    rot_abt.y = COLLISION_HEIGHT;
     // draw to dest, rotated by orientation
     SDL_RenderCopyEx(s.renderer,
                      t,

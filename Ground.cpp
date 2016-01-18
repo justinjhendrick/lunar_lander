@@ -12,7 +12,10 @@ void Ground::draw(Screen& s) {
 
     SDL_SetRenderDrawColor(s.renderer, 0x55, 0x55, 0xFF, 0xFF);
     Vector p2 = Vector::plus(begin, segment);
-    SDL_RenderDrawLine(s.renderer, begin.x, begin.y, p2.x, p2.y);
+    SDL_RenderDrawLine(s.renderer,
+                       (int) begin.x, (int) begin.y,
+                       (int) p2.x, (int) p2.y
+    );
 
     // reset to old color
     SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);

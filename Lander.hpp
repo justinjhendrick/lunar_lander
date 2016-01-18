@@ -4,60 +4,72 @@
 #include <stdint.h>
 #include "Screen.hpp"
 #include "Ground.hpp"
+//#include "Pilot.hpp"
 
 class Lander {
-    private:
+    protected:
         // initialized by constructor
-        float x_pos; // pixels
+        float x_pos;       // pixels
         float y_pos;
-        float x_vel; // meters/second
+        float x_vel;       // meters/second
         float y_vel;
         float orientation; // radians cw from x axis
-        float spin_rate; // radians/second. positive is cw, negative is ccw
-        float max_torque; // radians/second^2 (const)
-        float fuel; // kg
-        float dry_mass; // kg (const)
-        float init_fuel; // kg (const)
-        float thrust; // Newtons
-        float max_thrust; // Newtons (const)
+        float spin_rate;   // radians/second. positive is cw, negative is ccw
+        float max_torque;  // radians/second^2 (const)
+        float fuel;        // kg
+        float dry_mass;    // kg (const)
+        float init_fuel;   // kg (const)
+        float thrust;      // Newtons
+        float max_thrust;  // Newtons (const)
         float exhaust_vel; // m/s
 
         bool thrusting = false;
-        float torque; // radians / second^2
-        float dt;
-        float vel; // magnitude. pixels/s
-        float g = 1.62; // gravitational acceleration
-        const float safe_vel = 15.; // pixels/s
-        const float max_vel = 100.; // pixels/s. only cosmetic
+        float torque;                // radians / second^2
+        float dt;                    // seconds
+        float vel;                   // magnitude in pixels/s
+        const float g = 1.62;        // gravitational acceleration
+        const float safe_vel = 15.;  // pixels/s
+        const float max_vel = 100.;  // pixels/s. only cosmetic
         const int pixels_per_meter = 10;
+
+        // image textures
         SDL_Texture* txtr;
         SDL_Texture* txtr_fire_low;
         SDL_Texture* txtr_fire_med;
         SDL_Texture* txtr_fire_high;
+        // text textures
         SDL_Texture* fuel_txtr;
         SDL_Texture* thrust_txtr;
         SDL_Texture* vel_txtr;
         SDL_Texture* vel_txtr_green;
 
-        void craft_to_sdl_coords();
+        // the center of mass of the craft
+        SDL_Point rot_abt;
+
+        // update position of corners in world coordinates
+        void update_corners();
+
+        // draw thrust, velocity, and fuel bars
         void draw_status(Screen& s);
-    public:
         static const int WIDTH = 21;
         static const int HEIGHT = 40;
         static const int COLLISION_HEIGHT = 30;
 
-        // collision points of triangle
+        // collision points of triangle (corners)
         // in sc coords (rot_abt is center)
         // Looking at the SC right side up
-        // 1 is bottom left
-        // 2 is top
-        // 3 is bottom right
+        // 1 is bottom left      2
+        // 2 is top             / \
+        // 3 is bottom right   1 - 3
+        // all units here are pixels
+        // spacecraft coordinates
         const float sc_p1x = -WIDTH / 2.;
         const float sc_p1y = 0.;
         const float sc_p2x = 0.;
         const float sc_p2y = (float) COLLISION_HEIGHT;
         const float sc_p3x = WIDTH / 2.;
         const float sc_p3y = 0.;
+        // world coordinates
         float p1x;
         float p1y;
         float p2x;
@@ -65,6 +77,7 @@ class Lander {
         float p3x;
         float p3y;
 
+    public:
         Lander(Screen& s);
         Lander(Screen& s,
                float _x_pos,
@@ -88,6 +101,7 @@ class Lander {
         bool safe_landing();
         bool is_colliding(const Ground& ground);
         void fly_self(Ground& pad);
+        //friend void Pilot::fly(World& world);
 };
 
 #endif
