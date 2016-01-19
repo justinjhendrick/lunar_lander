@@ -17,7 +17,7 @@ class Lander {
         float y_vel;
         float orientation; // radians cw from x axis
         float spin_rate;   // radians/second. positive is cw, negative is ccw
-        float max_torque;  // radians/second^2 (const)
+        float max_torque;  // radians/second^2 (const). Torque is misnomer.
         float fuel;        // kg
         float dry_mass;    // kg (const)
         float init_fuel;   // kg (const)
@@ -26,7 +26,7 @@ class Lander {
         float exhaust_vel; // m/s
 
         bool thrusting = false;
-        float torque;                // radians / second^2
+        float torque;                // radians / second^2. Torque is misnomer.
         float dt;                    // seconds
         float vel;                   // magnitude in pixels/s
         const float safe_vel = 15.;  // pixels/s

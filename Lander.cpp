@@ -131,6 +131,7 @@ void Lander::update_corners() {
 }
 
 void Lander::move() {
+    // TODO: divide by moment of inertia, or rename torque
     spin_rate += torque * dt;
     orientation += spin_rate * dt;
     if (orientation > 2 * M_PI) {
