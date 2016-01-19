@@ -9,11 +9,32 @@
 #include "Ground.hpp"
 #include "World.hpp"
 #include "Pilot.hpp"
+#include "Utils.hpp"
+
+void end_game(Screen& s, World& world, Lander& lander, SDL_Texture* text, bool win) {
+    SDL_Rect where;
+    where.w = Screen::WIDTH / 4;
+    where.h = Screen::HEIGHT / 4;
+    where.x = Screen::WIDTH / 2 - where.w / 2;
+    where.y = Screen::HEIGHT / 2 - where.h / 2;
+    if (!win) {
+        lander.explode();
+    }
+
+    s.clear();
+    lander.draw(s);
+    world.draw(s);
+    SDL_RenderCopy(s.renderer, text, NULL, &where);
+    s.flip();
+    SDL_Delay(1000);
+}
 
 unsigned long play(Pilot* pilot) {
     Screen s;
     World world;
     Lander lander(s);
+    SDL_Texture* win_text = Utils::create_text_texture(s, "You win!", NULL);
+    SDL_Texture* lose_text = Utils::create_text_texture(s, "You lose", NULL);
 
     bool quit = false;
     SDL_Event e;
@@ -39,10 +60,10 @@ unsigned long play(Pilot* pilot) {
 
         World::CollisionResult r = lander.check_collision(world);
         if (r == World::CollisionResult::WIN) {
-            printf("You win\n");
+            end_game(s, world, lander, win_text, true);
             return frame;
         } else if (r == World::CollisionResult::LOSE) {
-            printf("You lose\n");
+            end_game(s, world, lander, lose_text, false);
             return frame;
         }
 

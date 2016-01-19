@@ -38,6 +38,7 @@ class Lander {
         SDL_Texture* txtr_fire_low;
         SDL_Texture* txtr_fire_med;
         SDL_Texture* txtr_fire_high;
+        SDL_Texture* txtr_explosion;
         // text textures
         SDL_Texture* fuel_txtr;
         SDL_Texture* thrust_txtr;
@@ -78,7 +79,9 @@ class Lander {
         float p3x;
         float p3y;
 
-        bool safe_landing();
+        bool exploded = false; // hopefully we can keep it that way!
+
+        bool is_safe_landing();
         bool is_colliding(const Ground& ground);
     public:
         Lander(Screen& s);
@@ -101,6 +104,7 @@ class Lander {
         void draw(Screen& s);
         void handle(SDL_Event* e);
         void move();
+        void explode();
         World::CollisionResult check_collision(World& w);
         friend Pilot;
 };

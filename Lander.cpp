@@ -64,6 +64,7 @@ Lander::Lander(Screen& s,
     txtr_fire_low = Utils::load_texture(s.renderer, "sprites/lander_fire_low.bmp");
     txtr_fire_med = Utils::load_texture(s.renderer, "sprites/lander_fire_med.bmp");
     txtr_fire_high = Utils::load_texture(s.renderer, "sprites/lander_fire_high.bmp");
+    txtr_explosion = Utils::load_texture(s.renderer, "sprites/explosion.bmp");
     fuel_txtr = Utils::create_text_texture(s, "FUEL ", NULL);
     thrust_txtr = Utils::create_text_texture(s, "THRUST ", NULL);
     vel_txtr = Utils::create_text_texture(s, "VEL ", NULL);
@@ -282,7 +283,9 @@ void Lander::draw(Screen& s) {
 
     // choose texture based on thrust level
     SDL_Texture* t = txtr;
-    if (thrusting && thrust > 0.) {
+    if (exploded) {
+        t = txtr_explosion;
+    } else if (thrusting && thrust > 0.) {
         if (thrust < max_thrust / 3) {
             t = txtr_fire_low;
         } else if (thrust < 2 * max_thrust / 3) {
@@ -303,7 +306,7 @@ void Lander::draw(Screen& s) {
     );
 }
 
-bool Lander::safe_landing() {
+bool Lander::is_safe_landing() {
     printf("x_vel = %f, y_vel = %f\n", x_vel * pixels_per_meter, y_vel * pixels_per_meter);
     printf("velocity:    %f <= %f pixels per second\norientation: %f < %f radians\n",
            vel, safe_vel, fabs(orientation - 3 * M_PI_2), M_PI / 8);
@@ -332,16 +335,21 @@ bool Lander::is_colliding(const Ground& ground) {
                                                   ground.begin,
                                                   ground.segment);
     if (left_collide || right_collide || bot_collide) {
+        thrusting = false;
         return true;
     }
     return false;
+}
+
+void Lander::explode() {
+    exploded = true;
 }
 
 World::CollisionResult Lander::check_collision(World& w) {
     for (unsigned int i = 0; i < w.grounds.size(); i++) {
         Ground& gd = w.grounds[i];
         if (is_colliding(gd)) {
-            if (gd.is_pad && safe_landing()) {
+            if (gd.is_pad && is_safe_landing()) {
                 return World::WIN;
             } else {
                 return World::LOSE;
@@ -356,6 +364,7 @@ Lander::~Lander() {
     SDL_DestroyTexture(txtr_fire_low);
     SDL_DestroyTexture(txtr_fire_med);
     SDL_DestroyTexture(txtr_fire_high);
+    SDL_DestroyTexture(txtr_explosion);
     SDL_DestroyTexture(fuel_txtr);
     SDL_DestroyTexture(thrust_txtr);
     SDL_DestroyTexture(vel_txtr);
