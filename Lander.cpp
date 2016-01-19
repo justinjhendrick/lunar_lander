@@ -11,7 +11,7 @@ Lander::Lander(Screen& s) :
     Lander(s,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
            Screen::HEIGHT / 4, // y_pos
-           0.,//Utils::rand_float(-5., 5.),     // x_vel
+           Utils::rand_float(-5., 5.),     // x_vel
            0.,     // y_vel
            3 * M_PI_2,     // orientation
            0.,     // spin_rate
@@ -304,6 +304,7 @@ void Lander::draw(Screen& s) {
 }
 
 bool Lander::safe_landing() {
+    printf("x_vel = %f, y_vel = %f\n", x_vel * pixels_per_meter, y_vel * pixels_per_meter);
     printf("velocity:    %f <= %f pixels per second\norientation: %f < %f radians\n",
            vel, safe_vel, fabs(orientation - 3 * M_PI_2), M_PI / 8);
     return vel <= safe_vel && fabs(orientation - 3 * M_PI_2) < M_PI / 8;

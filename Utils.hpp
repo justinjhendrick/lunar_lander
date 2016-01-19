@@ -11,6 +11,8 @@ namespace Utils {
                                      const char text[],
                                      SDL_Color* color);
     float rand_float(float lower_bd, float upper_bd);
+    bool angle_diff(float a, float b, float* out);
+    int round_nearest_int(float a);
 }
 
 #endif

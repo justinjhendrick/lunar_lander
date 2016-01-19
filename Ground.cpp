@@ -20,3 +20,11 @@ void Ground::draw(Screen& s) {
     // reset to old color
     SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
 }
+
+int Ground::get_right() {
+    return begin.x + segment.x;
+}
+
+int Ground::get_center() {
+    return begin.x + segment.x / 2;
+}

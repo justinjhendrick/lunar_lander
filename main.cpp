@@ -59,6 +59,8 @@ unsigned long play(Pilot* pilot) {
         unsigned int sleep_time = FRAME_TIME - ((unsigned int) diff.tv_usec / 1000);
         if (FRAME_TIME > diff.tv_usec / 1000) {
             SDL_Delay(sleep_time);
+        } else {
+            printf("tired\n");
         }
         frame++;
     }

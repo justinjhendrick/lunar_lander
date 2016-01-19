@@ -38,3 +38,21 @@ SDL_Texture* Utils::create_text_texture(Screen& s,
 float Utils::rand_float(float lower_bd, float upper_bd) {
     return ((float)rand() / (float)(RAND_MAX)) * (upper_bd - lower_bd) + lower_bd;
 }
+
+// puts difference in 'out'
+// returns true if it'll pass through zero
+bool Utils::angle_diff(float a, float b, float* out) {
+    float diff = fabs(a - b);
+    bool result = false;
+    // shouldn't ever rotate more than half circle
+    if (diff > M_PI) {
+        diff = 2 * M_PI - diff;
+        result = true;
+    }
+    *out = diff;
+    return result;
+}
+
+int Utils::round_nearest_int(float a) {
+    return (int) floor(a + 0.5);
+}
