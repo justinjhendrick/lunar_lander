@@ -86,6 +86,7 @@ void Pilot::fly(Lander& l, World& world) {
         } else if (x_pos_pred > pad.get_right()) {
             state = ROTATION1;
             target_orientation = M_PI;
+        // TODO else if x_vel will be too fast
         } else {
             state = BEFORE_Y_BURN;
         }
@@ -102,14 +103,25 @@ void Pilot::fly(Lander& l, World& world) {
     } else if (state == INITIATE_X_BURN1) {
         l.thrusting = true;
         float x_dist_from_pad =
-            (float) abs(l.x_pos + l.rot_abt.x - pad.get_center()) /
+            (l.x_pos + l.rot_abt.x - pad.get_center()) /
             l.pixels_per_meter;
-        float target_x_vel = x_dist_from_pad / PI_FLIP_TIME;
-        float delta_x_vel = fabs(l.x_vel) + target_x_vel;
+        float target_x_vel = -x_dist_from_pad / PI_FLIP_TIME;
+        float delta_x_vel = target_x_vel - l.x_vel;
+        printf("%f - %f = %f m/s\n", target_x_vel, l.x_vel, delta_x_vel);
         // dt = dv * m / F_T
-        float burn_time = delta_x_vel * (l.dry_mass + l.fuel) /
+        float burn_time = fabs(delta_x_vel) * (l.dry_mass + l.fuel) /
                           (l.thrust * fabs(cos(l.orientation)));
-        printf("burn for %f seconds = ", burn_time);
+        float from_reversed_to_target; // time
+        if (diff_signs(target_x_vel, l.x_vel)) {
+            // the time it takes to reverse directions, before we start
+            float reverse_time = 2 * fabs(l.x_vel) * (l.dry_mass + l.fuel) /
+                                 (l.thrust * fabs(cos(l.orientation)));
+            from_reversed_to_target = burn_time - reverse_time;
+        } else {
+            from_reversed_to_target = burn_time;
+        }
+        // TODO use from_reversed_to_target to 
+            
         int burn_frames =
             Utils::round_nearest_int(burn_time * 1000. / FRAME_TIME);
         printf("%d frames\n", burn_frames);
