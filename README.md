@@ -20,6 +20,7 @@ Spacebar turns on your thruster.
 You don't play, just watch the flight computer do its work.
 
 Here's a gif of it!
+
 ![flight computer lands](https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/landing.gif)
 
 ## Attribution
