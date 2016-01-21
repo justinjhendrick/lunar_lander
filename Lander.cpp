@@ -309,8 +309,8 @@ void Lander::draw(Screen& s) {
 bool Lander::is_safe_landing() {
     printf("x_vel = %f, y_vel = %f\n", x_vel * pixels_per_meter, y_vel * pixels_per_meter);
     printf("velocity:    %f <= %f pixels per second\norientation: %f < %f radians\n",
-           vel, safe_vel, fabs(orientation - 3 * M_PI_2), M_PI / 8);
-    return vel <= safe_vel && fabs(orientation - 3 * M_PI_2) < M_PI / 8;
+           vel, safe_vel, fabs(orientation - 3 * M_PI_2), safe_orientation);
+    return vel <= safe_vel && fabs(orientation - 3 * M_PI_2) < safe_orientation;
 }
 
 bool Lander::is_colliding(const Ground& ground) {
