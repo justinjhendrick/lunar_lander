@@ -20,24 +20,22 @@ class Pilot {
 
         enum State {
             BEGIN,
-            ROTATION1,     // rotate horizontal
-            INITIATE_X_BURN1,
-            X_BURN1,       // go toward pad
-            ROTATION2,     // rotate to other horizontal (may need to skip)
-            INITIATE_X_BURN2,
-            X_BURN2,       // kill x velocity (may need to skip)
-            ROTATION3,     // point thruster down
-            BEFORE_Y_BURN, // fall and wait
-            Y_BURN,        // kill y velocity
-            AFTER_Y_BURN   // touchdown softly
+            ROT_HORIZ,      // rotate to horizontal
+            X_BURN,         // put us on trajectory to pad
+            FALL_TO_PAD,    // fall and rotate for burn
+                            // (actually we target a point just above the pad)
+            SUICIDE_BURN,   // kill velocity
+            LAND            // descend slowly
         };
         State state;
         unsigned long frame;
-        const float PI_FLIP_TIME = 1.58; // seconds. TODO: don't hardcode this
         float target_orientation;
         unsigned long stop_burn_frame;
+        float smooth_retrograde; // exponential smoothing
+        const float alpha = .5;
 
         void rotate_to(Lander& l, float tgt_orientation);
+        void point_retrograde(Lander& l, bool landing);
         float fall_time(float y_vel, float dist_to_pad);
     public:
         Pilot();

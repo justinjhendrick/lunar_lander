@@ -31,6 +31,7 @@ class Lander {
         float vel;                   // magnitude in pixels/s
         const float safe_vel = 15.;  // pixels/s
         const float max_vel = 100.;  // pixels/s. only cosmetic
+        const float safe_orientation = M_PI / 8;
         const int pixels_per_meter = 10;
 
         // image textures
