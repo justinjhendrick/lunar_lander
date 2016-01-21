@@ -19,6 +19,9 @@ Spacebar turns on your thruster.
 `$ ./lunar_lander -c` enables the computer controlled pilot.
 You don't play, just watch the flight computer do its work.
 
+Here's a gif of it!
+![flight computer lands](https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/landing.gif)
+
 ## Attribution
 All files except `UbuntuMono-R.ttf` are under Creative Commons Attribution (CC BY).
 See `COPYING` for more details
