@@ -6,7 +6,9 @@
 #include "Screen.hpp"
 
 namespace Utils {
-    SDL_Texture* load_texture(SDL_Renderer* r, const char filename[]);
+    SDL_Texture* load_texture(SDL_Renderer* r,
+                              const char filename[],
+                              bool has_alpha); 
     SDL_Texture* create_text_texture(Screen& s,
                                      const char text[],
                                      SDL_Color* color);

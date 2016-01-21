@@ -1,16 +1,27 @@
 #include <cstdlib>
 #include "Utils.hpp"
 
-SDL_Texture* Utils::load_texture(SDL_Renderer* r, const char filename[]) {
+SDL_Texture* Utils::load_texture(
+        SDL_Renderer* r,
+        const char filename[],
+        bool has_alpha) {
     SDL_Surface* surf = SDL_LoadBMP(filename);
     if (surf == NULL) {
         fprintf(stderr, "%s\n", SDL_GetError());
         return NULL;
     }
+    //if (has_alpha) {
+    //    printf("here\n");
+    //    surf->format->Amask = 0xFF000000; 
+    //    surf->format->Rmask = 0x00FF0000; 
+    //    surf->format->Gmask = 0x0000FF00; 
+    //    surf->format->Bmask = 0x000000FF; 
+    //}
     SDL_Texture* result = SDL_CreateTextureFromSurface(r, surf);
     if (result == NULL) {
         fprintf(stderr, "no convert to texture: %s\n", SDL_GetError());
     }
+    SDL_SetTextureBlendMode(result, SDL_BLENDMODE_BLEND);
     SDL_FreeSurface(surf);
     return result;
 }

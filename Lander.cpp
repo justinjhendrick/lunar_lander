@@ -60,11 +60,34 @@ Lander::Lander(Screen& s,
     rot_abt.x = WIDTH / 2;
     rot_abt.y = COLLISION_HEIGHT;
 
-    txtr = Utils::load_texture(s.renderer, "sprites/lander.bmp");
-    txtr_fire_low = Utils::load_texture(s.renderer, "sprites/lander_fire_low.bmp");
-    txtr_fire_med = Utils::load_texture(s.renderer, "sprites/lander_fire_med.bmp");
-    txtr_fire_high = Utils::load_texture(s.renderer, "sprites/lander_fire_high.bmp");
-    txtr_explosion = Utils::load_texture(s.renderer, "sprites/explosion.bmp");
+    // bmp textures
+    txtr = Utils::load_texture(s.renderer, "sprites/lander.bmp", false);
+    txtr_fire_low = Utils::load_texture(s.renderer,
+                                        "sprites/lander_fire_low.bmp",
+                                        false
+    );
+    txtr_fire_med = Utils::load_texture(s.renderer,
+                                        "sprites/lander_fire_med.bmp",
+                                        false
+    );
+    txtr_fire_high = Utils::load_texture(s.renderer,
+                                         "sprites/lander_fire_high.bmp",
+                                         false
+    );
+    txtr_explosion = Utils::load_texture(s.renderer,
+                                         "sprites/explosion.bmp",
+                                         false
+    );
+    txtr_torque_cw = Utils::load_texture(s.renderer,
+                                         "sprites/torque_cw.bmp",
+                                         true
+    );
+    txtr_torque_ccw = Utils::load_texture(s.renderer,
+                                          "sprites/torque_ccw.bmp",
+                                          true
+    );
+
+    // text textures
     fuel_txtr = Utils::create_text_texture(s, "FUEL ", NULL);
     thrust_txtr = Utils::create_text_texture(s, "THRUST ", NULL);
     vel_txtr = Utils::create_text_texture(s, "VEL ", NULL);
@@ -304,6 +327,32 @@ void Lander::draw(Screen& s) {
                      &rot_abt,
                      SDL_FLIP_NONE
     );
+
+    if (torque != 0.) {
+        SDL_Point rcs_rot_abt;
+        rcs_rot_abt.y = rot_abt.y;
+
+        dest.h = 5;
+        dest.w = 9;
+
+        SDL_Texture* torque_txtr;
+        if (torque > 0.) {
+            torque_txtr = txtr_torque_cw;
+            rcs_rot_abt.x = rot_abt.x;
+        } else {
+            torque_txtr = txtr_torque_ccw;
+            dest.x += 12;
+            rcs_rot_abt.x = rot_abt.x - 12;
+        }
+        SDL_RenderCopyEx(s.renderer,
+                         torque_txtr,
+                         NULL,
+                         &dest,
+                         (M_PI_2 + orientation) * 180. / M_PI,
+                         &rcs_rot_abt,
+                         SDL_FLIP_NONE
+        );
+    }
 }
 
 bool Lander::is_safe_landing() {
@@ -365,6 +414,8 @@ Lander::~Lander() {
     SDL_DestroyTexture(txtr_fire_med);
     SDL_DestroyTexture(txtr_fire_high);
     SDL_DestroyTexture(txtr_explosion);
+    SDL_DestroyTexture(txtr_torque_cw);
+    SDL_DestroyTexture(txtr_torque_ccw);
     SDL_DestroyTexture(fuel_txtr);
     SDL_DestroyTexture(thrust_txtr);
     SDL_DestroyTexture(vel_txtr);

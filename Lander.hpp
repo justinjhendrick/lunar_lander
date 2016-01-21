@@ -40,6 +40,8 @@ class Lander {
         SDL_Texture* txtr_fire_med;
         SDL_Texture* txtr_fire_high;
         SDL_Texture* txtr_explosion;
+        SDL_Texture* txtr_torque_cw;
+        SDL_Texture* txtr_torque_ccw;
         // text textures
         SDL_Texture* fuel_txtr;
         SDL_Texture* thrust_txtr;

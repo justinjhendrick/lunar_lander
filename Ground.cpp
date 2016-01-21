@@ -6,19 +6,24 @@ Ground::Ground(bool _is_pad, int x1, int y1, int x2, int y2) :
 }
 
 void Ground::draw(Screen& s) {
-    // save old color
-    Uint8 old_r, old_g, old_b, old_a;
-    SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
+    if (is_pad) {
+        // save old color
+        Uint8 old_r, old_g, old_b, old_a;
+        SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
 
-    SDL_SetRenderDrawColor(s.renderer, 0x55, 0x55, 0xFF, 0xFF);
-    Vector p2 = Vector::plus(begin, segment);
-    SDL_RenderDrawLine(s.renderer,
-                       (int) begin.x, (int) begin.y,
-                       (int) p2.x, (int) p2.y
-    );
+        // 398ee7
+        SDL_SetRenderDrawColor(s.renderer, 0x39, 0x8E, 0xE7, 0xFF);
+        Vector p2 = Vector::plus(begin, segment);
+        SDL_Rect r;
+        r.x = begin.x;
+        r.y = begin.y;
+        r.w = segment.x;
+        r.h = 10;
+        SDL_RenderFillRect(s.renderer, &r);
 
-    // reset to old color
-    SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
+        // reset to old color
+        SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
+    }
 }
 
 int Ground::get_right() {
