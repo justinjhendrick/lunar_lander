@@ -15,6 +15,10 @@ Left and right apply torque to your spacecraft.
 Up and down increase and decrease thrust.
 Spacebar turns on your thruster.
 
+## Computer Pilot
+`$ ./lunar_lander -c` enables the computer controlled pilot.
+You don't play, just watch the flight computer do its work.
+
 ## Attribution
 All files except `UbuntuMono-R.ttf` are under Creative Commons Attribution (CC BY).
 See `COPYING` for more details
