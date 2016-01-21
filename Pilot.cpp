@@ -12,6 +12,13 @@ Pilot::Pilot() {
     frame = 0;
 }
 
+void Pilot::point_retrograde(Lander& l) {
+    //float retrograde = atan2(l.y_vel, l.x_vel);
+    if (rot_state != DONE) {
+        rotate_to(l, 3 * M_PI_2);
+    }
+}
+
 // rotate the lander to the target orientation
 // to use:
 // rotate_to(l, angle)
@@ -49,7 +56,7 @@ void Pilot::rotate_to(Lander& l, float tgt_orientation) {
         // null out spin by applying down torque exactly as many frames as we
         // applied up torque
         if (rot_frame >= flip_frame) {
-            l.torque *= 0;
+            l.torque = 0;
             rot_state = DONE;
 
             float diff;
@@ -79,97 +86,62 @@ void Pilot::fly(Lander& l, World& world) {
                         l.pixels_per_meter;
     if (state == BEGIN) {
         float fall_t = fall_time(l.y_vel, dist_to_pad);
-        float x_pos_pred = l.x_pos + l.rot_abt.x + l.x_vel * fall_t * l.pixels_per_meter;
+        float x_pos_pred = l.x_pos + l.rot_abt.x +
+                           l.x_vel * fall_t * l.pixels_per_meter;
         if (x_pos_pred < pad.begin.x) {
-            state = ROTATION1;
+            state = ROT_HORIZ;
             target_orientation = 0.;
         } else if (x_pos_pred > pad.get_right()) {
-            state = ROTATION1;
+            state = ROT_HORIZ;
             target_orientation = M_PI;
         } else {
-            state = BEFORE_Y_BURN;
+            state = FALL_TO_PAD;
         }
-    } else if (state == ROTATION1) {
+    } else if (state == ROT_HORIZ) {
         rotate_to(l, target_orientation);
         if (rot_state == DONE) {
             rot_state = START;
-            state = INITIATE_X_BURN1;
-            target_orientation -= M_PI;
-            if (target_orientation < 0.) {
-                target_orientation += 2 * M_PI;
+            state = X_BURN;
+        }
+    } else if (state == X_BURN) {
+        l.thrusting = true;
+        float fall_t = fall_time(l.y_vel, dist_to_pad);
+        float x_pos_pred = l.x_pos + l.rot_abt.x +
+                           l.x_vel * fall_t * l.pixels_per_meter;
+        if (x_pos_pred > pad.begin.x && x_pos_pred < pad.get_right()) {
+            l.thrusting = false;
+            state = FALL_TO_PAD;
+        }
+    } else if (state == FALL_TO_PAD) {
+        point_retrograde(l);
+        if (rot_state == DONE) {
+            // When do we turn on the thruster?
+            // What will our acceleration be while thrusting?
+            // a = g - F_T / m                 (NOTE: assumption dm/dt << m)
+            float net_accel = World::g + l.thrust * sin(l.orientation) /
+                                         (l.dry_mass + l.fuel);
+            // How long will that thrust take?
+            // t = v / a
+            float thrust_time = fabs(l.y_vel / net_accel);
+            // How far from pad must we begin burning to burn for t time?
+            // d = v * t + (a/2) * t^2
+            float thrust_distance = l.y_vel * thrust_time +
+                .5 * net_accel * thrust_time * thrust_time;
+            if (dist_to_pad <= thrust_distance) {
+                printf("%f <= %f\n", dist_to_pad, thrust_distance);
+                int burn_frames =
+                    Utils::round_nearest_int(thrust_time * 1000. /
+                                             (float) FRAME_TIME);
+                l.thrusting = true;
+                state = SUICIDE_BURN;
+                stop_burn_frame = frame + burn_frames;
             }
         }
-    } else if (state == INITIATE_X_BURN1) {
-        l.thrusting = true;
-        float x_dist_from_pad =
-            (float) abs(l.x_pos + l.rot_abt.x - pad.get_center()) /
-            l.pixels_per_meter;
-        float target_x_vel = x_dist_from_pad / PI_FLIP_TIME;
-        float delta_x_vel = fabs(l.x_vel) + target_x_vel;
-        // dt = dv * m / F_T
-        float burn_time = delta_x_vel * (l.dry_mass + l.fuel) /
-                          (l.thrust * fabs(cos(l.orientation)));
-        printf("burn for %f seconds = ", burn_time);
-        int burn_frames =
-            Utils::round_nearest_int(burn_time * 1000. / FRAME_TIME);
-        printf("%d frames\n", burn_frames);
-        stop_burn_frame = frame + burn_frames;
-        state = X_BURN1;
-    } else if (state == X_BURN1) {
+    } else if (state == SUICIDE_BURN) {
+        //point_retrograde(l);
         if (frame >= stop_burn_frame) {
             l.thrusting = false;
-            state = ROTATION2;
-        }
-    } else if (state == ROTATION2) {
-        rotate_to(l, target_orientation);
-        if (rot_state == DONE) {
-            rot_state = START;
-            state = INITIATE_X_BURN2;
-        }
-    } else if (state == INITIATE_X_BURN2) {
-        l.thrusting = true;
-        float burn_time = fabs(l.x_vel) * (l.dry_mass + l.fuel) /
-                          (l.thrust * fabs(cos(l.orientation)));
-        int burn_frames =
-            Utils::round_nearest_int(burn_time * 1000. / FRAME_TIME);
-        stop_burn_frame = frame + burn_frames;
-        state = X_BURN2;
-    } else if (state == X_BURN2) {
-        if (frame >= stop_burn_frame) {
-            l.thrusting = false;
-            state = ROTATION3;
-        }
-    } else if (state == ROTATION3) {
-        rotate_to(l, 3 * M_PI_2);
-        if (rot_state == DONE) {
-            rot_state = START;
-            state = BEFORE_Y_BURN;
-        }
-    } else if (state == BEFORE_Y_BURN) {
-        // When do we turn on the thruster?
-        // What will our acceleration be while thrusting?
-        // a = g - F_T / m                 (NOTE: assumption dm/dt << m)
-        float net_accel = World::g + l.thrust * sin(l.orientation) /
-                                     (l.dry_mass + l.fuel);
-        // How long will that thrust take?
-        // t = v / a
-        float thrust_time = fabs(l.y_vel / net_accel);
-        // How far from pad must we begin burning to burn for t time?
-        // d = v * t + (a/2) * t^2
-        float thrust_distance = l.y_vel * thrust_time +
-            .5 * net_accel * thrust_time * thrust_time;
-        if (dist_to_pad <= thrust_distance) {
-            int burn_frames =
-                Utils::round_nearest_int(thrust_time * 1000. /
-                                         (float) FRAME_TIME);
-            l.thrusting = true;
-            state = Y_BURN;
-            stop_burn_frame = frame + burn_frames;
-        }
-    } else if (state == Y_BURN) {
-        if (frame >= stop_burn_frame) {
-            l.thrusting = false;
-            state = AFTER_Y_BURN;
+            state = LAND;
         }
     }
     frame++;
