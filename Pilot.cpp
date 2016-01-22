@@ -199,8 +199,7 @@ void Pilot::fly(Lander& l, World& world) {
         }
     } else if (state == LAND) {
         point_retrograde(l, true);
-        if (l.y_vel * l.pixels_per_meter > l.safe_vel / 3 &&
-            l.y_vel * l.pixels_per_meter < 2 * l.safe_vel / 3) {
+        if (l.y_vel + World::g * l.dt > l.safe_vel / l.pixels_per_meter) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }
