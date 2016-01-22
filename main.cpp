@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <sys/time.h>
 #include <SDL2/SDL.h>
+#include <time.h>
 #include "Screen.hpp"
 #include "Lander.hpp"
 #include "constants.hpp"
@@ -91,6 +92,8 @@ unsigned long play(Pilot* pilot) {
 
 int main(int argc, char** argv) {
     Pilot* p = NULL;
+    unsigned int time_ui = (unsigned int) (time(NULL));
+    srand(time_ui);
     if (argc == 2 && strcmp(argv[1], "-c") == 0) {
         p = new Pilot;
     }
