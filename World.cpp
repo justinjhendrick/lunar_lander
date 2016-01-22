@@ -2,9 +2,9 @@
 
 World::World () {
     int pad_w = 40;
-    int pad_x = rand() % (Screen::WIDTH - pad_w / 2);
-    Ground pad(true, pad_x - pad_w / 2, Screen::HEIGHT - 10,
-                     pad_x + pad_w / 2, Screen::HEIGHT - 10);
+    int pad_x = rand() % (Screen::WIDTH - pad_w);
+    Ground pad(true, pad_x, Screen::HEIGHT - 10,
+                     pad_x + pad_w, Screen::HEIGHT - 10);
     Ground top(false, 0, 0, Screen::WIDTH, 0);
     Ground left(false, 0, 0, 0, Screen::HEIGHT);
     Ground right(false, Screen::WIDTH, 0, Screen::WIDTH, Screen::HEIGHT);

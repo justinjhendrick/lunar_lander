@@ -18,7 +18,6 @@ Lander::Lander(Screen& s) :
            5.,    // max_torque
            2150.,  // dry_mass
            100.,   //2353.,  // init_fuel
-           0.,     // thrust
            30000., //16000., // max_thrust
            3050.   // exhaust velocity
     ) {
@@ -36,7 +35,6 @@ Lander::Lander(Screen& s,
        float _max_torque,
        float _dry_mass,
        float _init_fuel,
-       float _thrust,
        float _max_thrust,
        float _exhaust_vel) {
     // set init vals
@@ -50,7 +48,7 @@ Lander::Lander(Screen& s,
     fuel = _init_fuel;
     dry_mass = _dry_mass;
     init_fuel = _init_fuel;
-    thrust = _thrust;
+    thrust = _max_thrust / 2;
     max_thrust = _max_thrust;
     exhaust_vel = _exhaust_vel;
 
@@ -385,6 +383,7 @@ bool Lander::is_colliding(const Ground& ground) {
                                                   ground.segment);
     if (left_collide || right_collide || bot_collide) {
         thrusting = false;
+        torque = 0.;
         return true;
     }
     return false;

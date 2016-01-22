@@ -98,7 +98,6 @@ class Lander {
                float _max_torque,
                float _dry_mass,
                float _init_fuel,
-               float _thrust,
                float _max_thrust,
                float _exhaust_vel
         );
