@@ -201,7 +201,7 @@ void Pilot::fly(Lander& l, World& world) {
         point_retrograde(l, true);
         float next_y_vel = l.y_vel + World::g * l.dt;
         float next_vel = sqrt(l.x_vel * l.x_vel + next_y_vel * next_y_vel);
-        if (next_vel > (l.safe_vel * .9) / l.pixels_per_meter) {
+        if (next_vel > l.safe_vel / l.pixels_per_meter) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }
