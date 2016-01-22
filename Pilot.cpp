@@ -183,8 +183,6 @@ void Pilot::fly(Lander& l, World& world) {
         // d = v * t + (a/2) * t^2
         float thrust_distance = vel * thrust_time +
             .5 * net_accel * thrust_time * thrust_time;
-        // cuz who needs safety when you can have SPEED
-        thrust_distance = thrust_distance / 1.1;
         if (dist_to_pad <= thrust_distance) {
             int burn_frames =
                 Utils::round_nearest_int(thrust_time * 1000. /
