@@ -15,10 +15,11 @@ class World {
         };
         // list of all collidable surfaces. Starting with pad(s)
         std::vector<Ground> grounds;
-        constexpr static const float g = 1.62; // gravitational acceleration
+        // gravitational acceleration, meters/s^2
+        constexpr static const float g = 1.62;
 
         World();
-        
+
         CollisionResult check_collision();
         void draw(Screen& s);
 };
