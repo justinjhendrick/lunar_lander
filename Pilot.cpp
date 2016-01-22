@@ -183,6 +183,8 @@ void Pilot::fly(Lander& l, World& world) {
         // d = v * t + (a/2) * t^2
         float thrust_distance = vel * thrust_time +
             .5 * net_accel * thrust_time * thrust_time;
+        // cuz who needs safety when you can have SPEED
+        thrust_distance = thrust_distance / 1.1;
         if (dist_to_pad <= thrust_distance) {
             int burn_frames =
                 Utils::round_nearest_int(thrust_time * 1000. /
@@ -199,8 +201,7 @@ void Pilot::fly(Lander& l, World& world) {
         }
     } else if (state == LAND) {
         point_retrograde(l, true);
-        if (l.y_vel * l.pixels_per_meter > l.safe_vel / 3 &&
-            l.y_vel * l.pixels_per_meter < 2 * l.safe_vel / 3) {
+        if (l.y_vel + World::g * FRAME_TIME > l.safe_vel) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }
