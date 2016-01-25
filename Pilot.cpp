@@ -19,7 +19,14 @@ Pilot::Pilot() {
 // an orientation that's safe for landing
 void Pilot::point_retrograde(Lander& l, bool landing) {
     if (rot_state == START) {
+        if (l.vel < 3.) {
+            // if we're moving really slowly, retrograde direction
+            // isn't very meaningful. Safe to not rotate.
+            return;
+        }
+        //printf("vel = %f, ", l.vel);
         float retrograde = atan2(l.y_vel, l.x_vel);
+        //printf("atan2(%f, %f) = %f, ", l.y_vel, l.x_vel, retrograde * 180. / M_PI);
         retrograde += M_PI;
         if (retrograde >= 2 * M_PI) {
             retrograde -= 2 * M_PI;
@@ -27,11 +34,10 @@ void Pilot::point_retrograde(Lander& l, bool landing) {
 
         float diff;
         if (landing) {
-            printf("atan2(%f, %f) = %f", l.y_vel, l.x_vel, retrograde * 180. / M_PI);
             // don't rotate past the safe difference from straight up
             Utils::angle_diff(retrograde, 3 * M_PI_2, &diff);
             if (diff >= l.safe_orientation) {
-                printf(" retrograde is unsafe for landing!");
+                //printf("retrograde is unsafe for landing! ");
                 if (retrograde > 3 * M_PI_2) {
                     retrograde = 3 * M_PI_2 + .9 * l.safe_orientation;
                 } else {
@@ -44,8 +50,9 @@ void Pilot::point_retrograde(Lander& l, bool landing) {
                                 (1. - alpha) * smooth_retrograde;
             retrograde = smooth_retrograde;
 
-            printf(" corrected_retrograde = %f\n", retrograde * 180. / M_PI);
+            //printf(" corrected_retrograde = %f\n", retrograde * 180. / M_PI);
         } else {
+            //printf("\n");
             smooth_retrograde = retrograde;
         }
 
@@ -124,8 +131,6 @@ float Pilot::fall_time(float y_vel, float y_dist_to_pad) {
 // the pilot is a state machine.
 // see enum Pilot::State in Pilot.hpp for more details
 void Pilot::fly(Lander& l, World& world) {
-    l.thrust = l.max_thrust;
-
     Ground& pad = world.grounds.at(0);
 
     // find distance to pad
@@ -139,6 +144,7 @@ void Pilot::fly(Lander& l, World& world) {
                              y_dist_to_pad * y_dist_to_pad);
 
     if (state == BEGIN) {
+        l.thrust = l.max_thrust;
         // Which way do we need to burn to get a trajectory to the pad?
         float fall_t = fall_time(l.y_vel, y_dist_to_pad);
         float x_pos_pred = l.x_pos + l.rot_abt.x +
@@ -150,7 +156,6 @@ void Pilot::fly(Lander& l, World& world) {
             state = ROT_HORIZ;
             target_orientation = M_PI;
         } else {
-            printf("skip to fall to pad\n");
             state = FALL_TO_PAD;
         }
     } else if (state == ROT_HORIZ) {
@@ -208,7 +213,7 @@ void Pilot::fly(Lander& l, World& world) {
         point_retrograde(l, true);
         float next_y_vel = l.y_vel + World::g * l.dt;
         float next_vel = sqrt(l.x_vel * l.x_vel + next_y_vel * next_y_vel);
-        if (next_vel > l.safe_vel / l.pixels_per_meter) {
+        if (next_vel > (l.safe_vel * .95) / l.pixels_per_meter) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }

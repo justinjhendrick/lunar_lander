@@ -1,7 +1,7 @@
 #include <random>
 #include "Utils.hpp"
 
-std::default_random_engine Utils::rand_generator;
+std::mt19937 Utils::rand_generator;
 
 void Utils::init(unsigned int seed) {
     rand_generator.seed(seed);

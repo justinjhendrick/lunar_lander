@@ -8,7 +8,7 @@
 
 class Utils {
     private:
-        static std::default_random_engine rand_generator;
+        static std::mt19937 rand_generator;
     public:
         static void init(unsigned int seed);
         static SDL_Texture* load_texture(SDL_Renderer* r,

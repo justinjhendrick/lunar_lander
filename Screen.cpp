@@ -11,6 +11,7 @@ Screen::Screen() {
                                     &renderer) < 0) {
         fprintf(stderr, "No window & renderer: %s\n", SDL_GetError());
     }
+    SDL_SetWindowTitle(window, "Lunar Lander");
     if (TTF_Init() == -1) {
         fprintf(stderr, "no ttf: %s\n", TTF_GetError());
     }

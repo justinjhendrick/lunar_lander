@@ -67,9 +67,11 @@ unsigned long play(Pilot* pilot) {
 
         World::CollisionResult r = lander.check_collision(world);
         if (r == World::CollisionResult::WIN) {
+            printf("win\n");
             end_game(s, world, lander, win_text, true);
             return frame;
         } else if (r == World::CollisionResult::LOSE) {
+            printf("lose\n");
             end_game(s, world, lander, lose_text, false);
             return frame;
         }
@@ -98,8 +100,8 @@ unsigned long play(Pilot* pilot) {
 }
 
 void invalid_args() {
-    printf("Invalid command line arguments\n.");
-    printf("Usage: ./lunar_lander [-c] [-s <seed>]\n");
+    fprintf(stderr, "Invalid command line arguments\n.");
+    fprintf(stderr, "Usage: ./lunar_lander [-c] [-s <seed>]\n");
 }
 
 int main(int argc, char** argv) {
