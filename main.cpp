@@ -1,6 +1,7 @@
 // used this tutorial http://www.lazyfoo.net/tutorials/SDL/
 // and copied some code from it.
 #include <cstdio>
+#include <cstdlib>
 #include <random>
 #include <sys/time.h>
 #include <SDL2/SDL.h>
@@ -13,7 +14,11 @@
 #include "Pilot.hpp"
 #include "Utils.hpp"
 
-void end_game(Screen& s, World& world, Lander& lander, SDL_Texture* text, bool win) {
+void end_game(Screen& s,
+              World& world,
+              Lander& lander,
+              SDL_Texture* text,
+              bool win) {
     SDL_Rect where;
     where.w = Screen::WIDTH / 4;
     where.h = Screen::HEIGHT / 4;
@@ -79,7 +84,8 @@ unsigned long play(Pilot* pilot) {
         gettimeofday(&now, NULL);
         struct timeval diff = {0, 0};
         timersub(&now, &start, &diff);
-        unsigned int sleep_time = FRAME_TIME - ((unsigned int) diff.tv_usec / 1000);
+        unsigned int sleep_time = FRAME_TIME -
+            ((unsigned int) diff.tv_usec / 1000);
         if (FRAME_TIME > diff.tv_usec / 1000) {
             SDL_Delay(sleep_time);
         } else {
@@ -91,6 +97,11 @@ unsigned long play(Pilot* pilot) {
     return frame;
 }
 
+void invalid_args() {
+    printf("Invalid command line arguments\n.");
+    printf("Usage: ./lunar_lander [-c] [-s <seed>]\n");
+}
+
 int main(int argc, char** argv) {
     Pilot* p = NULL;
     unsigned int seed = (unsigned int) time(NULL);
@@ -100,10 +111,14 @@ int main(int argc, char** argv) {
         } else if (strcmp(argv[i], "-s") == 0) {
             if (i + 1 < argc) {
                 i++;
-                seed = atoi(argv[i]);
+                char* endptr;
+                seed = (unsigned int)strtoul(argv[i], &endptr, 10);
+                if (endptr == argv[i]) {
+                    invalid_args();
+                    return 1;
+                }
             } else {
-                printf("Invalid command line arguments\n.");
-                printf("Usage: ./lunar_lander [-c] [-s <seed>]\n");
+                invalid_args();
                 return 1;
             }
         }
@@ -113,5 +128,6 @@ int main(int argc, char** argv) {
     unsigned long frames = play(p);
     //printf("elapsed %lu.%lu\n", frames * FRAME_TIME / 1000, frames * 100);
     delete p;
+    printf("seed = %u\n", seed);
 }
 

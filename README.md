@@ -10,6 +10,12 @@ $ make
 $ ./lunar_lander
 ```
 
+### Command line arguments
+```
+-c           enable computer pilot
+-s <seed>    seed the random number generator
+```
+
 ## How to play
 Left and right apply torque to your spacecraft.
 Up and down increase and decrease thrust.

@@ -27,20 +27,24 @@ void Pilot::point_retrograde(Lander& l, bool landing) {
 
         float diff;
         if (landing) {
-            // smooth retrograde orientation
-            smooth_retrograde = alpha * retrograde +
-                                (1. - alpha) * smooth_retrograde;
-            retrograde = smooth_retrograde;
-
+            printf("atan2(%f, %f) = %f", l.y_vel, l.x_vel, retrograde * 180. / M_PI);
             // don't rotate past the safe difference from straight up
             Utils::angle_diff(retrograde, 3 * M_PI_2, &diff);
             if (diff >= l.safe_orientation) {
+                printf(" retrograde is unsafe for landing!");
                 if (retrograde > 3 * M_PI_2) {
                     retrograde = 3 * M_PI_2 + .9 * l.safe_orientation;
                 } else {
                     retrograde = 3 * M_PI_2 - .9 * l.safe_orientation;
                 }
             }
+
+            // smooth retrograde orientation
+            smooth_retrograde = alpha * retrograde +
+                                (1. - alpha) * smooth_retrograde;
+            retrograde = smooth_retrograde;
+
+            printf(" corrected_retrograde = %f\n", retrograde * 180. / M_PI);
         } else {
             smooth_retrograde = retrograde;
         }
@@ -125,8 +129,8 @@ void Pilot::fly(Lander& l, World& world) {
     Ground& pad = world.grounds.at(0);
 
     // find distance to pad
-    int x_pos = l.x_pos + l.rot_abt.x;
-    int y_pos = l.y_pos + l.rot_abt.y;
+    int x_pos = Utils::nearest_int(l.x_pos) + l.rot_abt.x;
+    int y_pos = Utils::nearest_int(l.y_pos) + l.rot_abt.y;
     float y_dist_to_pad = ((pad.begin.y - 15) - y_pos) /
                           l.pixels_per_meter;
     float x_dist_to_pad = (pad.get_center() - x_pos) /
@@ -146,6 +150,7 @@ void Pilot::fly(Lander& l, World& world) {
             state = ROT_HORIZ;
             target_orientation = M_PI;
         } else {
+            printf("skip to fall to pad\n");
             state = FALL_TO_PAD;
         }
     } else if (state == ROT_HORIZ) {
@@ -184,12 +189,14 @@ void Pilot::fly(Lander& l, World& world) {
         float thrust_distance = vel * thrust_time +
             .5 * net_accel * thrust_time * thrust_time;
         if (dist_to_pad <= thrust_distance) {
-            int burn_frames =
-                Utils::round_nearest_int(thrust_time * 1000. /
-                                         (float) FRAME_TIME);
+            int burn_frames = Utils::nearest_int(thrust_time * 1000. /
+                                                 (float) FRAME_TIME);
             l.thrusting = true;
             state = SUICIDE_BURN;
-            stop_burn_frame = frame + burn_frames;
+            stop_burn_frame = frame + (unsigned long) burn_frames;
+            // above cast to unsigned is safe because
+            // burn frames is positive because
+            // thrust time is positive because it's a result of fabs()
         }
     } else if (state == SUICIDE_BURN) {
         point_retrograde(l, false);

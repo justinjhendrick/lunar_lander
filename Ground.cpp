@@ -13,11 +13,10 @@ void Ground::draw(Screen& s) {
 
         // 398ee7
         SDL_SetRenderDrawColor(s.renderer, 0x39, 0x8E, 0xE7, 0xFF);
-        Vector p2 = Vector::plus(begin, segment);
         SDL_Rect r;
-        r.x = begin.x;
-        r.y = begin.y;
-        r.w = segment.x;
+        r.x = (int) begin.x;
+        r.y = (int) begin.y;
+        r.w = (int) segment.x;
         r.h = 10;
         SDL_RenderFillRect(s.renderer, &r);
 
@@ -27,9 +26,9 @@ void Ground::draw(Screen& s) {
 }
 
 int Ground::get_right() {
-    return begin.x + segment.x;
+    return (int)(begin.x + segment.x);
 }
 
 int Ground::get_center() {
-    return begin.x + segment.x / 2;
+    return (int)(begin.x + segment.x / 2);
 }

@@ -11,13 +11,15 @@ class Pilot;
 class Lander {
     protected:
         // initialized by constructor
-        float x_pos;       // pixels
-        float y_pos;
+        float x_pos;       // pixels. positive is to the right on the screen.
+        float y_pos;       // positive is down the screen.
         float x_vel;       // meters/second
         float y_vel;
         float orientation; // radians cw from x axis
         float spin_rate;   // radians/second. positive is cw, negative is ccw
-        float max_torque;  // radians/second^2 (const). Torque is misnomer.
+        float max_torque;  // radians/second^2 (const).
+                           // Torque is misnomer.
+                           // it's actually angular acceleration. TODO fix?
         float fuel;        // kg
         float dry_mass;    // kg (const)
         float init_fuel;   // kg (const)
@@ -26,13 +28,13 @@ class Lander {
         float exhaust_vel; // m/s
 
         bool thrusting = false;
-        float torque;                // radians / second^2. Torque is misnomer.
+        float torque;                // radians/s^2. Torque is misnomer.
         float dt;                    // seconds
         float vel;                   // magnitude in pixels/s
         const float safe_vel = 15.;  // pixels/s
         const float max_vel = 100.;  // pixels/s. only cosmetic
-        const float safe_orientation = M_PI / 8;
-        const int pixels_per_meter = 10;
+        const float safe_orientation = M_PI / 8; // radians
+        const int pixels_per_meter = 10; // pixels/meter
 
         // image textures
         SDL_Texture* txtr;

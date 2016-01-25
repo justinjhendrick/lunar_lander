@@ -9,8 +9,7 @@ void Utils::init(unsigned int seed) {
 
 SDL_Texture* Utils::load_texture(
         SDL_Renderer* r,
-        const char filename[],
-        bool has_alpha) {
+        const char filename[]) {
     SDL_Surface* surf = SDL_LoadBMP(filename);
     if (surf == NULL) {
         fprintf(stderr, "%s\n", SDL_GetError());
@@ -50,7 +49,7 @@ float Utils::rand_float(float lower_bd, float upper_bd) {
     return dist(rand_generator);
 }
 
-float Utils::rand_int(int lower_bd, int upper_bd) {
+int Utils::rand_int(int lower_bd, int upper_bd) {
     std::uniform_int_distribution<int> dist(lower_bd, upper_bd);
     return dist(rand_generator);
 }
@@ -59,16 +58,16 @@ float Utils::rand_int(int lower_bd, int upper_bd) {
 // returns true if it'll pass through zero
 bool Utils::angle_diff(float a, float b, float* out) {
     float diff = fabs(a - b);
-    bool result = false;
+    bool thru_zero = false;
     // shouldn't ever rotate more than half circle
     if (diff > M_PI) {
         diff = 2 * M_PI - diff;
-        result = true;
+        thru_zero = true;
     }
     *out = diff;
-    return result;
+    return thru_zero;
 }
 
-int Utils::round_nearest_int(float a) {
+int Utils::nearest_int(float a) {
     return (int) floor(a + 0.5);
 }
