@@ -1,6 +1,7 @@
 // used this tutorial http://www.lazyfoo.net/tutorials/SDL/
 // and copied some code from it.
 #include <cstdio>
+#include <random>
 #include <sys/time.h>
 #include <SDL2/SDL.h>
 #include <time.h>
@@ -92,11 +93,23 @@ unsigned long play(Pilot* pilot) {
 
 int main(int argc, char** argv) {
     Pilot* p = NULL;
-    unsigned int time_ui = (unsigned int) (time(NULL));
-    srand(time_ui);
-    if (argc == 2 && strcmp(argv[1], "-c") == 0) {
-        p = new Pilot;
+    unsigned int seed = (unsigned int) time(NULL);
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-c") == 0) {
+            p = new Pilot;
+        } else if (strcmp(argv[i], "-s") == 0) {
+            if (i + 1 < argc) {
+                i++;
+                seed = atoi(argv[i]);
+            } else {
+                printf("Invalid command line arguments\n.");
+                printf("Usage: ./lunar_lander [-c] [-s <seed>]\n");
+                return 1;
+            }
+        }
     }
+    printf("seed = %u\n", seed);
+    Utils::init(seed);
     unsigned long frames = play(p);
     //printf("elapsed %lu.%lu\n", frames * FRAME_TIME / 1000, frames * 100);
     delete p;

@@ -20,7 +20,6 @@ class World {
 
         World();
 
-        CollisionResult check_collision();
         void draw(Screen& s);
 };
 

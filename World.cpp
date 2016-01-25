@@ -1,8 +1,9 @@
 #include "World.hpp"
+#include "Utils.hpp"
 
 World::World () {
     int pad_w = 40;
-    int pad_x = rand() % (Screen::WIDTH - pad_w);
+    int pad_x = Utils::rand_int(0, Screen::WIDTH - pad_w);
     Ground pad(true, pad_x, Screen::HEIGHT - 10,
                      pad_x + pad_w, Screen::HEIGHT - 10);
     Ground top(false, 0, 0, Screen::WIDTH, 0);

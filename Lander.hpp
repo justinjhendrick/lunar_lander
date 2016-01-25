@@ -62,7 +62,7 @@ class Lander {
 
         // collision points of triangle (corners)
         // in sc coords (rot_abt is center)
-        // Looking at the SC right side up
+        // Looking at the SC with thrusters pointed down
         // 1 is bottom left      2
         // 2 is top             / \
         // 3 is bottom right   1 - 3

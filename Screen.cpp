@@ -14,7 +14,6 @@ Screen::Screen() {
     if (TTF_Init() == -1) {
         fprintf(stderr, "no ttf: %s\n", TTF_GetError());
     }
-    //font = TTF_OpenFont("1979_dot_matrix.ttf", 12);
     font = TTF_OpenFont("UbuntuMono-R.ttf", 12);
     if (font == NULL) {
         fprintf(stderr, "no font: %s\n", TTF_GetError());
