@@ -135,7 +135,7 @@ float Pilot::fall_time(float y_vel, float y_dist_of_fall) {
 // the pilot is a state machine.
 // see enum Pilot::State in Pilot.hpp for more details
 void Pilot::fly(Lander& l, World& world) {
-    Ground& pad = world.grounds.at(0);
+    Ground& pad = world.get_pad();
 
     // find distance to pad
     int x_pos = Utils::nearest_int(l.x_pos) + l.rot_abt.x;

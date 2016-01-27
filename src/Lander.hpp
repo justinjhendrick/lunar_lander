@@ -9,7 +9,7 @@
 class Pilot;
 
 class Lander {
-    protected:
+    private:
         // initialized by constructor
         float x_pos;       // pixels. positive is to the right on the screen.
         float y_pos;       // positive is down the screen.

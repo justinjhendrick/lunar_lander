@@ -295,7 +295,7 @@ void Lander::draw(Screen& s) {
     } else if (thrusting && thrust > 0.) {
         if (thrust < max_thrust / 3) {
             t = txtr_fire_low;
-        } else if (thrust < 2 * max_thrust / 3) {
+        } else if (thrust < 2. * max_thrust / 3.) {
             t = txtr_fire_med;
         } else {
             t = txtr_fire_high;
@@ -329,7 +329,7 @@ void Lander::draw(Screen& s) {
         } else {
             torque_txtr = txtr_torque_ccw;
             dest.x += WIDTH / 2 + 2;
-            rcs_rot_abt.x = rot_abt.x - WIDTH / 2 + 2;
+            rcs_rot_abt.x = rot_abt.x - (WIDTH / 2 + 2);
         }
         SDL_RenderCopyEx(s.renderer,
                          torque_txtr,

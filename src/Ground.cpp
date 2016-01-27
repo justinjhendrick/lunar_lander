@@ -25,6 +25,21 @@ void Ground::draw(Screen& s) {
 
         // reset to old color
         SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
+    } else {
+        // save old color
+        Uint8 old_r, old_g, old_b, old_a;
+        SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
+
+        SDL_SetRenderDrawColor(s.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        SDL_RenderDrawLine(s.renderer,
+                           (int) begin.x,
+                           (int) begin.y,
+                           (int) (begin.x + segment.x),
+                           (int) (begin.y + segment.y)
+        );
+
+        // reset to old color
+        SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
     }
 }
 

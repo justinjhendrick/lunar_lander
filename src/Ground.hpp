@@ -15,6 +15,7 @@ class Ground {
         // segment points from the leftmost point to the end of the line
         Vector segment;
 
+        // point 1 must be left of point 2
         Ground(bool _is_pad, int x1, int y1, int x2, int y2);
         void draw(Screen& s);
 

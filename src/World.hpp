@@ -7,6 +7,8 @@
 #include "Ground.hpp"
 
 class World {
+    private:
+        void generate_terrain(int init_x, int init_y, int dx);
     public:
         enum CollisionResult {
             NO_COLLISION,
@@ -21,6 +23,7 @@ class World {
         World();
 
         void draw(Screen& s);
+        Ground& get_pad();
 };
 
 #endif

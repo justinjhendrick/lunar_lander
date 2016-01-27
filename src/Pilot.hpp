@@ -15,8 +15,11 @@ class Pilot {
         };
         RotationState rot_state;
         float init_orientation;
+        // total angle to rotate
         float d_theta;
+        // a count of frames spend on this rotation
         unsigned long rot_frame;
+        // the frame that we switch torque directions on
         unsigned long flip_frame;
 
         // state variables for the landing sequence
@@ -30,8 +33,11 @@ class Pilot {
             LAND            // descend slowly
         };
         State state;
+        // a count of frames flying so far
         unsigned long frame;
+        // for use with rotate_to()
         float target_orientation;
+        // When to turn off the thrusters
         unsigned long stop_burn_frame;
 
         // exponential smoothing of retrograde orientation while landing
