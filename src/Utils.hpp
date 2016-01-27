@@ -12,7 +12,7 @@ class Utils {
     public:
         // Initialize the random number generator
         // used by rand_float and rand_int
-        static void init(unsigned int seed);
+        static void seed_random(unsigned int seed);
         
         // load a BMP
         static SDL_Texture* load_texture(SDL_Renderer* r,

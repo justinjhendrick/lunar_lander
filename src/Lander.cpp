@@ -81,24 +81,33 @@ Lander::Lander(Screen& s,
 void Lander::handle(SDL_Event* e) {
     if (e->type == SDL_KEYDOWN) {
         switch (e->key.keysym.sym) {
+
+            case SDLK_w:
             case SDLK_UP:
                 thrust += max_thrust / 10.;
                 if (thrust > max_thrust) {
                     thrust = max_thrust;
                 }
                 break;
+
+            case SDLK_s:
             case SDLK_DOWN:
                 thrust -= max_thrust / 10.;
                 if (thrust < 0.) {
                     thrust = 0.;
                 }
                 break;
+                
+            case SDLK_a:
             case SDLK_LEFT:
                 torque = -max_torque;
                 break;
+
+            case SDLK_d:
             case SDLK_RIGHT:
                 torque = max_torque;
                 break;
+
             case SDLK_SPACE:
                 if (fuel > 0.) {
                     thrusting = true;
@@ -109,12 +118,17 @@ void Lander::handle(SDL_Event* e) {
         }
     } else if (e->type == SDL_KEYUP) {
         switch (e->key.keysym.sym) {
+
+            case SDLK_a:
             case SDLK_LEFT:
                 torque = 0.;
                 break;
+
+            case SDLK_d:
             case SDLK_RIGHT:
                 torque = 0.;
                 break;
+
             case SDLK_SPACE:
                 thrusting = false;
                 break;

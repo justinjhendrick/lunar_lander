@@ -17,9 +17,13 @@ $ ./lunar_lander
 ```
 
 ## How to play
-Left and right apply torque to your spacecraft.
-Up and down increase and decrease thrust.
-Spacebar turns on your thruster.
+```
+left  or a     apply torque counterclockwise
+right or d     apply torque clockwise
+up    or w     increase thrust
+down  or s     decrease thrust
+Spacebar       turns on your thruster.
+```
 
 ## Computer Pilot
 `$ ./lunar_lander -c` enables the computer controlled pilot.

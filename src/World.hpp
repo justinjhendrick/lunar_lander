@@ -19,6 +19,8 @@ class World {
         std::vector<Ground> grounds;
         // gravitational acceleration, meters/s^2
         constexpr static const float g = 1.62;
+        static const int SEGMENT_WIDTH = 40;
+        static const int MAX_DY = 40;
 
         World();
 

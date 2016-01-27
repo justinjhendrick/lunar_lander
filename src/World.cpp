@@ -2,11 +2,10 @@
 #include "Utils.hpp"
 
 World::World () {
-    int segment_w = 40;
-    int pad_x = Utils::rand_int(0, Screen::WIDTH - segment_w);
+    int pad_x = Utils::rand_int(0, Screen::WIDTH - SEGMENT_WIDTH);
     int pad_y = Utils::rand_int(3 * Screen::HEIGHT / 4, Screen::HEIGHT - 10);
     Ground pad(true, pad_x, pad_y,
-                     pad_x + segment_w, pad_y);
+                     pad_x + SEGMENT_WIDTH, pad_y);
     Ground top(false, 0, 0, Screen::WIDTH, 0);
     Ground left(false, 0, 0, 0, Screen::HEIGHT);
     Ground right(false, Screen::WIDTH, 0, Screen::WIDTH, Screen::HEIGHT);
@@ -17,8 +16,8 @@ World::World () {
     
     // The pad location has already been chosen,
     // create random terrain on both sides of it
-    generate_terrain(pad_x, pad_y, -segment_w);
-    generate_terrain(pad_x + segment_w, pad_y, segment_w);
+    generate_terrain(pad_x, pad_y, -SEGMENT_WIDTH);
+    generate_terrain(pad_x + SEGMENT_WIDTH, pad_y, SEGMENT_WIDTH);
 }
 
 // generate random terrain from (init_x, init_y) until the wall by dx steps
@@ -28,7 +27,7 @@ void World::generate_terrain(int init_x, int init_y, int dx) {
     int this_x;
     int this_y;
     while (last_x >= 0 && last_x < Screen::WIDTH) {
-        int dy = Utils::rand_int(-20, 20);
+        int dy = Utils::rand_int(-MAX_DY, MAX_DY);
         if (last_y + dy < 0 || last_y + dy >= Screen::HEIGHT) {
             dy *= -1;
         }
