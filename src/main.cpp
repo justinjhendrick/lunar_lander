@@ -14,6 +14,19 @@
 #include "Pilot.hpp"
 #include "Utils.hpp"
 
+/***************** TODO *******************************************************
+ * Testing
+ * Better design pattern compliance
+ *     Like hiding internal details inside classes
+ *     Split physics out of the lander
+ *     no magic numbers
+ * Ground obstacles
+ * Competition
+ *     Score for time and fuel used
+ *     compete against computer and/or other humans
+ * Make Lander::torque actually torque, not angular acceleration
+ ******************************************************************************/
+
 void end_game(Screen& s,
               World& world,
               Lander& lander,

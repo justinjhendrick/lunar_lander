@@ -19,7 +19,7 @@ class Lander {
         float spin_rate;   // radians/second. positive is cw, negative is ccw
         float max_torque;  // radians/second^2 (const).
                            // Torque is misnomer.
-                           // it's actually angular acceleration. TODO fix?
+                           // it's actually angular acceleration.
         float fuel;        // kg
         float dry_mass;    // kg (const)
         float init_fuel;   // kg (const)

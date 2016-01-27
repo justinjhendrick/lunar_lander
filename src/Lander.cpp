@@ -21,7 +21,7 @@ Lander::Lander(Screen& s) :
            30000., //16000., // max_thrust
            3050.   // exhaust velocity
     ) {
-    // values above from the Apollo lunar module
+    // some values above from the Apollo lunar module
     // https://en.wikipedia.org/wiki/Apollo_Lunar_Module
 }
 
@@ -138,7 +138,6 @@ void Lander::update_corners() {
 }
 
 void Lander::move() {
-    // TODO: divide by moment of inertia, or rename torque
     spin_rate += torque * dt;
     orientation += spin_rate * dt;
     if (orientation > 2 * M_PI) {
