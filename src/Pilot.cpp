@@ -39,9 +39,11 @@ void Pilot::point_retrograde(Lander& l, bool landing) {
             if (diff >= l.safe_orientation) {
                 //printf("retrograde is unsafe for landing! ");
                 if (retrograde > 3 * M_PI_2) {
-                    retrograde = 3 * M_PI_2 + .9 * l.safe_orientation;
+                    retrograde = 3 * M_PI_2 +
+                        LANDING_ORIENTATION_SAFETY_MARGIN * l.safe_orientation;
                 } else {
-                    retrograde = 3 * M_PI_2 - .9 * l.safe_orientation;
+                    retrograde = 3 * M_PI_2 -
+                        LANDING_ORIENTATION_SAFETY_MARGIN * l.safe_orientation;
                 }
             }
 
@@ -57,11 +59,13 @@ void Pilot::point_retrograde(Lander& l, bool landing) {
         }
 
         Utils::angle_diff(retrograde, l.orientation, &diff);
-        if (diff > .02) {
+        if (diff > MAX_DIFF_FROM_RETROGRADE) {
+            // start a rotation
             target_orientation = retrograde;
             rotate_to(l, target_orientation);
         }
     } else {
+        // finish a rotation we started earlier
         rotate_to(l, target_orientation);
         if (rot_state == DONE) {
             rot_state = START;
@@ -118,13 +122,13 @@ void Pilot::rotate_to(Lander& l, float tgt_orientation) {
     }
 }
 
-// y_dist_to_pad in m/s (not pixels)
-float Pilot::fall_time(float y_vel, float y_dist_to_pad) {
+// y_dist_of_fall in meters (not pixels)
+float Pilot::fall_time(float y_vel, float y_dist_of_fall) {
     // d = v_0 * t + (g/2) * t^2
     // Solve with quadratic method
-    float a = World::g / 2;
+    float a = World::g / 2.;
     float b = y_vel;
-    float c = -y_dist_to_pad;
+    float c = -y_dist_of_fall;
     return (-b + sqrt(b * b - 4. * a * c)) / (2. * a);
 }
 
@@ -136,20 +140,19 @@ void Pilot::fly(Lander& l, World& world) {
     // find distance to pad
     int x_pos = Utils::nearest_int(l.x_pos) + l.rot_abt.x;
     int y_pos = Utils::nearest_int(l.y_pos) + l.rot_abt.y;
-    float y_dist_to_pad = ((pad.begin.y - 15) - y_pos) /
+    float y_dist_to_stop = ((pad.get_top() - STOP_ABOVE_PAD) - y_pos) /
                           l.pixels_per_meter;
-    float x_dist_to_pad = (pad.get_center() - x_pos) /
+    float x_dist_to_stop = (pad.get_center() - x_pos) /
                           l.pixels_per_meter;
-    float dist_to_pad = sqrt(x_dist_to_pad * x_dist_to_pad +
-                             y_dist_to_pad * y_dist_to_pad);
+    float dist_to_stop = hypot(x_dist_to_stop, y_dist_to_stop);
 
     if (state == BEGIN) {
         l.thrust = l.max_thrust;
         // Which way do we need to burn to get a trajectory to the pad?
-        float fall_t = fall_time(l.y_vel, y_dist_to_pad);
+        float fall_t = fall_time(l.y_vel, y_dist_to_stop);
         float x_pos_pred = l.x_pos + l.rot_abt.x +
                            l.x_vel * fall_t * l.pixels_per_meter;
-        if (x_pos_pred < pad.begin.x + l.rot_abt.x) {
+        if (x_pos_pred < pad.get_left() + l.rot_abt.x) {
             state = ROT_HORIZ;
             target_orientation = 0.;
         } else if (x_pos_pred > pad.get_right() - l.rot_abt.x) {
@@ -167,10 +170,10 @@ void Pilot::fly(Lander& l, World& world) {
     } else if (state == X_BURN) {
         // thrust until our predicted position is just above the pad
         l.thrusting = true;
-        float fall_t = fall_time(l.y_vel, y_dist_to_pad);
+        float fall_t = fall_time(l.y_vel, y_dist_to_stop);
         float x_pos_pred = l.x_pos + l.rot_abt.x +
                            l.x_vel * fall_t * l.pixels_per_meter;
-        if (x_pos_pred > pad.begin.x + l.rot_abt.x &&
+        if (x_pos_pred > pad.get_left() + l.rot_abt.x &&
             x_pos_pred < pad.get_right() - l.rot_abt.x) {
             l.thrusting = false;
             state = FALL_TO_PAD;
@@ -193,7 +196,7 @@ void Pilot::fly(Lander& l, World& world) {
         // d = v * t + (a/2) * t^2
         float thrust_distance = vel * thrust_time +
             .5 * net_accel * thrust_time * thrust_time;
-        if (dist_to_pad <= thrust_distance) {
+        if (dist_to_stop <= thrust_distance) {
             int burn_frames = Utils::nearest_int(thrust_time * 1000. /
                                                  (float) FRAME_TIME);
             l.thrusting = true;
@@ -212,8 +215,9 @@ void Pilot::fly(Lander& l, World& world) {
     } else if (state == LAND) {
         point_retrograde(l, true);
         float next_y_vel = l.y_vel + World::g * l.dt;
-        float next_vel = sqrt(l.x_vel * l.x_vel + next_y_vel * next_y_vel);
-        if (next_vel > (l.safe_vel * .95) / l.pixels_per_meter) {
+        float next_vel = hypot(l.x_vel, next_y_vel);
+        if (next_vel > l.safe_vel * LANDING_VEL_SAFETY_MARGIN /
+                       l.pixels_per_meter) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }

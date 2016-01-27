@@ -6,6 +6,7 @@
 
 class Pilot {
     private:
+        // state variables for rotate_to()
         enum RotationState {
             START,
             TORQUE_UP,
@@ -18,6 +19,7 @@ class Pilot {
         unsigned long rot_frame;
         unsigned long flip_frame;
 
+        // state variables for the landing sequence
         enum State {
             BEGIN,
             ROT_HORIZ,      // rotate to horizontal
@@ -31,12 +33,25 @@ class Pilot {
         unsigned long frame;
         float target_orientation;
         unsigned long stop_burn_frame;
-        float smooth_retrograde; // exponential smoothing
+
+        // exponential smoothing of retrograde orientation while landing
+        float smooth_retrograde;
         const float alpha = .5;
 
+        // constants
+        const int STOP_ABOVE_PAD = 15; // pixels
+        const float LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
+        const float MAX_DIFF_FROM_RETROGRADE = .02; // radians
+        const float LANDING_VEL_SAFETY_MARGIN = .95; // for rounding error
+
+        // rotate the lander to the tgt_orientation
         void rotate_to(Lander& l, float tgt_orientation);
+
+        // point the thrusters in the direction of travel
         void point_retrograde(Lander& l, bool landing);
-        float fall_time(float y_vel, float dist_to_pad);
+
+        // how long will a freefall of y_fall_dist take, starting at y_vel?
+        float fall_time(float y_vel, float y_fall_dist);
     public:
         Pilot();
         void fly(Lander& l, World& world);

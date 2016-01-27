@@ -48,7 +48,7 @@ Lander::Lander(Screen& s,
     fuel = _init_fuel;
     dry_mass = _dry_mass;
     init_fuel = _init_fuel;
-    thrust = _max_thrust / 2;
+    thrust = _max_thrust / 2.;
     max_thrust = _max_thrust;
     exhaust_vel = _exhaust_vel;
 
@@ -82,15 +82,15 @@ void Lander::handle(SDL_Event* e) {
     if (e->type == SDL_KEYDOWN) {
         switch (e->key.keysym.sym) {
             case SDLK_UP:
-                thrust += max_thrust / 10;
+                thrust += max_thrust / 10.;
                 if (thrust > max_thrust) {
                     thrust = max_thrust;
                 }
                 break;
             case SDLK_DOWN:
-                thrust -= max_thrust / 10;
-                if (thrust < 0) {
-                    thrust = 0;
+                thrust -= max_thrust / 10.;
+                if (thrust < 0.) {
+                    thrust = 0.;
                 }
                 break;
             case SDLK_LEFT:
@@ -125,6 +125,8 @@ void Lander::handle(SDL_Event* e) {
 }
 
 void Lander::update_corners() {
+    // apply a rotation matrix
+    // https://en.wikipedia.org/wiki/Rotation_matrix
     float s = sin(3 * M_PI_2 + orientation);
     float c = cos(3 * M_PI_2 + orientation);
     p1x = c * sc_p1x - s * sc_p1y + WIDTH / 2 + x_pos;
@@ -164,7 +166,7 @@ void Lander::move() {
     x_vel += x_accel * dt;
     y_vel += (y_accel + World::g) * dt; // gravity
 
-    vel = sqrt(x_vel * x_vel + y_vel * y_vel) * pixels_per_meter;
+    vel = hypot(x_vel, y_vel) * pixels_per_meter;
 
     // calculate new position
     x_pos += (x_vel * dt + .5 * x_accel * dt * dt) * pixels_per_meter;
@@ -310,10 +312,13 @@ void Lander::draw(Screen& s) {
                      SDL_FLIP_NONE
     );
 
+    // draw the cold gas thrusters, if they're on
     if (torque != 0.) {
+        // the point to rotate the torque texture about
         SDL_Point rcs_rot_abt;
         rcs_rot_abt.y = rot_abt.y;
 
+        // dimensions of the texture in pixels
         dest.h = 5;
         dest.w = 9;
 
@@ -323,8 +328,8 @@ void Lander::draw(Screen& s) {
             rcs_rot_abt.x = rot_abt.x;
         } else {
             torque_txtr = txtr_torque_ccw;
-            dest.x += 12;
-            rcs_rot_abt.x = rot_abt.x - 12;
+            dest.x += WIDTH / 2 + 2;
+            rcs_rot_abt.x = rot_abt.x - WIDTH / 2 + 2;
         }
         SDL_RenderCopyEx(s.renderer,
                          torque_txtr,

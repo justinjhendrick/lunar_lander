@@ -28,13 +28,14 @@ class Lander {
         float exhaust_vel; // m/s
 
         bool thrusting = false;
-        float torque;                // radians/s^2. Torque is misnomer.
-        float dt;                    // seconds
-        float vel;                   // magnitude in pixels/s
-        const float safe_vel = 15.;  // pixels/s
-        const float max_vel = 100.;  // pixels/s. only cosmetic
-        const float safe_orientation = M_PI / 8; // radians
-        const int pixels_per_meter = 10; // pixels/meter
+        float torque;                            // radians/s^2.
+                                                 // torque is misnomer.
+        float dt;                                // seconds
+        float vel;                               // magnitude in pixels/s
+        const float safe_vel = 15.;              // pixels/s
+        const float max_vel = 100.;              // pixels/s. only cosmetic
+        const float safe_orientation = M_PI / 8; // radians from 3 * PI / 2
+        const int pixels_per_meter = 10;         // pixels/meter
 
         // image textures
         SDL_Texture* txtr;
@@ -53,11 +54,10 @@ class Lander {
         // the center of mass of the craft
         SDL_Point rot_abt;
 
-        // update position of corners in world coordinates
-        void update_corners();
-
         // draw thrust, velocity, and fuel bars
         void draw_status(Screen& s);
+
+        // dimensions of texture and spacecraft
         static const int WIDTH = 21;
         static const int HEIGHT = 40;
         static const int COLLISION_HEIGHT = 30;
@@ -83,6 +83,10 @@ class Lander {
         float p2y;
         float p3x;
         float p3y;
+
+        // Update position of corners in world coordinates.
+        // Use sc_p#x and sc_p#y to compute p#x and p#y
+        void update_corners();
 
         bool exploded = false; // hopefully we can keep it that way!
 

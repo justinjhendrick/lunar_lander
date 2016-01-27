@@ -15,7 +15,11 @@ class Screen {
 
         Screen();
         ~Screen();
+
+        // put the buffered pixels to the screen
         void flip();
+
+        // set all pixels on screen to black
         void clear();
 };
 

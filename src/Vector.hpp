@@ -1,6 +1,7 @@
 #ifndef VECTOR_H_
 #define VECTOR_H_
 
+// 2 dimensional float vectors used for collision detection
 class Vector {
     public:
         float x;

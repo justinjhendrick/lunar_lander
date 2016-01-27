@@ -49,6 +49,7 @@ void end_game(Screen& s,
     SDL_Delay(1000);
 }
 
+// play the game. A NULL pilot is a human player
 unsigned long play(Pilot* pilot) {
     Screen s;
     World world;
@@ -129,10 +130,12 @@ int main(int argc, char** argv) {
                 char* endptr;
                 seed = (unsigned int)strtoul(argv[i], &endptr, 10);
                 if (endptr == argv[i]) {
+                    // what followed -s is not a number
                     invalid_args();
                     return 1;
                 }
             } else {
+                // nothing followed -s
                 invalid_args();
                 return 1;
             }
