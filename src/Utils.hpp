@@ -4,7 +4,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <random>
-#include "Screen.hpp"
 
 class Utils {
     private:
@@ -13,15 +12,6 @@ class Utils {
         // Initialize the random number generator
         // used by rand_float and rand_int
         static void seed_random(unsigned int seed);
-        
-        // load a BMP
-        static SDL_Texture* load_texture(SDL_Renderer* r,
-                                  const char filename[]);
-
-        // create a Texture with text in it
-        static SDL_Texture* create_text_texture(Screen& s,
-                                         const char text[],
-                                         SDL_Color* color);
 
         // generate a pseudo-random number uniformly from the
         // range [lower_bd, upper_bd], including the endpoints
@@ -32,6 +22,7 @@ class Utils {
         static bool angle_diff(float a, float b, float* out);
 
         // round a float to the nearest integer
+        // ties round up (1.5 -> 2)
         static int nearest_int(float a);
 };
 

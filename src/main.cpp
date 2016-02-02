@@ -70,9 +70,9 @@ bool end_game(Screen& s,
 bool play(Screen& s, Pilot* pilot) {
     World world;
     Lander lander(s);
-    SDL_Texture* win_text = Utils::create_text_texture(s,
+    SDL_Texture* win_text = s.create_text_texture(
             "You win! Play again? y/n", NULL);
-    SDL_Texture* lose_text = Utils::create_text_texture(s,
+    SDL_Texture* lose_text = s.create_text_texture(
             "You lose. Play again? y/n", NULL);
 
     SDL_Event e;

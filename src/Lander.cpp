@@ -59,23 +59,20 @@ Lander::Lander(Screen& s,
     rot_abt.y = COLLISION_HEIGHT;
 
     // bmp textures
-    txtr = Utils::load_texture(s.renderer, "sprites/lander.bmp");
-    txtr_fire_low = Utils::load_texture(s.renderer,
-                                        "sprites/lander_fire_low.bmp");
-    txtr_fire_med = Utils::load_texture(s.renderer,
-                                        "sprites/lander_fire_med.bmp");
-    txtr_fire_high = Utils::load_texture(s.renderer,
-                                         "sprites/lander_fire_high.bmp");
-    txtr_explosion = Utils::load_texture(s.renderer, "sprites/explosion.bmp");
-    txtr_torque_cw = Utils::load_texture(s.renderer, "sprites/torque_cw.bmp");
-    txtr_torque_ccw = Utils::load_texture(s.renderer, "sprites/torque_ccw.bmp");
+    txtr = s.load_texture("sprites/lander.bmp");
+    txtr_fire_low = s.load_texture("sprites/lander_fire_low.bmp");
+    txtr_fire_med = s.load_texture("sprites/lander_fire_med.bmp");
+    txtr_fire_high = s.load_texture("sprites/lander_fire_high.bmp");
+    txtr_explosion = s.load_texture("sprites/explosion.bmp");
+    txtr_torque_cw = s.load_texture("sprites/torque_cw.bmp");
+    txtr_torque_ccw = s.load_texture("sprites/torque_ccw.bmp");
 
     // text textures
-    fuel_txtr = Utils::create_text_texture(s, "FUEL ", NULL);
-    thrust_txtr = Utils::create_text_texture(s, "THRUST ", NULL);
-    vel_txtr = Utils::create_text_texture(s, "VEL ", NULL);
+    fuel_txtr = s.create_text_texture("FUEL ", NULL);
+    thrust_txtr = s.create_text_texture("THRUST ", NULL);
+    vel_txtr = s.create_text_texture("VEL ", NULL);
     SDL_Color green = {0x33, 0xFF, 0x33, 0xFF};
-    vel_txtr_green = Utils::create_text_texture(s, "VEL ", &green);
+    vel_txtr_green = s.create_text_texture("VEL ", &green);
 }
 
 void Lander::handle(SDL_Event* e) {

@@ -37,3 +37,36 @@ void Screen::flip() {
 void Screen::clear() {
     SDL_RenderClear(renderer);
 }
+
+SDL_Texture* Screen::load_texture(const char filename[]) {
+    SDL_Surface* surf = SDL_LoadBMP(filename);
+    if (surf == NULL) {
+        fprintf(stderr, "%s\n", SDL_GetError());
+        return NULL;
+    }
+    SDL_Texture* result = SDL_CreateTextureFromSurface(renderer, surf);
+    if (result == NULL) {
+        fprintf(stderr, "no convert to texture: %s\n", SDL_GetError());
+    }
+    SDL_FreeSurface(surf);
+    return result;
+}
+
+SDL_Texture* Screen::create_text_texture(const char text[],
+                                         SDL_Color* color) {
+    SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
+    if (color == NULL) {
+        color = &white;
+    }
+    SDL_Surface* surf = TTF_RenderText_Solid(font, text, *color);
+    if (surf == NULL) {
+        fprintf(stderr, "%s\n", SDL_GetError());
+        return NULL;
+    }
+    SDL_Texture* result = SDL_CreateTextureFromSurface(renderer, surf);
+    if (result == NULL) {
+        fprintf(stderr, "no convert to texture: %s\n", SDL_GetError());
+    }
+    SDL_FreeSurface(surf);
+    return result;
+}

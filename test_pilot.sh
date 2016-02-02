@@ -3,6 +3,9 @@
 # test the autopilot by running it a bunch
 # if it fails, save stdout from that run (it contains the random seed)
 
+# TODO fix this script. It was broken by adding the replay feature
+# fix with a headless mode probably
+
 mkdir test_results
 i=0;
 while true; do

@@ -21,6 +21,14 @@ class Screen {
 
         // set all pixels on screen to black
         void clear();
+        
+        // load a BMP
+        SDL_Texture* load_texture(const char filename[]);
+
+        // create a Texture with text in it
+        // if color is NULL, white is used.
+        SDL_Texture* create_text_texture(const char text[],
+                                         SDL_Color* color);
 };
 
 #endif
