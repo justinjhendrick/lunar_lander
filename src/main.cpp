@@ -26,25 +26,23 @@
  * Make Lander::torque actually torque, not angular acceleration
  ******************************************************************************/
 
-// returns true if the player wants to play again
-bool end_game(Screen& s,
+enum EndGameOpt {
+    NEW_GAME,
+    REPLAY,
+    QUIT
+};
+
+EndGameOpt end_game(Screen& s,
               World& world,
               Lander& lander,
-              SDL_Texture* text,
               bool win) {
-    SDL_Rect where;
-    where.w = 3 * Screen::WIDTH / 4;
-    where.h = Screen::HEIGHT / 4;
-    where.x = Screen::WIDTH / 2 - where.w / 2;
-    where.y = Screen::HEIGHT / 2 - where.h / 2;
     if (!win) {
         lander.explode();
     }
-
     s.clear();
     lander.draw(s);
     world.draw(s);
-    SDL_RenderCopy(s.renderer, text, NULL, &where);
+    s.put_endgame_text(win);
     s.flip();
 
     // Take input to get response to "play again?"
@@ -52,12 +50,14 @@ bool end_game(Screen& s,
     while (true) {
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
-                return false;
+                return QUIT;
             } else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_n) {
-                    return false;
-                } else if (e.key.keysym.sym == SDLK_y) {
-                    return true;
+                    return NEW_GAME;
+                } else if (e.key.keysym.sym == SDLK_r) {
+                    return REPLAY;
+                } else if (e.key.keysym.sym == SDLK_q) {
+                    return QUIT;
                 }
             }
         }
@@ -65,21 +65,10 @@ bool end_game(Screen& s,
     }
 }
 
-enum EndGameOpt {
-    NEW_GAME,
-    REPLAY,
-    QUIT
-}
-
 // play the game. A NULL pilot is a human player
-// returns true if the player wants to play again.
 EndGameOpt play(Screen& s, Pilot* pilot) {
     World world;
     Lander lander(s);
-    SDL_Texture* win_text = s.create_text_texture(
-            "You win! Play again? y/n", NULL);
-    SDL_Texture* lose_text = s.create_text_texture(
-            "You lose. Play again? y/n", NULL);
 
     SDL_Event e;
     unsigned long frame = 0;
@@ -90,7 +79,7 @@ EndGameOpt play(Screen& s, Pilot* pilot) {
         // Handle all events on queue
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
-                return false;
+                return QUIT;
             }
             if (pilot == NULL) {
                 lander.handle(&e);
@@ -105,10 +94,10 @@ EndGameOpt play(Screen& s, Pilot* pilot) {
         World::CollisionResult r = lander.check_collision(world);
         if (r == World::CollisionResult::WIN) {
             printf("win\n");
-            return end_game(s, world, lander, win_text, true);
+            return end_game(s, world, lander, true);
         } else if (r == World::CollisionResult::LOSE) {
             printf("lose\n");
-            return end_game(s, world, lander, lose_text, false);
+            return end_game(s, world, lander, false);
         }
 
         s.clear();

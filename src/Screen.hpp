@@ -7,6 +7,12 @@
 class Screen {
     private:
         SDL_Window* window;
+
+        SDL_Texture* win_text;
+        SDL_Texture* lose_text;
+        SDL_Texture* newgame_text;
+        SDL_Texture* replay_text;
+        SDL_Texture* quit_text;
     public:
         static const int WIDTH = 640;
         static const int HEIGHT = 480;
@@ -15,6 +21,8 @@ class Screen {
 
         Screen();
         ~Screen();
+
+        void put_endgame_text(bool win);
 
         // put the buffered pixels to the screen
         void flip();
