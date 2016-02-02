@@ -22,7 +22,7 @@ left  or a     apply torque counterclockwise
 right or d     apply torque clockwise
 up    or w     increase thrust
 down  or s     decrease thrust
-Spacebar       turns on your thruster.
+Spacebar       turn on your thruster
 ```
 
 ## Computer Pilot

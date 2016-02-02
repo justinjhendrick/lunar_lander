@@ -8,8 +8,8 @@ void Utils::seed_random(unsigned int seed) {
 }
 
 
-float Utils::rand_float(float lower_bd, float upper_bd) {
-    std::uniform_real_distribution<float> dist(lower_bd, upper_bd);
+double Utils::rand_double(double lower_bd, double upper_bd) {
+    std::uniform_real_distribution<double> dist(lower_bd, upper_bd);
     return dist(rand_generator);
 }
 
@@ -20,8 +20,8 @@ int Utils::rand_int(int lower_bd, int upper_bd) {
 
 // puts difference in 'out'
 // returns true if it'll pass through zero
-bool Utils::angle_diff(float a, float b, float* out) {
-    float diff = fabs(a - b);
+bool Utils::angle_diff(double a, double b, double* out) {
+    double diff = fabs(a - b);
     bool thru_zero = false;
     // shouldn't ever rotate more than half circle
     if (diff > M_PI) {
@@ -32,6 +32,6 @@ bool Utils::angle_diff(float a, float b, float* out) {
     return thru_zero;
 }
 
-int Utils::nearest_int(float a) {
+int Utils::nearest_int(double a) {
     return (int) floor(a + 0.5);
 }

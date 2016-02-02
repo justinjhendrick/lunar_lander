@@ -39,15 +39,15 @@ EndGameOpt end_game(Screen& s,
     if (!win) {
         lander.explode();
     }
-    s.clear();
-    lander.draw(s);
-    world.draw(s);
-    s.put_endgame_text(win);
-    s.flip();
 
     // Take input to get response to "play again?"
     SDL_Event e;
     while (true) {
+        s.clear();
+        lander.draw(s);
+        world.draw(s);
+        s.put_endgame_text(win);
+        s.flip();
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 return QUIT;
@@ -71,7 +71,6 @@ EndGameOpt play(Screen& s, Pilot* pilot) {
     Lander lander(s);
 
     SDL_Event e;
-    unsigned long frame = 0;
     while (true) {
         struct timeval start = {0, 0};
         gettimeofday(&start, NULL);
@@ -153,18 +152,16 @@ int main(int argc, char** argv) {
 
     Screen s;
     bool again = true;
-    EndGameOpt choice = NEW_GAME;
+    EndGameOpt choice;
     while (again) {
-        // same map every time with -s <seed>
-        if (!user_supplied_seed && choice == NEW_GAME) {
-            seed = (unsigned int) time(NULL);
-        }
         printf("seed = %u\n", seed);
         Utils::seed_random(seed);
 
         choice = play(s, p);
         if (choice == QUIT) {
             again = false;
+        } else if (choice == NEW_GAME) {
+            seed = (unsigned int) time(NULL);
         }
 
         if (p != NULL) {

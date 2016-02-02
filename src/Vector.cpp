@@ -2,12 +2,12 @@
 #include <cstdio>
 #include <cmath>
 
-Vector::Vector(float _x, float _y) {
+Vector::Vector(double _x, double _y) {
     x = _x;
     y = _y;
 }
 
-float Vector::cross(const Vector& a, const Vector& b) {
+double Vector::cross(const Vector& a, const Vector& b) {
     return a.x * b.y - a.y * b.x;
 }
 
@@ -21,7 +21,7 @@ Vector Vector::plus(const Vector & a, const Vector& b) {
     return result;
 }
 
-float Vector::dot(const Vector& a, const Vector& b) {
+double Vector::dot(const Vector& a, const Vector& b) {
     return a.x * b.x + a.y * b.y;
 }
 
@@ -29,18 +29,18 @@ bool Vector::segments_intersect(const Vector& p,
                                 const Vector& r,
                                 const Vector& q,
                                 const Vector& s) {
-    float eps = 0.0001;
-    float rs = cross(r, s);
+    double eps = 0.0001;
+    double rs = cross(r, s);
     Vector qp = minus(q, p);
-    float qpr = cross(qp, r);
+    double qpr = cross(qp, r);
     if (fabs(rs) < eps && fabs(qpr) < eps) {
         // collinear
-        float rr = dot(r, r);
-        float t0 = dot(qp, r) / rr;
-        float t1 = dot(minus(plus(q, s), p), r) / rr;
+        double rr = dot(r, r);
+        double t0 = dot(qp, r) / rr;
+        double t1 = dot(minus(plus(q, s), p), r) / rr;
         if (t0 > t1) {
             // make [t0, t1] well formed
-            float tmp = t0;
+            double tmp = t0;
             t0 = t1;
             t1 = tmp;
         }
@@ -56,8 +56,8 @@ bool Vector::segments_intersect(const Vector& p,
         return false;
     }
 
-    float t = cross(qp, s) / rs;
-    float u = qpr / rs;
+    double t = cross(qp, s) / rs;
+    double u = qpr / rs;
     if (0. <= t && t <= 1. && 0. <= u && u <= 1.) {
         return true;
     }

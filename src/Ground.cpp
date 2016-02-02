@@ -2,8 +2,8 @@
 #include "Ground.hpp"
 
 Ground::Ground(bool _is_pad, int x1, int y1, int x2, int y2) :
-    begin((float) x1, (float) y1),
-    segment((float) x2 - x1, (float) y2 - y1) {
+    begin((double) x1, (double) y1),
+    segment((double) x2 - x1, (double) y2 - y1) {
     assert(x1 <= x2);
     is_pad = _is_pad;
 }

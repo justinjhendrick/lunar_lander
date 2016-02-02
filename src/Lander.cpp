@@ -11,7 +11,7 @@ Lander::Lander(Screen& s) :
     Lander(s,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
            Screen::HEIGHT / 4, // y_pos
-           Utils::rand_float(-5., 5.),     // x_vel
+           Utils::rand_double(-5., 5.),     // x_vel
            0.,     // y_vel
            3 * M_PI_2,     // orientation
            0.,     // spin_rate
@@ -26,17 +26,17 @@ Lander::Lander(Screen& s) :
 }
 
 Lander::Lander(Screen& s,
-       float _x_pos,
-       float _y_pos,
-       float _x_vel,
-       float _y_vel,
-       float _orientation,
-       float _spin_rate,
-       float _max_torque,
-       float _dry_mass,
-       float _init_fuel,
-       float _max_thrust,
-       float _exhaust_vel) {
+       double _x_pos,
+       double _y_pos,
+       double _x_vel,
+       double _y_vel,
+       double _orientation,
+       double _spin_rate,
+       double _max_torque,
+       double _dry_mass,
+       double _init_fuel,
+       double _max_thrust,
+       double _exhaust_vel) {
     // set init vals
     x_pos = _x_pos;
     y_pos = _y_pos;
@@ -138,8 +138,8 @@ void Lander::handle(SDL_Event* e) {
 void Lander::update_corners() {
     // apply a rotation matrix
     // https://en.wikipedia.org/wiki/Rotation_matrix
-    float s = sin(3 * M_PI_2 + orientation);
-    float c = cos(3 * M_PI_2 + orientation);
+    double s = sin(3 * M_PI_2 + orientation);
+    double c = cos(3 * M_PI_2 + orientation);
     p1x = c * sc_p1x - s * sc_p1y + WIDTH / 2 + x_pos;
     p1y = s * sc_p1x + c * sc_p1y + COLLISION_HEIGHT + y_pos;
 
@@ -159,18 +159,18 @@ void Lander::move() {
         orientation += 2 * M_PI;
     }
 
-    float x_accel = 0.;
-    float y_accel = 0.;
+    double x_accel = 0.;
+    double y_accel = 0.;
     if (thrusting && thrust > 0.) {
         // compute acceleration
         x_accel = thrust * cos(orientation) / (dry_mass + fuel);
         y_accel = thrust * sin(orientation) / (dry_mass + fuel);
 
-        float new_x_vel = x_vel + x_accel * dt;
-        float new_y_vel = y_vel + y_accel * dt;
+        double new_x_vel = x_vel + x_accel * dt;
+        double new_y_vel = y_vel + y_accel * dt;
         
         // calculate mass change
-        float dmdt = ((dry_mass + fuel) * sqrt(pow(new_x_vel - x_vel, 2) +
+        double dmdt = ((dry_mass + fuel) * sqrt(pow(new_x_vel - x_vel, 2) +
                      pow(new_y_vel - y_vel, 2) / dt) - thrust) / exhaust_vel;
         fuel += dmdt * dt;
     }
@@ -257,12 +257,12 @@ void Lander::draw_status(Screen& s) {
 
     // thrust bar
     SDL_RenderDrawRect(s.renderer, &thrust_bar);
-    thrust_bar.w = (int) (thrust * ((float) bar_width) / max_thrust);
+    thrust_bar.w = (int) (thrust * ((double) bar_width) / max_thrust);
     SDL_RenderFillRect(s.renderer, &thrust_bar);
 
     // fuel bar
     SDL_RenderDrawRect(s.renderer, &fuel_bar);
-    fuel_bar.w = (int) (fuel * ((float) bar_width) / init_fuel);
+    fuel_bar.w = (int) (fuel * ((double) bar_width) / init_fuel);
     SDL_RenderFillRect(s.renderer, &fuel_bar);
 
     // velocity bar
@@ -271,7 +271,7 @@ void Lander::draw_status(Screen& s) {
         SDL_SetRenderDrawColor(s.renderer, 0x33, 0xFF, 0x33, 0xFF);
     }
     SDL_RenderDrawRect(s.renderer, &vel_bar);
-    vel_bar.w = (int) (vel * ((float) bar_width) / max_vel);
+    vel_bar.w = (int) (vel * ((double) bar_width) / max_vel);
     if (vel_bar.w > bar_width) {
         vel_bar.w = bar_width; // don't go past end of bar
     }
@@ -279,7 +279,7 @@ void Lander::draw_status(Screen& s) {
 
     // outline safe zone in green
     SDL_SetRenderDrawColor(s.renderer, 0x33, 0xFF, 0x33, 0xFF);
-    vel_bar.w = (int) (safe_vel * ((float) bar_width) / max_vel);
+    vel_bar.w = (int) (safe_vel * ((double) bar_width) / max_vel);
     SDL_RenderDrawRect(s.renderer, &vel_bar);
 
     // add a notch to make it clearer where the safe zone ends

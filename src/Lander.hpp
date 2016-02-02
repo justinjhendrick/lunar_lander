@@ -11,30 +11,30 @@ class Pilot;
 class Lander {
     private:
         // initialized by constructor
-        float x_pos;       // pixels. positive is to the right on the screen.
-        float y_pos;       // positive is down the screen.
-        float x_vel;       // meters/second
-        float y_vel;
-        float orientation; // radians cw from x axis
-        float spin_rate;   // radians/second. positive is cw, negative is ccw
-        float max_torque;  // radians/second^2 (const).
+        double x_pos;       // pixels. positive is to the right on the screen.
+        double y_pos;       // positive is down the screen.
+        double x_vel;       // meters/second
+        double y_vel;
+        double orientation; // radians cw from x axis
+        double spin_rate;   // radians/second. positive is cw, negative is ccw
+        double max_torque;  // radians/second^2 (const).
                            // Torque is misnomer.
                            // it's actually angular acceleration.
-        float fuel;        // kg
-        float dry_mass;    // kg (const)
-        float init_fuel;   // kg (const)
-        float thrust;      // Newtons
-        float max_thrust;  // Newtons (const)
-        float exhaust_vel; // m/s
+        double fuel;        // kg
+        double dry_mass;    // kg (const)
+        double init_fuel;   // kg (const)
+        double thrust;      // Newtons
+        double max_thrust;  // Newtons (const)
+        double exhaust_vel; // m/s
 
         bool thrusting = false;
-        float torque;                            // radians/s^2.
+        double torque;                            // radians/s^2.
                                                  // torque is misnomer.
-        float dt;                                // seconds
-        float vel;                               // magnitude in pixels/s
-        const float safe_vel = 15.;              // pixels/s
-        const float max_vel = 100.;              // pixels/s. only cosmetic
-        const float safe_orientation = M_PI / 8; // radians from 3 * PI / 2
+        double dt;                                // seconds
+        double vel;                               // magnitude in pixels/s
+        const double safe_vel = 15.;              // pixels/s
+        const double max_vel = 100.;              // pixels/s. only cosmetic
+        const double safe_orientation = M_PI / 8; // radians from 3 * PI / 2
         const int pixels_per_meter = 10;         // pixels/meter
 
         // image textures
@@ -70,19 +70,19 @@ class Lander {
         // 3 is bottom right   1 - 3
         // all units here are pixels
         // spacecraft coordinates
-        const float sc_p1x = -WIDTH / 2.;
-        const float sc_p1y = 0.;
-        const float sc_p2x = 0.;
-        const float sc_p2y = (float) COLLISION_HEIGHT;
-        const float sc_p3x = WIDTH / 2.;
-        const float sc_p3y = 0.;
+        const double sc_p1x = -WIDTH / 2.;
+        const double sc_p1y = 0.;
+        const double sc_p2x = 0.;
+        const double sc_p2y = (double) COLLISION_HEIGHT;
+        const double sc_p3x = WIDTH / 2.;
+        const double sc_p3y = 0.;
         // world coordinates
-        float p1x;
-        float p1y;
-        float p2x;
-        float p2y;
-        float p3x;
-        float p3y;
+        double p1x;
+        double p1y;
+        double p2x;
+        double p2y;
+        double p3x;
+        double p3y;
 
         // Update position of corners in world coordinates.
         // Use sc_p#x and sc_p#y to compute p#x and p#y
@@ -95,17 +95,17 @@ class Lander {
     public:
         Lander(Screen& s);
         Lander(Screen& s,
-               float _x_pos,
-               float _y_pos,
-               float _x_vel,
-               float _y_vel,
-               float _orientation,
-               float _spin_rate,
-               float _max_torque,
-               float _dry_mass,
-               float _init_fuel,
-               float _max_thrust,
-               float _exhaust_vel
+               double _x_pos,
+               double _y_pos,
+               double _x_vel,
+               double _y_vel,
+               double _orientation,
+               double _spin_rate,
+               double _max_torque,
+               double _dry_mass,
+               double _init_fuel,
+               double _max_thrust,
+               double _exhaust_vel
         );
         ~Lander();
 
