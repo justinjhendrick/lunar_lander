@@ -7,7 +7,7 @@ Vector::Vector(float _x, float _y) {
     y = _y;
 }
 
-float Vector::cross_mag(const Vector& a, const Vector& b) {
+float Vector::cross(const Vector& a, const Vector& b) {
     return a.x * b.y - a.y * b.x;
 }
 
@@ -30,9 +30,9 @@ bool Vector::segments_intersect(const Vector& p,
                                 const Vector& q,
                                 const Vector& s) {
     float eps = 0.0001;
-    float rs = cross_mag(r, s);
+    float rs = cross(r, s);
     Vector qp = minus(q, p);
-    float qpr = cross_mag(qp, r);
+    float qpr = cross(qp, r);
     if (fabs(rs) < eps && fabs(qpr) < eps) {
         // collinear
         float rr = dot(r, r);
@@ -56,7 +56,7 @@ bool Vector::segments_intersect(const Vector& p,
         return false;
     }
 
-    float t = cross_mag(qp, s) / rs;
+    float t = cross(qp, s) / rs;
     float u = qpr / rs;
     if (0. <= t && t <= 1. && 0. <= u && u <= 1.) {
         return true;

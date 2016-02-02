@@ -8,8 +8,10 @@ class Vector {
         float y;
         Vector(float _x, float _y);
 
-        // magnitude of the cross product
-        static float cross_mag(const Vector& a, const Vector& b);
+        // value of 3rd coordinate of cross product
+        // the 3rd coordinate is the only nonzero component
+        // because a and b must be coplanar.
+        static float cross(const Vector& a, const Vector& b);
         static Vector minus(const Vector& a, const Vector& b);
         static Vector plus(const Vector& a, const Vector& b);
         // dot product
