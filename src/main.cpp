@@ -65,9 +65,15 @@ bool end_game(Screen& s,
     }
 }
 
+enum EndGameOpt {
+    NEW_GAME,
+    REPLAY,
+    QUIT
+}
+
 // play the game. A NULL pilot is a human player
 // returns true if the player wants to play again.
-bool play(Screen& s, Pilot* pilot) {
+EndGameOpt play(Screen& s, Pilot* pilot) {
     World world;
     Lander lander(s);
     SDL_Texture* win_text = s.create_text_texture(
@@ -156,24 +162,28 @@ int main(int argc, char** argv) {
         }
     }
 
-    // new map every time they replay without -s <seed>
-    if (!user_supplied_seed) {
-        Utils::seed_random(time(NULL));
-    }
-
     Screen s;
     bool again = true;
+    EndGameOpt choice = NEW_GAME;
     while (again) {
         // same map every time with -s <seed>
-        if (user_supplied_seed) {
-            Utils::seed_random(seed);
+        if (!user_supplied_seed && choice == NEW_GAME) {
+            seed = (unsigned int) time(NULL);
         }
-        again = play(s, p);
+        printf("seed = %u\n", seed);
+        Utils::seed_random(seed);
+
+        choice = play(s, p);
+        if (choice == QUIT) {
+            again = false;
+        }
+
         if (p != NULL) {
             delete p;
-            p = new Pilot();
+            if (again) {
+                p = new Pilot();
+            }
         }
     }
-    printf("seed = %u\n", seed);
 }
 
