@@ -167,13 +167,10 @@ void Lander::move() {
         // compute acceleration
         x_accel = thrust * cos(orientation) / (dry_mass + fuel);
         y_accel = thrust * sin(orientation) / (dry_mass + fuel);
-
-        double new_x_vel = x_vel + x_accel * dt;
-        double new_y_vel = y_vel + y_accel * dt;
         
         // calculate mass change
-        double dmdt = ((dry_mass + fuel) * sqrt(pow(new_x_vel - x_vel, 2) +
-                     pow(new_y_vel - y_vel, 2) / dt) - thrust) / exhaust_vel;
+        double dmdt = ((dry_mass + fuel) *
+                      hypot(x_accel * dt, y_accel * dt) - thrust) / exhaust_vel;
         fuel += dmdt * dt;
     }
     x_vel += x_accel * dt;
