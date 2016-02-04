@@ -2,17 +2,11 @@
 // and copied some code from it.
 #include <cstdio>
 #include <cstdlib>
-#include <random>
-#include <sys/time.h>
-#include <SDL2/SDL.h>
-#include <time.h>
 #include "Screen.hpp"
-#include "Lander.hpp"
 #include "constants.hpp"
-#include "Ground.hpp"
-#include "World.hpp"
 #include "Pilot.hpp"
 #include "Utils.hpp"
+#include "play.hpp"
 
 /***************** TODO *******************************************************
  * Testing
@@ -25,99 +19,6 @@
  *     compete against computer and/or other humans
  * Make Lander::torque actually torque, not angular acceleration
  ******************************************************************************/
-
-enum EndGameOpt {
-    NEW_GAME,
-    REPLAY,
-    QUIT
-};
-
-EndGameOpt end_game(Screen& s,
-              World& world,
-              Lander& lander,
-              bool win) {
-    if (!win) {
-        lander.explode();
-    }
-
-    // Take input to get response to "play again?"
-    SDL_Event e;
-    while (true) {
-        s.clear();
-        lander.draw(s);
-        world.draw(s);
-        s.put_endgame_text(win);
-        s.flip();
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                return QUIT;
-            } else if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_n) {
-                    return NEW_GAME;
-                } else if (e.key.keysym.sym == SDLK_r) {
-                    return REPLAY;
-                } else if (e.key.keysym.sym == SDLK_q) {
-                    return QUIT;
-                }
-            }
-        }
-        SDL_Delay(100);
-    }
-}
-
-// play the game. A NULL pilot is a human player
-EndGameOpt play(Screen& s, Pilot* pilot) {
-    World world;
-    Lander lander(s);
-
-    SDL_Event e;
-    while (true) {
-        struct timeval start = {0, 0};
-        gettimeofday(&start, NULL);
-
-        // Handle all events on queue
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                return QUIT;
-            }
-            if (pilot == NULL) {
-                lander.handle(&e);
-            }
-        }
-        if (pilot != NULL) {
-            pilot->fly(lander, world);
-        }
-
-        lander.move();
-
-        World::CollisionResult r = lander.check_collision(world);
-        if (r == World::CollisionResult::WIN) {
-            printf("win\n");
-            return end_game(s, world, lander, true);
-        } else if (r == World::CollisionResult::LOSE) {
-            printf("lose\n");
-            return end_game(s, world, lander, false);
-        }
-
-        s.clear();
-        lander.draw(s);
-        world.draw(s);
-        s.flip();
-
-        // sleep so that a frame takes FRAME_TIME
-        struct timeval now = {0, 0};
-        gettimeofday(&now, NULL);
-        struct timeval diff = {0, 0};
-        timersub(&now, &start, &diff);
-        unsigned int sleep_time = FRAME_TIME -
-            ((unsigned int) diff.tv_usec / 1000);
-        if (FRAME_TIME > diff.tv_usec / 1000) {
-            SDL_Delay(sleep_time);
-        } else {
-            printf("tired\n");
-        }
-    }
-}
 
 void invalid_args() {
     fprintf(stderr, "Invalid command line arguments\n.");
@@ -152,15 +53,13 @@ int main(int argc, char** argv) {
 
     Screen s;
     bool again = true;
-    EndGameOpt choice;
+    PlayResult result(false, QUIT);
     while (again) {
-        printf("seed = %u\n", seed);
-        Utils::seed_random(seed);
 
-        choice = play(s, p);
-        if (choice == QUIT) {
+        result = play(&s, p, seed);
+        if (result.choice == QUIT) {
             again = false;
-        } else if (choice == NEW_GAME) {
+        } else if (result.choice == NEW_GAME) {
             seed = (unsigned int) time(NULL);
         }
 

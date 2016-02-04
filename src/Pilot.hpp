@@ -47,7 +47,7 @@ class Pilot {
         // constants
         const int STOP_ABOVE_PAD = 15; // pixels
         const double MAX_XDIST_FROM_PAD_CENTER = World::SEGMENT_WIDTH / 10;
-        const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.2;
+        const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
         const double MAX_DIFF_FROM_RETROGRADE = .02; // radians
         const double LANDING_VEL_SAFETY_MARGIN = .95; // for rounding error
 

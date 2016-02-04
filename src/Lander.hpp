@@ -38,18 +38,18 @@ class Lander {
         const int pixels_per_meter = 10;         // pixels/meter
 
         // image textures
-        SDL_Texture* txtr;
-        SDL_Texture* txtr_fire_low;
-        SDL_Texture* txtr_fire_med;
-        SDL_Texture* txtr_fire_high;
-        SDL_Texture* txtr_explosion;
-        SDL_Texture* txtr_torque_cw;
-        SDL_Texture* txtr_torque_ccw;
+        SDL_Texture* txtr = NULL;
+        SDL_Texture* txtr_fire_low = NULL;
+        SDL_Texture* txtr_fire_med = NULL;
+        SDL_Texture* txtr_fire_high = NULL;
+        SDL_Texture* txtr_explosion = NULL;
+        SDL_Texture* txtr_torque_cw = NULL;
+        SDL_Texture* txtr_torque_ccw = NULL;
         // text textures
-        SDL_Texture* fuel_txtr;
-        SDL_Texture* thrust_txtr;
-        SDL_Texture* vel_txtr;
-        SDL_Texture* vel_txtr_green;
+        SDL_Texture* fuel_txtr = NULL;
+        SDL_Texture* thrust_txtr = NULL;
+        SDL_Texture* vel_txtr = NULL;
+        SDL_Texture* vel_txtr_green = NULL;
 
         // the center of mass of the craft
         SDL_Point rot_abt;
@@ -93,8 +93,8 @@ class Lander {
         bool is_safe_landing();
         bool is_colliding(const Ground& ground);
     public:
-        Lander(Screen& s);
-        Lander(Screen& s,
+        Lander(Screen* s);
+        Lander(Screen* s,
                double _x_pos,
                double _y_pos,
                double _x_vel,

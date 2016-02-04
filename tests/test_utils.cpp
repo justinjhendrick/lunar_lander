@@ -6,7 +6,7 @@
 #include "../src/Utils.hpp"
 
 void test_angle_diff() {
-    float out = 0.0;
+    double out = 0.0;
     assert(Utils::angle_diff(.1, 2 * M_PI - .1, &out));
     assert(fabs(out - .2) < .001);
 
@@ -35,7 +35,7 @@ void test_nearest_int() {
 
 void test_random() {
     Utils::seed_random(time(NULL));
-    float f = Utils::rand_float(0., 10.);
+    double f = Utils::rand_double(0., 10.);
     assert(f >= 0. && f <= 10.);
 
     int i = Utils::rand_int(1, 10);

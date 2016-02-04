@@ -221,6 +221,7 @@ void Pilot::fly(Lander& l, World& world) {
         double next_vel = hypot(l.x_vel, next_y_vel);
         if (next_vel > l.safe_vel * LANDING_VEL_SAFETY_MARGIN /
                        l.pixels_per_meter) {
+            //printf("GO\n");
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }

@@ -7,7 +7,7 @@
 #include "Utils.hpp"
 #include "World.hpp"
 
-Lander::Lander(Screen& s) :
+Lander::Lander(Screen* s) :
     Lander(s,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
            Screen::HEIGHT / 4, // y_pos
@@ -25,7 +25,7 @@ Lander::Lander(Screen& s) :
     // https://en.wikipedia.org/wiki/Apollo_Lunar_Module
 }
 
-Lander::Lander(Screen& s,
+Lander::Lander(Screen* s,
        double _x_pos,
        double _y_pos,
        double _x_vel,
@@ -58,21 +58,23 @@ Lander::Lander(Screen& s,
     rot_abt.x = WIDTH / 2;
     rot_abt.y = COLLISION_HEIGHT;
 
-    // bmp textures
-    txtr = s.load_texture("sprites/lander.bmp");
-    txtr_fire_low = s.load_texture("sprites/lander_fire_low.bmp");
-    txtr_fire_med = s.load_texture("sprites/lander_fire_med.bmp");
-    txtr_fire_high = s.load_texture("sprites/lander_fire_high.bmp");
-    txtr_explosion = s.load_texture("sprites/explosion.bmp");
-    txtr_torque_cw = s.load_texture("sprites/torque_cw.bmp");
-    txtr_torque_ccw = s.load_texture("sprites/torque_ccw.bmp");
+    if (s != NULL) {
+        // bmp textures
+        txtr = s->load_texture("sprites/lander.bmp");
+        txtr_fire_low = s->load_texture("sprites/lander_fire_low.bmp");
+        txtr_fire_med = s->load_texture("sprites/lander_fire_med.bmp");
+        txtr_fire_high = s->load_texture("sprites/lander_fire_high.bmp");
+        txtr_explosion = s->load_texture("sprites/explosion.bmp");
+        txtr_torque_cw = s->load_texture("sprites/torque_cw.bmp");
+        txtr_torque_ccw = s->load_texture("sprites/torque_ccw.bmp");
 
-    // text textures
-    fuel_txtr = s.create_text_texture("FUEL ", NULL);
-    thrust_txtr = s.create_text_texture("THRUST ", NULL);
-    vel_txtr = s.create_text_texture("VEL ", NULL);
-    SDL_Color green = {0x33, 0xFF, 0x33, 0xFF};
-    vel_txtr_green = s.create_text_texture("VEL ", &green);
+        // text textures
+        fuel_txtr = s->create_text_texture("FUEL ", NULL);
+        thrust_txtr = s->create_text_texture("THRUST ", NULL);
+        vel_txtr = s->create_text_texture("VEL ", NULL);
+        SDL_Color green = {0x33, 0xFF, 0x33, 0xFF};
+        vel_txtr_green = s->create_text_texture("VEL ", &green);
+    }
 }
 
 void Lander::handle(SDL_Event* e) {
@@ -408,15 +410,17 @@ World::CollisionResult Lander::check_collision(World& w) {
 }
 
 Lander::~Lander() {
-    SDL_DestroyTexture(txtr);
-    SDL_DestroyTexture(txtr_fire_low);
-    SDL_DestroyTexture(txtr_fire_med);
-    SDL_DestroyTexture(txtr_fire_high);
-    SDL_DestroyTexture(txtr_explosion);
-    SDL_DestroyTexture(txtr_torque_cw);
-    SDL_DestroyTexture(txtr_torque_ccw);
-    SDL_DestroyTexture(fuel_txtr);
-    SDL_DestroyTexture(thrust_txtr);
-    SDL_DestroyTexture(vel_txtr);
-    SDL_DestroyTexture(vel_txtr_green);
+    if (txtr != NULL) {
+        SDL_DestroyTexture(txtr);
+        SDL_DestroyTexture(txtr_fire_low);
+        SDL_DestroyTexture(txtr_fire_med);
+        SDL_DestroyTexture(txtr_fire_high);
+        SDL_DestroyTexture(txtr_explosion);
+        SDL_DestroyTexture(txtr_torque_cw);
+        SDL_DestroyTexture(txtr_torque_ccw);
+        SDL_DestroyTexture(fuel_txtr);
+        SDL_DestroyTexture(thrust_txtr);
+        SDL_DestroyTexture(vel_txtr);
+        SDL_DestroyTexture(vel_txtr_green);
+    }
 }
