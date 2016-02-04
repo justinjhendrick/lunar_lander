@@ -173,8 +173,10 @@ void Lander::move() {
                       hypot(x_accel * dt, y_accel * dt) - thrust) / exhaust_vel;
         fuel += dmdt * dt;
     }
+    y_accel += World::g;
+
     x_vel += x_accel * dt;
-    y_vel += (y_accel + World::g) * dt; // gravity
+    y_vel += y_accel * dt;
 
     vel = hypot(x_vel, y_vel) * pixels_per_meter;
 
