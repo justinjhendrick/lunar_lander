@@ -152,6 +152,38 @@ void Lander::update_corners() {
     p3y = s * sc_p3x + c * sc_p3y + COLLISION_HEIGHT + y_pos;
 }
 
+// publicly available next_velocity is only a prediction,
+// it can't use fuel.
+std::pair<double, double> Lander::next_velocity() {
+    VelAccel va = next_vel_accel(false);
+    std::pair<double, double> result(va.x_vel, va.y_vel);
+    return result;
+}
+
+Lander::VelAccel Lander::next_vel_accel(bool real) {
+    VelAccel va;
+    va.x_accel = 0.;
+    va.y_accel = 0.;
+    if (thrusting && thrust > 0.) {
+        // compute acceleration
+        va.x_accel = thrust * cos(orientation) / (dry_mass + fuel);
+        va.y_accel = thrust * sin(orientation) / (dry_mass + fuel);
+
+        if (real) {
+            // calculate mass change
+            double dmdt = ((dry_mass + fuel) *
+                          hypot(va.x_accel * dt, va.y_accel * dt) - thrust) /
+                          exhaust_vel;
+            fuel += dmdt * dt;
+        }
+    }
+    va.y_accel += World::g;
+
+    va.x_vel = x_vel + va.x_accel * dt;
+    va.y_vel = y_vel + va.y_accel * dt;
+    return va;
+}
+
 void Lander::move() {
     spin_rate += torque * dt;
     orientation += spin_rate * dt;
@@ -161,28 +193,15 @@ void Lander::move() {
         orientation += 2 * M_PI;
     }
 
-    double x_accel = 0.;
-    double y_accel = 0.;
-    if (thrusting && thrust > 0.) {
-        // compute acceleration
-        x_accel = thrust * cos(orientation) / (dry_mass + fuel);
-        y_accel = thrust * sin(orientation) / (dry_mass + fuel);
-        
-        // calculate mass change
-        double dmdt = ((dry_mass + fuel) *
-                      hypot(x_accel * dt, y_accel * dt) - thrust) / exhaust_vel;
-        fuel += dmdt * dt;
-    }
-    y_accel += World::g;
-
-    x_vel += x_accel * dt;
-    y_vel += y_accel * dt;
+    VelAccel va = next_vel_accel(true);
+    x_vel = va.x_vel;
+    y_vel = va.y_vel;
 
     vel = hypot(x_vel, y_vel) * pixels_per_meter;
 
     // calculate new position
-    x_pos += (x_vel * dt + .5 * x_accel * dt * dt) * pixels_per_meter;
-    y_pos += (y_vel * dt + .5 * y_accel * dt * dt) * pixels_per_meter;
+    x_pos += (x_vel * dt + .5 * va.x_accel * dt * dt) * pixels_per_meter;
+    y_pos += (y_vel * dt + .5 * va.y_accel * dt * dt) * pixels_per_meter;
 
     // recalculate collision points
     update_corners();

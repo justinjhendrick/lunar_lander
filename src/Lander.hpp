@@ -92,6 +92,17 @@ class Lander {
 
         bool is_safe_landing();
         bool is_colliding(const Ground& ground);
+
+        typedef struct VelAccel {
+            double x_vel;
+            double y_vel;
+            double x_accel;
+            double y_accel;
+        } VelAccel;
+
+        // computes next velocity (m/s) and and acceleration (m/s^2)
+        // if [real] is true, fuel will be used
+        VelAccel next_vel_accel(bool real);
     public:
         Lander(Screen* s);
         Lander(Screen* s,
@@ -110,10 +121,23 @@ class Lander {
         ~Lander();
 
         void draw(Screen& s);
+
+        // Look for keys that control the Lander
         void handle(SDL_Event* e);
+
+        // Under the current Lander conditions,
+        // what would the velocity in the next frame be?
+        std::pair<double, double> next_velocity();
+
+        // move the Lander
         void move();
+
+        // for changing the texture to an explosion
         void explode();
+
+        // Are we colliding with the ground or the pad?
         World::CollisionResult check_collision(World& w);
+
         friend Pilot;
 };
 
