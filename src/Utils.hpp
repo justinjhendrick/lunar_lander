@@ -19,6 +19,11 @@ class Utils {
         static int rand_int(int lower_bd, int upper_bd);
 
         // compute the absolute value of the difference between two angles
+        // returns true if difference passes thru zero
+        static bool Utils::abs_angle_diff(double a, double b, double* out);
+
+        // compute the difference between two angles (a - b)
+        // returns true if difference passes thru zero
         static bool angle_diff(double a, double b, double* out);
 
         // round a double to the nearest integer

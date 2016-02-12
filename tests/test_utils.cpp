@@ -7,12 +7,14 @@
 
 void test_angle_diff() {
     double out = 0.0;
-    assert(Utils::angle_diff(.1, 2 * M_PI - .1, &out));
+    assert(Utils::abs_angle_diff(.1, 2 * M_PI - .1, &out));
     assert(fabs(out - .2) < .001);
 
     out = 0.0;
-    assert(!Utils::angle_diff(M_PI + .1, M_PI - .1, &out));
+    assert(!Utils::abs_angle_diff(M_PI + .1, M_PI - .1, &out));
     assert(fabs(out - .2) < .001);
+
+    // TODO: test non-absolute version
 }
 
 void test_nearest_int() {

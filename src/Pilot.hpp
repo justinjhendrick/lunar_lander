@@ -50,6 +50,7 @@ class Pilot {
         const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
         const double MAX_DIFF_FROM_RETROGRADE = .02; // radians
         const double LANDING_VEL_SAFETY_MARGIN = .95; // for rounding error
+        const double INSIGNIFICANT_VEL_THRESH = 3.; // pixels/s
 
         // rotate the lander to the tgt_orientation
         void rotate_to(Lander& l, double tgt_orientation);

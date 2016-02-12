@@ -18,14 +18,25 @@ int Utils::rand_int(int lower_bd, int upper_bd) {
     return dist(rand_generator);
 }
 
+
+bool Utils::abs_angle_diff(double a, double b, double* out) {
+    double result;
+    bool thru_zero = angle_diff(a, b, &result);
+    *out = fabs(result);
+    return thru_zero;
+}
+
 // puts difference in 'out'
 // returns true if it'll pass through zero
 bool Utils::angle_diff(double a, double b, double* out) {
-    double diff = fabs(a - b);
+    double diff = a - b;
     bool thru_zero = false;
     // shouldn't ever rotate more than half circle
     if (diff > M_PI) {
         diff = 2 * M_PI - diff;
+        thru_zero = true;
+    } else if (diff < -M_PI) {
+        diff = -2 * M_PI - diff;
         thru_zero = true;
     }
     *out = diff;

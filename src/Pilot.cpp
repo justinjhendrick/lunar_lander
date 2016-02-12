@@ -11,65 +11,35 @@ Pilot::Pilot() {
     frame = 0;
 }
 
+// return an angle in radians (0 .. 2pi)
+// that represents an orientation where
+// thrusters point in the direction of travel
+double compute_retrograde(x_vel, y_vel) {
+    double retrograde = atan2(y_vel, x_vel);
+    retrograde += M_PI;
+    if (retrograde >= 2 * M_PI) {
+        retrograde -= 2 * M_PI;
+    }
+    return retrograde;
+}
+
 // point craft in direction opposite our velocity ==
 // point thrusters in direction of our velocity
 //
 // the bool flag 'landing' tells us to maintain
 // an orientation that's safe for landing
 void Pilot::point_retrograde(Lander& l, bool landing) {
-    if (rot_state == START) {
-        if (l.vel < 3.) {
-            // if we're moving really slowly, retrograde direction
-            // isn't very meaningful. Safe to not rotate.
-            return;
-        }
-        //printf("vel = %f, ", l.vel);
-        double retrograde = atan2(l.y_vel, l.x_vel);
-        //printf("atan2(%f, %f) = %f, ", l.y_vel, l.x_vel, retrograde * 180. / M_PI);
-        retrograde += M_PI;
-        if (retrograde >= 2 * M_PI) {
-            retrograde -= 2 * M_PI;
-        }
-
-        double diff;
-        if (landing) {
-            // don't rotate past the safe difference from straight up
-            Utils::angle_diff(retrograde, 3 * M_PI_2, &diff);
-            if (diff >= LANDING_ORIENTATION_SAFETY_MARGIN * l.safe_orientation) {
-                //printf("retrograde is unsafe for landing!\n");
-                if (retrograde > 3 * M_PI_2) {
-                    retrograde = 3 * M_PI_2 +
-                        LANDING_ORIENTATION_SAFETY_MARGIN * l.safe_orientation;
-                } else {
-                    retrograde = 3 * M_PI_2 -
-                        LANDING_ORIENTATION_SAFETY_MARGIN * l.safe_orientation;
-                }
-            }
-
-            // smooth retrograde orientation
-            smooth_retrograde = alpha * retrograde +
-                                (1. - alpha) * smooth_retrograde;
-            retrograde = smooth_retrograde;
-
-            //printf(" corrected_retrograde = %f\n", retrograde * 180. / M_PI);
-        } else {
-            //printf("\n");
-            smooth_retrograde = retrograde;
-        }
-
-        Utils::angle_diff(retrograde, l.orientation, &diff);
-        if (diff > MAX_DIFF_FROM_RETROGRADE) {
-            // start a rotation
-            target_orientation = retrograde;
-            rotate_to(l, target_orientation);
-        }
-    } else {
-        // finish a rotation we started earlier
-        rotate_to(l, target_orientation);
-        if (rot_state == DONE) {
-            rot_state = START;
-        }
+    if (l.vel < INSIGNIFICANT_VEL_THRESH) {
+        // if we're moving really slowly, retrograde direction
+        // isn't very meaningful. Safe to not rotate.
+        return;
     }
+
+    double retrograde = compute_retrograde(l.x_vel, l.y_vel);
+    std::pair<double, double> next_vel = l.next_velocity();
+    double next_retro = compute_retrograde(next_vel.first, next_vel.second);
+    double delta_retro;
+    Utils::angle_diff(next_retro, retrograde, &delta_retro);
 }
 
 // rotate the lander to the target orientation
@@ -80,7 +50,7 @@ void Pilot::rotate_to(Lander& l, double tgt_orientation) {
     if (rot_state == START) {
         // choose which direction to rotate
         init_orientation = l.orientation;
-        bool through_zero = Utils::angle_diff(tgt_orientation,
+        bool through_zero = Utils::abs_angle_diff(tgt_orientation,
                                               init_orientation,
                                               &d_theta
         );
@@ -96,7 +66,7 @@ void Pilot::rotate_to(Lander& l, double tgt_orientation) {
     } else if (rot_state == TORQUE_UP) {
         // torque until we make it halfway
         double traveled;
-        Utils::angle_diff(init_orientation, l.orientation, &traveled);
+        Utils::abs_angle_diff(init_orientation, l.orientation, &traveled);
         if (traveled >= d_theta / 2.) {
             l.torque *= -1;
             rot_state = TORQUE_DOWN;
@@ -113,7 +83,7 @@ void Pilot::rotate_to(Lander& l, double tgt_orientation) {
             rot_state = DONE;
 
             double diff;
-            Utils::angle_diff(l.orientation, tgt_orientation, &diff);
+            Utils::abs_angle_diff(l.orientation, tgt_orientation, &diff);
             //printf("rot error = %f radians\n", diff);
         } else {
             rot_frame++;
@@ -177,7 +147,6 @@ void Pilot::fly(Lander& l, World& world) {
             state = FALL_TO_PAD;
         }
     } else if (state == FALL_TO_PAD) {
-        point_retrograde(l, false);
         // When do we turn on the thruster?
         // What will our acceleration be while thrusting?
         // a = g - F_T / m                 (NOTE: assumption dm/dt << m)
@@ -205,18 +174,18 @@ void Pilot::fly(Lander& l, World& world) {
             // burn frames is positive because
             // thrust time is positive because it's a result of fabs()
         }
+        point_retrograde(l, false);
     } else if (state == SUICIDE_BURN) {
         //double vel = hypot(l.x_vel, l.y_vel);
         //printf("burn: hypot(%f, %f) = %f m/s\n", l.x_vel, l.y_vel, vel);
-        point_retrograde(l, false);
         if (frame >= stop_burn_frame) {
             l.thrusting = false;
             state = LAND;
         }
+        point_retrograde(l, false);
     } else if (state == LAND) {
         //double vel = hypot(l.x_vel, l.y_vel);
         //printf("land: hypot(%f, %f) = %f m/s\n", l.x_vel, l.y_vel, vel);
-        point_retrograde(l, true);
         double next_y_vel = l.y_vel + World::g * l.dt;
         double next_vel = hypot(l.x_vel, next_y_vel);
         if (next_vel > l.safe_vel * LANDING_VEL_SAFETY_MARGIN /
@@ -225,6 +194,7 @@ void Pilot::fly(Lander& l, World& world) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }
+        point_retrograde(l, true);
     }
     frame++;
 }
