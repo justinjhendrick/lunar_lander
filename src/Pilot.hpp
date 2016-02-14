@@ -56,9 +56,9 @@ class Pilot {
         constexpr static const double INSIGNIFICANT_VEL_THRESH = 3.; // pixels/s
 
         // see https://en.wikipedia.org/wiki/PID_controller
-        constexpr static const double PID_KP = 0.5;
-        constexpr static const double PID_KD = 1.0;
-        constexpr static const double PID_KI = 0.5;
+        constexpr static const double PID_KP = 10.0;
+        constexpr static const double PID_KD = 0.0;
+        constexpr static const double PID_KI = 0.0;
 
         // rotate the lander to the tgt_orientation
         void rotate_to(Lander& l, double tgt_orientation);

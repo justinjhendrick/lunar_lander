@@ -33,10 +33,10 @@ bool Utils::angle_diff(double a, double b, double* out) {
     bool thru_zero = false;
     // shouldn't ever rotate more than half circle
     if (diff > M_PI) {
-        diff = 2 * M_PI - diff;
+        diff = -2 * M_PI + diff;
         thru_zero = true;
     } else if (diff < -M_PI) {
-        diff = -2 * M_PI - diff;
+        diff = 2 * M_PI + diff;
         thru_zero = true;
     }
     *out = diff;

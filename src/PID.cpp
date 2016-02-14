@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "PID.hpp"
+#include "Utils.hpp"
 
 // https://gist.github.com/bradley219/5373998
 using namespace std;
@@ -36,9 +37,9 @@ PIDImpl::PIDImpl( double dt, double max, double min, double Kp, double Kd, doubl
 
 double PIDImpl::calculate( double setpoint, double pv )
 {
-    
     // Calculate error
-    double error = setpoint - pv;
+    double error;// = setpoint - pv;
+    Utils::angle_diff(setpoint, pv, &error);
 
     // Proportional term
     double Pout = _Kp * error;

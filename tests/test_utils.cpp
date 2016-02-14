@@ -16,15 +16,23 @@ void test_angle_diff() {
 
     out = 0.0;
     assert(Utils::angle_diff(.1, 2 * M_PI - .1, &out));
-    assert(fabs(out + .2) < .001);
+    assert(fabs(out - .2) < .001);
 
     out = 0.0;
     assert(Utils::angle_diff(2 * M_PI - .1, .1, &out));
-    assert(fabs(out - .2) < .001);
+    assert(fabs(out + .2) < .001);
 
     out = 0.0;
     assert(!Utils::angle_diff(M_PI + .1, M_PI - .1, &out));
     assert(fabs(out - .2) < .001);
+
+    out = 0.0;
+    assert(!Utils::angle_diff(4.0, 2 * M_PI, &out));
+    assert(fabs(out + 2.283) < .001);
+
+    out = 0.0;
+    assert(Utils::angle_diff(4.0, 0., &out));
+    assert(fabs(out + 2.283) < .001);
 }
 
 void test_nearest_int() {
