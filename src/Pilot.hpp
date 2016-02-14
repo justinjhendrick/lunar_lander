@@ -63,6 +63,11 @@ class Pilot {
 
         // how long will a freefall of y_fall_dist take, starting at y_vel?
         double fall_time(double y_vel, double y_fall_dist);
+
+        // return an angle in radians (0 .. 2pi)
+        // that represents an orientation where
+        // thrusters point in the direction of travel
+        double compute_retrograde(double x_vel, double y_vel);
     public:
         Pilot();
         void fly(Lander& l, World& world);

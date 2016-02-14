@@ -1,5 +1,6 @@
 // used this tutorial http://www.lazyfoo.net/tutorials/SDL/
 // and copied some code from it.
+#include <SDL2/SDL.h>
 #include <cstdio>
 #include <cstdlib>
 #include "Screen.hpp"
@@ -8,12 +9,12 @@
 #include "Utils.hpp"
 #include "play.hpp"
 
+
 /***************** TODO *******************************************************
- * Testing
+ * More testing
  * Better design pattern compliance
  *     Like hiding internal details inside classes
- *     Split physics out of the lander
- *     no magic numbers
+ *     Split physics out of the lander?
  * Competition
  *     Score for time and fuel used
  *     compete against computer and/or other humans
@@ -23,6 +24,58 @@
 void invalid_args() {
     fprintf(stderr, "Invalid command line arguments\n.");
     fprintf(stderr, "Usage: ./lunar_lander [-c] [-s <seed>]\n");
+}
+
+// Main menu. How to play and press any key to begin.
+bool menu(Screen& s) {
+    SDL_Rect title;
+    title.w = Screen::WIDTH / 4;
+    title.h = 3 * Screen::HEIGHT / 16;
+    title.x = Screen::WIDTH / 2 - title.w / 2;
+    title.y = Screen::HEIGHT / 16;
+    
+    SDL_Rect where;
+    where.w = 3 * Screen::WIDTH / 4;
+    where.h = Screen::HEIGHT / 16;
+    where.x = Screen::WIDTH / 2 - where.w / 2;
+
+    SDL_Texture* title_text[7];
+    title_text[0] = s.create_text_texture( "Lunar Lander", NULL);
+    title_text[1] = s.create_text_texture(
+            "left  or a     apply torque counterclockwise", NULL);
+    title_text[2] = s.create_text_texture(
+            "right or d     apply torque clockwise       ", NULL);
+    title_text[3] = s.create_text_texture(
+            "Spacebar       fire thruster                ", NULL);
+    title_text[4] = s.create_text_texture(
+            "up    or w     increase thrust              ", NULL);
+    title_text[5] = s.create_text_texture(
+            "down  or s     decrease thrust              ", NULL);
+    title_text[6] = s.create_text_texture(
+            "            Press any key to start          ", NULL);
+
+    SDL_Event e;
+    while (true) {
+        s.clear();
+        where.y = Screen::HEIGHT / 6 - where.h / 2;
+        for (int i = 0; i < 7; i++) {
+            SDL_Rect rect = (i == 0 ? title : where);
+            SDL_RenderCopy(s.renderer, title_text[i], NULL, &rect);
+            where.y += rect.h;
+            if (i == 5) {
+                where.y += rect.h;
+            }
+        }
+        s.flip();
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                return false;
+            } else if (e.type == SDL_KEYDOWN) {
+                return true;
+            }
+        }
+        SDL_Delay(100);
+    }
 }
 
 int main(int argc, char** argv) {
@@ -53,16 +106,23 @@ int main(int argc, char** argv) {
 
     Screen s;
     bool again = true;
+    if (p == NULL) {
+        again = menu(s);
+    }
     PlayResult result(false, QUIT);
     while (again) {
 
+        // play the game
         result = play(&s, p, seed);
+
+        // read their choice (Quit, New game, or replay)
         if (result.choice == QUIT) {
             again = false;
         } else if (result.choice == NEW_GAME) {
             seed = (unsigned int) time(NULL);
         }
 
+        // recreate the Pilot if we need to
         if (p != NULL) {
             delete p;
             if (again) {

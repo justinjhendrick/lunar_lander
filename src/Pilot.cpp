@@ -16,7 +16,7 @@ Pilot::Pilot() :
 // return an angle in radians (0 .. 2pi)
 // that represents an orientation where
 // thrusters point in the direction of travel
-double compute_retrograde(double x_vel, double y_vel) {
+double Pilot::compute_retrograde(double x_vel, double y_vel) {
     double retrograde = atan2(y_vel, x_vel);
     retrograde += M_PI;
     if (retrograde >= 2 * M_PI) {
