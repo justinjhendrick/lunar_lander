@@ -27,23 +27,12 @@ double compute_retrograde(double x_vel, double y_vel) {
 
 // point craft in direction opposite our velocity ==
 // point thrusters in direction of our velocity
-//
-// the bool flag 'landing' tells us to maintain
-// an orientation that's safe for landing
 void Pilot::point_retrograde(Lander& l, bool landing) {
-    //if (l.vel < INSIGNIFICANT_VEL_THRESH) {
-    //    // if we're moving really slowly, retrograde direction
-    //    // isn't very meaningful. Safe to not rotate.
-    //    return;
-    //}
-
     std::pair<double, double> next_vel = l.next_velocity();
     double next_retro = compute_retrograde(next_vel.first, next_vel.second);
     // calculate(desired, current)
     double pid_output = pid.calculate(next_retro, l.orientation);
-    double error;
-    Utils::angle_diff(next_retro, l.orientation, &error);
-    printf("%f, %f, %f, %f\n", next_retro, l.orientation, pid_output, error);
+    //printf("%f, %f, %f\n", next_retro, l.orientation, pid_output);
     l.torque = pid_output;
 }
 

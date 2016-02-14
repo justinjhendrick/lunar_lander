@@ -48,7 +48,7 @@ class Pilot {
         const double alpha = .5;
 
         // constants
-        constexpr static const int STOP_ABOVE_PAD = 15; // pixels
+        constexpr static const int STOP_ABOVE_PAD = 10; // pixels
         constexpr static const double MAX_XDIST_FROM_PAD_CENTER = World::SEGMENT_WIDTH / 10;
         constexpr static const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
         constexpr static const double MAX_DIFF_FROM_RETROGRADE = .02; // radians
@@ -57,7 +57,7 @@ class Pilot {
 
         // see https://en.wikipedia.org/wiki/PID_controller
         constexpr static const double PID_KP = 10.0;
-        constexpr static const double PID_KD = 0.0;
+        constexpr static const double PID_KD = 5.0;
         constexpr static const double PID_KI = 0.0;
 
         // rotate the lander to the tgt_orientation
