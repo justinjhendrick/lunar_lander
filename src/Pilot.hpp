@@ -43,17 +43,12 @@ class Pilot {
         // When to turn off the thrusters
         unsigned long stop_burn_frame;
 
-        // exponential smoothing of retrograde orientation while landing
-        double smooth_retrograde;
-        const double alpha = .5;
-
         // constants
         constexpr static const int STOP_ABOVE_PAD = 10; // pixels
         constexpr static const double MAX_XDIST_FROM_PAD_CENTER = World::SEGMENT_WIDTH / 10;
         constexpr static const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
         constexpr static const double MAX_DIFF_FROM_RETROGRADE = .02; // radians
         constexpr static const double LANDING_VEL_SAFETY_MARGIN = .95; // for rounding error
-        constexpr static const double INSIGNIFICANT_VEL_THRESH = 3.; // pixels/s
 
         // see https://en.wikipedia.org/wiki/PID_controller
         constexpr static const double PID_KP = 10.0;
