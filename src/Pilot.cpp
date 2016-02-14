@@ -4,8 +4,10 @@
 #include "Ground.hpp"
 #include "constants.hpp"
 #include "Utils.hpp"
+#include "PID.hpp"
 
-Pilot::Pilot() {
+Pilot::Pilot() :
+    pid(DT, Lander::MAX_TORQUE, -Lander::MAX_TORQUE, PID_KP, PID_KD, PID_KI) {
     state = BEGIN;
     rot_state = START;
     frame = 0;
@@ -14,7 +16,7 @@ Pilot::Pilot() {
 // return an angle in radians (0 .. 2pi)
 // that represents an orientation where
 // thrusters point in the direction of travel
-double compute_retrograde(x_vel, y_vel) {
+double compute_retrograde(double x_vel, double y_vel) {
     double retrograde = atan2(y_vel, x_vel);
     retrograde += M_PI;
     if (retrograde >= 2 * M_PI) {
@@ -35,11 +37,12 @@ void Pilot::point_retrograde(Lander& l, bool landing) {
         return;
     }
 
-    double retrograde = compute_retrograde(l.x_vel, l.y_vel);
     std::pair<double, double> next_vel = l.next_velocity();
     double next_retro = compute_retrograde(next_vel.first, next_vel.second);
-    double delta_retro;
-    Utils::angle_diff(next_retro, retrograde, &delta_retro);
+    printf("next_retro = %f, ", next_retro);
+    double pid_output = pid.calculate(next_retro, l.orientation);
+    l.torque = pid_output;
+    printf("pid_output = %f\n", pid_output);
 }
 
 // rotate the lander to the target orientation
@@ -57,9 +60,9 @@ void Pilot::rotate_to(Lander& l, double tgt_orientation) {
         int correction = through_zero ? -1 : 1;
 
         if (tgt_orientation > l.orientation) {
-            l.torque = l.max_torque * correction;
+            l.torque = Lander::MAX_TORQUE * correction;
         } else {
-            l.torque = -l.max_torque * correction;
+            l.torque = -Lander::MAX_TORQUE * correction;
         }
         rot_state = TORQUE_UP;
         rot_frame = 1;
@@ -186,7 +189,7 @@ void Pilot::fly(Lander& l, World& world) {
     } else if (state == LAND) {
         //double vel = hypot(l.x_vel, l.y_vel);
         //printf("land: hypot(%f, %f) = %f m/s\n", l.x_vel, l.y_vel, vel);
-        double next_y_vel = l.y_vel + World::g * l.dt;
+        double next_y_vel = l.y_vel + World::g * DT;
         double next_vel = hypot(l.x_vel, next_y_vel);
         if (next_vel > l.safe_vel * LANDING_VEL_SAFETY_MARGIN /
                        l.pixels_per_meter) {

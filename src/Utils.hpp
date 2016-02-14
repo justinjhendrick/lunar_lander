@@ -20,7 +20,7 @@ class Utils {
 
         // compute the absolute value of the difference between two angles
         // returns true if difference passes thru zero
-        static bool Utils::abs_angle_diff(double a, double b, double* out);
+        static bool abs_angle_diff(double a, double b, double* out);
 
         // compute the difference between two angles (a - b)
         // returns true if difference passes thru zero

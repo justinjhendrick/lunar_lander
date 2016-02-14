@@ -17,7 +17,6 @@ class Lander {
         double y_vel;
         double orientation; // radians cw from x axis
         double spin_rate;   // radians/second. positive is cw, negative is ccw
-        double max_torque;  // radians/second^2 (const).
                            // Torque is misnomer.
                            // it's actually angular acceleration.
         double fuel;        // kg
@@ -30,12 +29,12 @@ class Lander {
         bool thrusting = false;
         double torque;                            // radians/s^2.
                                                  // torque is misnomer.
-        double dt;                                // seconds
         double vel;                               // magnitude in pixels/s
         const double safe_vel = 15.;              // pixels/s
         const double max_vel = 100.;              // pixels/s. only cosmetic
         const double safe_orientation = M_PI / 8; // radians from 3 * PI / 2
         const int pixels_per_meter = 10;         // pixels/meter
+        constexpr static const double MAX_TORQUE = 5.;  // radians/s^2
 
         // image textures
         SDL_Texture* txtr = NULL;
@@ -112,7 +111,6 @@ class Lander {
                double _y_vel,
                double _orientation,
                double _spin_rate,
-               double _max_torque,
                double _dry_mass,
                double _init_fuel,
                double _max_thrust,

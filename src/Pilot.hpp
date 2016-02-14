@@ -3,9 +3,12 @@
 
 #include "World.hpp"
 #include "Lander.hpp"
+#include "PID.hpp"
 
 class Pilot {
     private:
+        PID pid;
+        
         // state variables for rotate_to()
         enum RotationState {
             START,
@@ -45,12 +48,17 @@ class Pilot {
         const double alpha = .5;
 
         // constants
-        const int STOP_ABOVE_PAD = 15; // pixels
-        const double MAX_XDIST_FROM_PAD_CENTER = World::SEGMENT_WIDTH / 10;
-        const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
-        const double MAX_DIFF_FROM_RETROGRADE = .02; // radians
-        const double LANDING_VEL_SAFETY_MARGIN = .95; // for rounding error
-        const double INSIGNIFICANT_VEL_THRESH = 3.; // pixels/s
+        constexpr static const int STOP_ABOVE_PAD = 15; // pixels
+        constexpr static const double MAX_XDIST_FROM_PAD_CENTER = World::SEGMENT_WIDTH / 10;
+        constexpr static const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
+        constexpr static const double MAX_DIFF_FROM_RETROGRADE = .02; // radians
+        constexpr static const double LANDING_VEL_SAFETY_MARGIN = .95; // for rounding error
+        constexpr static const double INSIGNIFICANT_VEL_THRESH = 3.; // pixels/s
+
+        // see https://en.wikipedia.org/wiki/PID_controller
+        constexpr static const double PID_KP = 0.5;
+        constexpr static const double PID_KD = 1.0;
+        constexpr static const double PID_KI = 0.5;
 
         // rotate the lander to the tgt_orientation
         void rotate_to(Lander& l, double tgt_orientation);

@@ -15,7 +15,6 @@ Lander::Lander(Screen* s) :
            0.,     // y_vel
            3 * M_PI_2,     // orientation
            0.,     // spin_rate
-           5.,    // max_torque
            2150.,  // dry_mass
            100.,   //2353.,  // init_fuel
            30000., //16000., // max_thrust
@@ -32,7 +31,6 @@ Lander::Lander(Screen* s,
        double _y_vel,
        double _orientation,
        double _spin_rate,
-       double _max_torque,
        double _dry_mass,
        double _init_fuel,
        double _max_thrust,
@@ -44,7 +42,6 @@ Lander::Lander(Screen* s,
     y_vel = _y_vel;
     orientation = _orientation;
     spin_rate = _spin_rate;
-    max_torque = _max_torque;
     fuel = _init_fuel;
     dry_mass = _dry_mass;
     init_fuel = _init_fuel;
@@ -53,7 +50,6 @@ Lander::Lander(Screen* s,
     exhaust_vel = _exhaust_vel;
 
     torque = 0.;
-    dt = FRAME_TIME / 1000.;
     // rotate about middle of thruster (at bottom of craft)
     rot_abt.x = WIDTH / 2;
     rot_abt.y = COLLISION_HEIGHT;
@@ -99,12 +95,12 @@ void Lander::handle(SDL_Event* e) {
                 
             case SDLK_a:
             case SDLK_LEFT:
-                torque = -max_torque;
+                torque = -MAX_TORQUE;
                 break;
 
             case SDLK_d:
             case SDLK_RIGHT:
-                torque = max_torque;
+                torque = MAX_TORQUE;
                 break;
 
             case SDLK_SPACE:
@@ -172,21 +168,21 @@ Lander::VelAccel Lander::next_vel_accel(bool real) {
         if (real) {
             // calculate mass change
             double dmdt = ((dry_mass + fuel) *
-                          hypot(va.x_accel * dt, va.y_accel * dt) - thrust) /
+                          hypot(va.x_accel * DT, va.y_accel * DT) - thrust) /
                           exhaust_vel;
-            fuel += dmdt * dt;
+            fuel += dmdt * DT;
         }
     }
     va.y_accel += World::g;
 
-    va.x_vel = x_vel + va.x_accel * dt;
-    va.y_vel = y_vel + va.y_accel * dt;
+    va.x_vel = x_vel + va.x_accel * DT;
+    va.y_vel = y_vel + va.y_accel * DT;
     return va;
 }
 
 void Lander::move() {
-    spin_rate += torque * dt;
-    orientation += spin_rate * dt;
+    spin_rate += torque * DT;
+    orientation += spin_rate * DT;
     if (orientation > 2 * M_PI) {
         orientation -= 2 * M_PI;
     } else if (orientation < 0) {
@@ -200,8 +196,8 @@ void Lander::move() {
     vel = hypot(x_vel, y_vel) * pixels_per_meter;
 
     // calculate new position
-    x_pos += (x_vel * dt + .5 * va.x_accel * dt * dt) * pixels_per_meter;
-    y_pos += (y_vel * dt + .5 * va.y_accel * dt * dt) * pixels_per_meter;
+    x_pos += (x_vel * DT + .5 * va.x_accel * DT * DT) * pixels_per_meter;
+    y_pos += (y_vel * DT + .5 * va.y_accel * DT * DT) * pixels_per_meter;
 
     // recalculate collision points
     update_corners();
