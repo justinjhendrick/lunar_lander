@@ -1,0 +1,44 @@
+Lunar Lander
+##############
+
+Auto-Pilot timeline:
+---------------------
+
+Solve y axis first (Suicide burn)
+next, add random init_x velocity
+
+go horizontal, get to center, kill x_vel
+For this, I needed rotate_to(double angle)
+
+better trajectory:
+go horizontal and choose a trajectory that intersects the pad
+need point_retrograde() so we can kill velocity near pad
+  (need time to rotate to straight up sometimes, Aim above the pad for this)
+
+First point_retrograde implementation:
+  if (fabs(lander.orientation - retrograde) > MAX_DEVIATION) {
+    rotate_to(lander.orientation)
+  }
+
+Problems with above approach:
+high RCS fuel use
+  high frequency stop-start rotation when tracking moving retrograde vector
+  TODO: Create animation
+
+I once saw my roomate work on a robot that had to follow a black line on the
+floor (with a downward facing camera).  I saw a similarity here, in that we want
+to smoothly correct without over-correcting. I asked him what his control logic 
+was and he pointed me to PID controllers
+(https://en.wikipedia.org/wiki/PID_controller).
+
+PID controllers work really well. TODO: Show plots!
+
+
+Testing
+--------
+
+All initial conditions are specified by a seed to the random number generator
+Run the autopilot for many trials. Note which seeds cause failure. Then, I
+replay those seeds and learn from my mistakes.
+
+Test because failure is when we learn the most.
