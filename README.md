@@ -36,8 +36,11 @@ Here's a gif of it!
 # Testing
 ```
 $ make test
-$ ./test.exe [<n>] # where n is number of trials for the auto-pilot
+$ ./test.exe 
 ```
+
+`test.exe` takes an optional argument,
+the number of trials to run the auto-pilot. Default is 1.
 
 ## Attribution
 All files except `UbuntuMono-R.ttf` are under Creative Commons Attribution (CC BY).
