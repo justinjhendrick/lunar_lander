@@ -19,13 +19,6 @@ down  or s     decrease thrust
 Spacebar       turn on your thruster
 ```
 
-### Command line arguments
-```
--c           enable computer pilot
--s <seed>    seed the random number generator
-```
-
-
 ## Computer Pilot
 `$ ./lunar_lander -c` enables the computer controlled pilot.
 You don't play, just watch the flight computer do its work.
@@ -33,6 +26,12 @@ You don't play, just watch the flight computer do its work.
 Here's a gif of it!
 
 ![flight computer lands](https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/landing.gif)
+
+### Command line arguments
+```
+-c           enable computer pilot
+-s <seed>    seed the random number generator
+```
 
 ## Testing
 ```
