@@ -11,6 +11,7 @@
 
 
 /***************** TODO *******************************************************
+ * Make Pilot aware of Ground obstacles
  * More testing
  * Better design pattern compliance
  *     Like hiding internal details inside classes
@@ -26,8 +27,10 @@ void invalid_args() {
     fprintf(stderr, "Usage: ./lunar_lander [-c] [-s <seed>]\n");
 }
 
-// Main menu. How to play and press any key to begin.
+// Main menu. Title, How to play, and press any key to begin.
+// returning true means play and false means quit
 bool menu(Screen& s) {
+    // set up rectangles for text
     SDL_Rect title;
     title.w = Screen::WIDTH / 4;
     title.h = 3 * Screen::HEIGHT / 16;
@@ -39,6 +42,7 @@ bool menu(Screen& s) {
     where.h = Screen::HEIGHT / 16;
     where.x = Screen::WIDTH / 2 - where.w / 2;
 
+    // create text textures
     SDL_Texture* title_text[7];
     title_text[0] = s.create_text_texture( "Lunar Lander", NULL);
     title_text[1] = s.create_text_texture(
@@ -56,6 +60,7 @@ bool menu(Screen& s) {
 
     SDL_Event e;
     while (true) {
+        // write text to the screen
         s.clear();
         where.y = Screen::HEIGHT / 6 - where.h / 2;
         for (int i = 0; i < 7; i++) {
@@ -67,11 +72,17 @@ bool menu(Screen& s) {
             }
         }
         s.flip();
+
+        // Read input
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 return false;
             } else if (e.type == SDL_KEYDOWN) {
-                return true;
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
+                    return false;
+                } else if (!Utils::is_mod_key(e.key.keysym.sym)) {
+                    return true;
+                }
             }
         }
         SDL_Delay(100);
@@ -79,13 +90,17 @@ bool menu(Screen& s) {
 }
 
 int main(int argc, char** argv) {
+
+    // read command line arguments
     Pilot* p = NULL;
     unsigned int seed = (unsigned int) time(NULL);
-    bool user_supplied_seed = false;
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-c") == 0) {
+            // -c supplied, create computer controlled pilot
             p = new Pilot;
         } else if (strcmp(argv[i], "-s") == 0) {
+            // a number should follow -s.
+            // Use it as a seed to random number generator
             if (i + 1 < argc) {
                 i++;
                 char* endptr;
@@ -95,7 +110,6 @@ int main(int argc, char** argv) {
                     invalid_args();
                     return 1;
                 }
-                user_supplied_seed = true;
             } else {
                 // nothing followed -s
                 invalid_args();
@@ -104,6 +118,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // initialize, then call play() in a loop
     Screen s;
     bool again = true;
     if (p == NULL) {

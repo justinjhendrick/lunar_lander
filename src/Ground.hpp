@@ -8,6 +8,8 @@
 // They can either be a pad (which is safe to land on)
 // or not a pad (which is not safe to land on)
 class Ground {
+    private:
+        int PAD_HEIGHT = 10;
     public:
         bool is_pad;
         // begin points from the origin to the leftmost point

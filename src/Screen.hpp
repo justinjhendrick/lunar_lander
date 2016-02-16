@@ -4,10 +4,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+// A class that represents the screen
+// using SDL rendering (which is capable of hardware acceleration).
+// https://wiki.libsdl.org/CategoryRender
 class Screen {
     private:
         SDL_Window* window;
 
+        // keep some textures that we reuse here
         SDL_Texture* win_text;
         SDL_Texture* lose_text;
         SDL_Texture* newgame_text;
@@ -26,9 +30,15 @@ class Screen {
 
         // put the buffered pixels to the screen
         void flip();
-
         // set all pixels on screen to black
         void clear();
+        // use clear() and flip() like this
+        // while () {
+        //     clear()
+        //     draw()
+        //     flip()
+        //     sleep()
+        // }
         
         // load a BMP
         SDL_Texture* load_texture(const char filename[]);

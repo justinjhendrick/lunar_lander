@@ -26,8 +26,6 @@ bool Utils::abs_angle_diff(double a, double b, double* out) {
     return thru_zero;
 }
 
-// puts difference in 'out'
-// returns true if it'll pass through zero
 bool Utils::angle_diff(double a, double b, double* out) {
     double diff = a - b;
     bool thru_zero = false;
@@ -45,4 +43,23 @@ bool Utils::angle_diff(double a, double b, double* out) {
 
 int Utils::nearest_int(double a) {
     return (int) floor(a + 0.5);
+}
+
+// https://wiki.libsdl.org/SDLKeycodeLookup
+bool Utils::is_mod_key(SDL_Keycode k) {
+    switch (k) {
+        case SDLK_LALT:
+        case SDLK_RALT:
+        case SDLK_LSHIFT:
+        case SDLK_RSHIFT:
+        case SDLK_CAPSLOCK:
+        case SDLK_LCTRL:
+        case SDLK_RCTRL:
+        case SDLK_TAB:
+        case SDLK_LGUI: // aka, super, meta, windows, command (apple)
+        case SDLK_RGUI:
+            return true;
+        default:
+            return false;
+    }
 }

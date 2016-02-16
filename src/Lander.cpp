@@ -10,15 +10,15 @@
 Lander::Lander(Screen* s) :
     Lander(s,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
-           Screen::HEIGHT / 4, // y_pos
-           Utils::rand_double(-5., 5.),     // x_vel
-           0.,     // y_vel
-           3 * M_PI_2,     // orientation
-           0.,     // spin_rate
-           2150.,  // dry_mass
-           100.,   //2353.,  // init_fuel
-           30000., //16000., // max_thrust
-           3050.   // exhaust velocity
+           Screen::HEIGHT / 4,             // y_pos
+           Utils::rand_double(-5., 5.),    // x_vel
+           0.,                             // y_vel
+           3 * M_PI_2,                     // orientation
+           0.,                             // spin_rate
+           2150.,                          // dry_mass
+           100.,                           // init_fuel
+           30000.,                         // max_thrust
+           3050.                           // exhaust velocity
     ) {
     // some values above from the Apollo lunar module
     // https://en.wikipedia.org/wiki/Apollo_Lunar_Module
@@ -35,7 +35,6 @@ Lander::Lander(Screen* s,
        double _init_fuel,
        double _max_thrust,
        double _exhaust_vel) {
-    // set init vals
     x_pos = _x_pos;
     y_pos = _y_pos;
     x_vel = _x_vel;
@@ -181,6 +180,7 @@ Lander::VelAccel Lander::next_vel_accel(bool real) {
 }
 
 void Lander::move() {
+    // rotation
     spin_rate += torque * DT;
     orientation += spin_rate * DT;
     if (orientation > 2 * M_PI) {
@@ -189,6 +189,7 @@ void Lander::move() {
         orientation += 2 * M_PI;
     }
 
+    // translation
     VelAccel va = next_vel_accel(true);
     x_vel = va.x_vel;
     y_vel = va.y_vel;
@@ -198,9 +199,6 @@ void Lander::move() {
     // calculate new position
     x_pos += (x_vel * DT + .5 * va.x_accel * DT * DT) * pixels_per_meter;
     y_pos += (y_vel * DT + .5 * va.y_accel * DT * DT) * pixels_per_meter;
-
-    // recalculate collision points
-    update_corners();
 }
 
 void Lander::draw_status(Screen& s) {
@@ -410,6 +408,9 @@ void Lander::explode() {
 }
 
 World::CollisionResult Lander::check_collision(World& w) {
+    // first, recalculate collision points
+    update_corners();
+
     for (unsigned int i = 0; i < w.grounds.size(); i++) {
         Ground& gd = w.grounds[i];
         if (is_colliding(gd)) {

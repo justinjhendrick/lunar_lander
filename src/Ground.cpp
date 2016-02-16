@@ -20,7 +20,7 @@ void Ground::draw(Screen& s) {
         r.x = (int) begin.x;
         r.y = (int) begin.y;
         r.w = (int) segment.x;
-        r.h = 10;
+        r.h = PAD_HEIGHT;
         SDL_RenderFillRect(s.renderer, &r);
 
         // reset to old color

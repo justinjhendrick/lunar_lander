@@ -9,6 +9,9 @@
 #include "Utils.hpp"
 #include "play.hpp"
 
+// Show player endgame screen and read their response
+// The endgame screen prompts them to replay (r), start a
+// new game (n) or quit (q)
 EndGameOpt end_game(Screen& s,
               World& world,
               Lander& lander,
@@ -47,8 +50,9 @@ PlayResult::PlayResult(bool _win, EndGameOpt _choice) {
     choice = _choice;
 }
 
-// play the game defined by the seed. A NULL pilot is a human player
-// a null screen means headless mode.
+// play the game defined by the seed.
+// A NULL pilot is a human player
+// a NULL screen means headless mode. (used for testing)
 PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
     printf("seed = %u\n", seed);
     Utils::seed_random(seed);
@@ -101,13 +105,16 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
         }
 
         // sleep so that a frame takes FRAME_TIME
+        // This is important for the physics simulations.
+        // If all frames take the same amout of time,
+        // the physics is independent of the framerate.
         struct timeval now = {0, 0};
         gettimeofday(&now, NULL);
         struct timeval diff = {0, 0};
         timersub(&now, &start, &diff);
         unsigned int sleep_time = FRAME_TIME -
             ((unsigned int) diff.tv_usec / 1000);
-        if (FRAME_TIME > diff.tv_usec / 1000) {
+        if (sleep_time > 0) {
             SDL_Delay(sleep_time);
         } else {
             printf("tired\n");

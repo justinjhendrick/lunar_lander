@@ -27,6 +27,9 @@ double Pilot::compute_retrograde(double x_vel, double y_vel) {
 
 // point craft in direction opposite our velocity ==
 // point thrusters in direction of our velocity
+//
+// This should be called after we decide on thrusting for this frame.
+// That way, next_velocity is correct.
 void Pilot::point_retrograde(Lander& l, bool landing) {
     std::pair<double, double> next_vel = l.next_velocity();
     double next_retro = compute_retrograde(next_vel.first, next_vel.second);
@@ -59,6 +62,7 @@ void Pilot::rotate_to(Lander& l, double tgt_orientation) {
         rot_frame = 1;
     } else if (rot_state == TORQUE_UP) {
         // torque until we make it halfway
+        // then, switch torque direction
         double traveled;
         Utils::abs_angle_diff(init_orientation, l.orientation, &traveled);
         if (traveled >= d_theta / 2.) {
@@ -78,7 +82,6 @@ void Pilot::rotate_to(Lander& l, double tgt_orientation) {
 
             double diff;
             Utils::abs_angle_diff(l.orientation, tgt_orientation, &diff);
-            //printf("rot error = %f radians\n", diff);
         } else {
             rot_frame++;
         }
@@ -150,7 +153,6 @@ void Pilot::fly(Lander& l, World& world) {
                         (l.dry_mass + l.fuel);
         double net_accel = -sqrt(x_accel * x_accel + y_accel * y_accel);
         double vel = hypot(l.x_vel, l.y_vel);
-        //printf("fall: hypot(%f, %f) = %f m/s\n", l.x_vel, l.y_vel, vel);
         // How long will that thrust take?
         // t = v / a
         double thrust_time = fabs(vel / net_accel);
@@ -170,21 +172,18 @@ void Pilot::fly(Lander& l, World& world) {
         }
         point_retrograde(l, false);
     } else if (state == SUICIDE_BURN) {
-        //double vel = hypot(l.x_vel, l.y_vel);
-        //printf("burn: hypot(%f, %f) = %f m/s\n", l.x_vel, l.y_vel, vel);
         if (frame >= stop_burn_frame) {
             l.thrusting = false;
             state = LAND;
         }
         point_retrograde(l, false);
     } else if (state == LAND) {
-        //double vel = hypot(l.x_vel, l.y_vel);
-        //printf("land: hypot(%f, %f) = %f m/s\n", l.x_vel, l.y_vel, vel);
+        // if our next velocity is unsafe,
+        // accelerate at World::g to stay safe
         double next_y_vel = l.y_vel + World::g * DT;
         double next_vel = hypot(l.x_vel, next_y_vel);
         if (next_vel > l.safe_vel * LANDING_VEL_SAFETY_MARGIN /
                        l.pixels_per_meter) {
-            //printf("GO\n");
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }

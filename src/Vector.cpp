@@ -29,6 +29,9 @@ bool Vector::segments_intersect(const Vector& p,
                                 const Vector& r,
                                 const Vector& q,
                                 const Vector& s) {
+    // http://stackoverflow.com/questions/563198/
+    // how-do-you-detect-where-two-line-segments-intersect
+
     double eps = 0.0001;
     double rs = cross(r, s);
     Vector qp = minus(q, p);

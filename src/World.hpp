@@ -6,8 +6,10 @@
 #include "Screen.hpp"
 #include "Ground.hpp"
 
+// a class to represent the world that the Lander flies in
 class World {
     private:
+        // randomly generate terrain
         void generate_terrain(int init_x, int init_y, int dx);
     public:
         enum CollisionResult {
@@ -19,8 +21,8 @@ class World {
         std::vector<Ground> grounds;
         // gravitational acceleration, meters/s^2
         constexpr static const double g = 1.62;
-        static const int SEGMENT_WIDTH = 40;
-        static const int MAX_DY = 40;
+        static const int SEGMENT_WIDTH = 40; // pixels
+        static const int MAX_DY = 40; // pixels
 
         World();
 

@@ -7,7 +7,13 @@
 
 class Pilot {
     private:
+        // Use a PID controller 
+        // (https://en.wikipedia.org/wiki/PID_controller)
+        // for point_retrograde()
         PID pid;
+        constexpr static const double PID_KP = 10.0;
+        constexpr static const double PID_KD = 5.0;
+        constexpr static const double PID_KI = 0.0;
         
         // state variables for rotate_to()
         enum RotationState {
@@ -36,24 +42,21 @@ class Pilot {
             LAND            // descend slowly
         };
         State state;
-        // a count of frames flying so far
+        // a count of frames flying so far (used for timing burns)
         unsigned long frame;
-        // for use with rotate_to()
+        // for use with rotate_to(). Because a rotation takes multiple frames
         double target_orientation;
         // When to turn off the thrusters
         unsigned long stop_burn_frame;
 
         // constants
         constexpr static const int STOP_ABOVE_PAD = 10; // pixels
-        constexpr static const double MAX_XDIST_FROM_PAD_CENTER = World::SEGMENT_WIDTH / 10;
+        constexpr static const double MAX_XDIST_FROM_PAD_CENTER =
+            World::SEGMENT_WIDTH / 10;
         constexpr static const double LANDING_ORIENTATION_SAFETY_MARGIN = 0.9;
         constexpr static const double MAX_DIFF_FROM_RETROGRADE = .02; // radians
-        constexpr static const double LANDING_VEL_SAFETY_MARGIN = .95; // for rounding error
-
-        // see https://en.wikipedia.org/wiki/PID_controller
-        constexpr static const double PID_KP = 10.0;
-        constexpr static const double PID_KD = 5.0;
-        constexpr static const double PID_KI = 0.0;
+        // for rounding error
+        constexpr static const double LANDING_VEL_SAFETY_MARGIN = .95;
 
         // rotate the lander to the tgt_orientation
         void rotate_to(Lander& l, double tgt_orientation);

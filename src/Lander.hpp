@@ -6,6 +6,7 @@
 #include "Ground.hpp"
 #include "World.hpp"
 
+// forward declare Pilot so it can be a friend
 class Pilot;
 
 class Lander {
@@ -17,8 +18,8 @@ class Lander {
         double y_vel;
         double orientation; // radians cw from x axis
         double spin_rate;   // radians/second. positive is cw, negative is ccw
-                           // Torque is misnomer.
-                           // it's actually angular acceleration.
+                            // Torque is misnomer.
+                            // it's actually angular acceleration.
         double fuel;        // kg
         double dry_mass;    // kg (const)
         double init_fuel;   // kg (const)
@@ -120,7 +121,7 @@ class Lander {
 
         void draw(Screen& s);
 
-        // Look for keys that control the Lander
+        // React to keys that control the Lander
         void handle(SDL_Event* e);
 
         // Under the current Lander conditions,
@@ -133,7 +134,7 @@ class Lander {
         // for changing the texture to an explosion
         void explode();
 
-        // Are we colliding with the ground or the pad?
+        // Are we colliding with the ground, the pad, or nothing?
         World::CollisionResult check_collision(World& w);
 
         friend Pilot;

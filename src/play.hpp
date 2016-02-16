@@ -1,8 +1,8 @@
 #ifndef PLAY_H_
 #define PLAY_H_
 
-#include "../src/Screen.hpp"
-#include "../src/Pilot.hpp"
+#include "Screen.hpp"
+#include "Pilot.hpp"
 
 enum EndGameOpt {
     NEW_GAME,

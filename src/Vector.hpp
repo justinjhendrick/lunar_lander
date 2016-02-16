@@ -9,8 +9,8 @@ class Vector {
         Vector(double _x, double _y);
 
         // value of 3rd coordinate of cross product
-        // the 3rd coordinate is the only nonzero component
-        // because a and b must be coplanar.
+        // the 3rd coordinate is the only nonzero component of the cross product
+        // because a and b are coplanar.
         static double cross(const Vector& a, const Vector& b);
         static Vector minus(const Vector& a, const Vector& b);
         static Vector plus(const Vector& a, const Vector& b);

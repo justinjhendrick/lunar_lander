@@ -1,6 +1,7 @@
 #include "Screen.hpp"
 
 Screen::Screen() {
+    // initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         fprintf(stderr, "SDL no init: %s\n", SDL_GetError());
     }
@@ -20,6 +21,7 @@ Screen::Screen() {
         fprintf(stderr, "no font: %s\n", TTF_GetError());
     }
 
+    // create text textures
     win_text = create_text_texture("You win!", NULL);
     lose_text = create_text_texture("You lose.", NULL);
     newgame_text = create_text_texture(
@@ -73,6 +75,7 @@ void Screen::clear() {
     SDL_RenderClear(renderer);
 }
 
+// create a surface, then convert to a texture
 SDL_Texture* Screen::load_texture(const char filename[]) {
     SDL_Surface* surf = SDL_LoadBMP(filename);
     if (surf == NULL) {
@@ -87,6 +90,7 @@ SDL_Texture* Screen::load_texture(const char filename[]) {
     return result;
 }
 
+// create a surface, then convert to a texture
 SDL_Texture* Screen::create_text_texture(const char text[],
                                          SDL_Color* color) {
     SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
