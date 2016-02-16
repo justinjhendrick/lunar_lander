@@ -33,7 +33,7 @@ class Utils {
         //
         // out is the smaller angle between a and b
         // the sign of out satisfies this equation
-        // a = b + out
+        // a = (b + out) mod 2pi
         //
         // a and b must be in the range [0 .. 2pi]
         // out is in the range [-pi .. pi]
