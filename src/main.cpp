@@ -12,6 +12,12 @@
 
 /***************** TODO *******************************************************
  * Make Pilot aware of Ground obstacles
+ *     bool collide_p1 Physics::send(Particle lander.p1, World w);
+ *     bool collide_p2 Physics::send(particle lander.p2, World w);
+ *     bool collide_p3 Physics::send(particle lander.p3, World w);
+ *     return collide_p1 || collide_p2 || collide_p3;
+ * }
+ *     
  * More testing
  * Better design pattern compliance
  *     Like hiding internal details inside classes
