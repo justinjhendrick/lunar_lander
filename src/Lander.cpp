@@ -193,8 +193,6 @@ void Lander::perturb() {
     } else if (orientation < 0) {
         orientation += 2 * M_PI;
     }
-
-    vel = hypot(x_vel, y_vel) * Physics::PIXELS_PER_METER;
 }
 
 void Lander::get_lines(std::vector<Line>& lines_out) {
@@ -260,7 +258,8 @@ void Lander::draw_status(Screen& s) {
 
     // write words
     SDL_RenderCopy(s.renderer, thrust_txtr, NULL, &thrust_text);
-    if (vel <= safe_vel) {
+    double vel = hypot(x_vel, y_vel) * Physics::PIXELS_PER_METER;
+    if (vel <= SAFE_VEL) {
         SDL_RenderCopy(s.renderer, vel_txtr_green, NULL, &vel_text);
     } else {
         SDL_RenderCopy(s.renderer, vel_txtr, NULL, &vel_text);
@@ -284,11 +283,11 @@ void Lander::draw_status(Screen& s) {
 
     // velocity bar
     // if we're in the safe zone, make bar green
-    if (vel <= safe_vel) {
+    if (vel <= SAFE_VEL) {
         SDL_SetRenderDrawColor(s.renderer, 0x33, 0xFF, 0x33, 0xFF);
     }
     SDL_RenderDrawRect(s.renderer, &vel_bar);
-    vel_bar.w = (int) (vel * ((double) bar_width) / max_vel);
+    vel_bar.w = (int) (vel * ((double) bar_width) / MAX_VEL);
     if (vel_bar.w > bar_width) {
         vel_bar.w = bar_width; // don't go past end of bar
     }
@@ -296,7 +295,7 @@ void Lander::draw_status(Screen& s) {
 
     // outline safe zone in green
     SDL_SetRenderDrawColor(s.renderer, 0x33, 0xFF, 0x33, 0xFF);
-    vel_bar.w = (int) (safe_vel * ((double) bar_width) / max_vel);
+    vel_bar.w = (int) (SAFE_VEL * ((double) bar_width) / MAX_VEL);
     SDL_RenderDrawRect(s.renderer, &vel_bar);
 
     // add a notch to make it clearer where the safe zone ends
@@ -371,14 +370,15 @@ void Lander::draw(Screen& s) {
 }
 
 bool Lander::is_safe_landing() {
+    double vel = hypot(x_vel, y_vel) * Physics::PIXELS_PER_METER;
     thrusting = false;
     torque = 0.;
     printf("x_vel = %f, y_vel = %f\n",
             x_vel * Physics::PIXELS_PER_METER,
             y_vel * Physics::PIXELS_PER_METER);
     printf("velocity:    %f <= %f pixels per second\norientation: %f < %f radians\n",
-           vel, safe_vel, fabs(orientation - 3 * M_PI_2), safe_orientation);
-    return vel <= safe_vel && fabs(orientation - 3 * M_PI_2) < safe_orientation;
+           vel, SAFE_VEL, fabs(orientation - 3 * M_PI_2), SAFE_ORIENTATION);
+    return vel <= SAFE_VEL && fabs(orientation - 3 * M_PI_2) < SAFE_ORIENTATION;
 }
 
 void Lander::explode() {

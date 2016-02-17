@@ -182,7 +182,7 @@ void Pilot::fly(Lander& l, World& world) {
         // accelerate at World::g to stay safe
         double next_y_vel = l.y_vel + World::g * DT;
         double next_vel = hypot(l.x_vel, next_y_vel);
-        if (next_vel > l.safe_vel * LANDING_VEL_SAFETY_MARGIN /
+        if (next_vel > Lander::SAFE_VEL * LANDING_VEL_SAFETY_MARGIN /
                        Physics::PIXELS_PER_METER) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;

@@ -17,7 +17,7 @@
  *     bool collide_p3 Physics::send(particle lander.p3, World w);
  *     return collide_p1 || collide_p2 || collide_p3;
  * }
- *     
+ *
  * More testing
  * Better design pattern compliance
  *     Like hiding internal details inside classes
@@ -26,6 +26,7 @@
  *     Score for time and fuel used
  *     compete against computer and/or other humans
  * Make Lander::torque actually torque, not angular acceleration
+ *     compute STOP_ABOVE_PAD based on rotation time
  ******************************************************************************/
 
 void invalid_args() {

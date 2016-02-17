@@ -24,12 +24,11 @@ class Lander : public Physics {
         double exhaust_vel; // m/s
 
         bool thrusting = false;
-        double torque;                            // radians/s^2.
-                                                 // torque is misnomer.
-        double vel;                               // magnitude in pixels/s
-        const double safe_vel = 15.;              // pixels/s
-        const double max_vel = 100.;              // pixels/s. only cosmetic
-        const double safe_orientation = M_PI / 8; // radians from 3 * PI / 2
+        double torque = 0.;      // radians/s^2.  torque is misnomer.
+        constexpr static const double SAFE_VEL = 15.; // pixels/s
+        constexpr static const double MAX_VEL = 100.; // pixels/s. only cosmetic
+        // radians from 3 * PI / 2
+        constexpr static const double SAFE_ORIENTATION = M_PI / 8; 
         constexpr static const double MAX_TORQUE = 5.;  // radians/s^2
 
         // image textures
