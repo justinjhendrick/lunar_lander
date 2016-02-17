@@ -19,21 +19,6 @@ void test_ops() {
     assert(fabs(.5 - Vector::dot(a, b)) < .001);
 }
 
-void test_segments_intersect() {
-    Vector a(1., 1.);
-    Vector b(1., 0.);
-
-    Vector c(1.5, 0.);
-    Vector d(0., 2.);
-
-    Vector e(0., 0.);
-
-    assert(Vector::segments_intersect(a, b, a, b));
-    assert(Vector::segments_intersect(a, b, c, d));
-    assert(!Vector::segments_intersect(a, b, e, d));
-}
-
 void test_vector() {
     test_ops();
-    test_segments_intersect();
 }

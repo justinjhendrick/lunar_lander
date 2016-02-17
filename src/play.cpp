@@ -80,15 +80,22 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
 
         lander.move();
 
-        World::CollisionResult r = lander.check_collision(world);
-        if (r == World::CollisionResult::WIN) {
-            printf("win\n");
-            if (s != NULL) {
-                return PlayResult(true, end_game(*s, world, lander, true));
+        World::CollisionResult r = world.check_collision(lander);
+        if (r == World::CollisionResult::PAD) {
+            bool safe = lander.is_safe_landing();
+            if (safe) {
+                printf("win\n");
+                if (s != NULL) {
+                    return PlayResult(true, end_game(*s, world, lander, true));
+                } else {
+                    return PlayResult(true, NEW_GAME);
+                }
             } else {
-                return PlayResult(true, NEW_GAME);
+                r = World::CollisionResult::LOSE;
             }
-        } else if (r == World::CollisionResult::LOSE) {
+        } 
+        
+        if (r == World::CollisionResult::LOSE) {
             printf("lose\n");
             if (s != NULL) {
                 return PlayResult(false, end_game(*s, world, lander, false));

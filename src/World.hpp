@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include "Screen.hpp"
 #include "Ground.hpp"
+#include "Physics.hpp"
 
 // a class to represent the world that the Lander flies in
 class World {
@@ -14,7 +15,7 @@ class World {
     public:
         enum CollisionResult {
             NO_COLLISION,
-            WIN,
+            PAD,
             LOSE
         };
         // list of all collidable surfaces. Starting with pad(s)
@@ -28,6 +29,9 @@ class World {
 
         void draw(Screen& s);
         Ground& get_pad();
+
+        // Are we colliding with the ground, the pad, or nothing?
+        CollisionResult check_collision(Physics& p);
 };
 
 #endif

@@ -1,5 +1,7 @@
+#include <vector>
 #include "World.hpp"
 #include "Utils.hpp"
+#include "Line.hpp"
 
 World::World () {
     int pad_x = Utils::rand_int(0, Screen::WIDTH - SEGMENT_WIDTH);
@@ -42,16 +44,8 @@ void World::generate_terrain(int init_x, int init_y, int dx) {
         this_x = last_x + dx;
         this_y = last_y + dy;
 
-        // these cases are needed because Ground() requires x1 <= x2
-        if (dx < 0) {
-            // going left
-            Ground next(false, this_x, this_y, last_x, last_y);
-            grounds.push_back(next);
-        } else {
-            // going right
-            Ground next(false, last_x, last_y, this_x, this_y);
-            grounds.push_back(next);
-        }
+        Ground next(false, this_x, this_y, last_x, last_y);
+        grounds.push_back(next);
 
         last_x = this_x;
         last_y = this_y;
@@ -66,4 +60,22 @@ void World::draw(Screen& s) {
 
 Ground& World::get_pad() {
     return grounds[0];
+}
+
+World::CollisionResult World::check_collision(Physics& p) {
+    std::vector<Line> lines;
+    p.get_lines(lines);
+    for (unsigned int i = 0; i < grounds.size(); i++) {
+        Ground& gd = grounds[i];
+        for (Line& line : lines) {
+            if (Line::intersect(line, gd)) {
+                if (gd.is_pad) {
+                    return World::PAD;
+                } else {
+                    return World::LOSE;
+                }
+            }
+        }
+    }
+    return World::NO_COLLISION;
 }

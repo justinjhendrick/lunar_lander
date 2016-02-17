@@ -2,6 +2,7 @@
 
 extern void test_utils();
 extern void test_vector();
+extern void test_line();
 extern void test_pilot(unsigned int n_trials);
 
 #define DEFAULT_TEST_TRIALS 1
@@ -25,6 +26,7 @@ int main(int argc, char** argv) {
     // run tests
     test_utils();
     test_vector();
+    test_line();
     test_pilot(num_pilot_trials);
     return 0;
 }

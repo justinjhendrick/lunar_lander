@@ -16,14 +16,6 @@ class Vector {
         static Vector plus(const Vector& a, const Vector& b);
         // dot product
         static double dot(const Vector& a, const Vector& b);
-
-        // Does p + r intersect q + s?
-        // http://stackoverflow.com/questions/563198/
-        // how-do-you-detect-where-two-line-segments-intersect
-        static bool segments_intersect(const Vector& p,
-                                       const Vector& r,
-                                       const Vector& q,
-                                       const Vector& s);
 };
 
 #endif

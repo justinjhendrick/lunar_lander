@@ -9,13 +9,9 @@
 // forward declare Pilot so it can be a friend
 class Pilot;
 
-class Lander {
+class Lander : public Physics {
     private:
         // initialized by constructor
-        double x_pos;       // pixels. positive is to the right on the screen.
-        double y_pos;       // positive is down the screen.
-        double x_vel;       // meters/second
-        double y_vel;
         double orientation; // radians cw from x axis
         double spin_rate;   // radians/second. positive is cw, negative is ccw
                             // Torque is misnomer.
@@ -34,7 +30,6 @@ class Lander {
         const double safe_vel = 15.;              // pixels/s
         const double max_vel = 100.;              // pixels/s. only cosmetic
         const double safe_orientation = M_PI / 8; // radians from 3 * PI / 2
-        const int pixels_per_meter = 10;         // pixels/meter
         constexpr static const double MAX_TORQUE = 5.;  // radians/s^2
 
         // image textures
@@ -84,25 +79,20 @@ class Lander {
         double p3x;
         double p3y;
 
+        Line lines[3] = {Line(0, 0, 0, 0),
+                         Line(0, 0, 0, 0),
+                         Line(0, 0, 0, 0)};
+
         // Update position of corners in world coordinates.
         // Use sc_p#x and sc_p#y to compute p#x and p#y
-        void update_corners();
+        //
+        // then, update the lines from the corner info
+        void update_lines();
 
         bool exploded = false; // hopefully we can keep it that way!
 
-        bool is_safe_landing();
         bool is_colliding(const Ground& ground);
 
-        typedef struct VelAccel {
-            double x_vel;
-            double y_vel;
-            double x_accel;
-            double y_accel;
-        } VelAccel;
-
-        // computes next velocity (m/s) and and acceleration (m/s^2)
-        // if [real] is true, fuel will be used
-        VelAccel next_vel_accel(bool real);
     public:
         Lander(Screen* s);
         Lander(Screen* s,
@@ -121,6 +111,8 @@ class Lander {
 
         void draw(Screen& s);
 
+        bool is_safe_landing();
+
         // React to keys that control the Lander
         void handle(SDL_Event* e);
 
@@ -128,14 +120,13 @@ class Lander {
         // what would the velocity in the next frame be?
         std::pair<double, double> next_velocity();
 
-        // move the Lander
-        void move();
+        // implementing virtuals from Physics
+        void perturb() override;
+        Physics::VelAccel next_vel_accel(bool real) override;
+        void get_lines(std::vector<Line>& lines_out) override;
 
         // for changing the texture to an explosion
         void explode();
-
-        // Are we colliding with the ground, the pad, or nothing?
-        World::CollisionResult check_collision(World& w);
 
         friend Pilot;
 };

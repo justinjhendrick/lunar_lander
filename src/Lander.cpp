@@ -132,7 +132,8 @@ void Lander::handle(SDL_Event* e) {
     }
 }
 
-void Lander::update_corners() {
+void Lander::update_lines() {
+    // first update the corners
     // apply a rotation matrix
     // https://en.wikipedia.org/wiki/Rotation_matrix
     double s = sin(3 * M_PI_2 + orientation);
@@ -145,6 +146,10 @@ void Lander::update_corners() {
 
     p3x = c * sc_p3x - s * sc_p3y + WIDTH / 2 + x_pos;
     p3y = s * sc_p3x + c * sc_p3y + COLLISION_HEIGHT + y_pos;
+
+    lines[0] = Line(p1x, p1y, p2x, p2y);
+    lines[1] = Line(p2x, p2y, p3x, p3y);
+    lines[2] = Line(p3x, p3y, p1x, p1y);
 }
 
 // publicly available next_velocity is only a prediction,
@@ -155,7 +160,7 @@ std::pair<double, double> Lander::next_velocity() {
     return result;
 }
 
-Lander::VelAccel Lander::next_vel_accel(bool real) {
+Physics::VelAccel Lander::next_vel_accel(bool real) {
     VelAccel va;
     va.x_accel = 0.;
     va.y_accel = 0.;
@@ -179,7 +184,7 @@ Lander::VelAccel Lander::next_vel_accel(bool real) {
     return va;
 }
 
-void Lander::move() {
+void Lander::perturb() {
     // rotation
     spin_rate += torque * DT;
     orientation += spin_rate * DT;
@@ -189,16 +194,14 @@ void Lander::move() {
         orientation += 2 * M_PI;
     }
 
-    // translation
-    VelAccel va = next_vel_accel(true);
-    x_vel = va.x_vel;
-    y_vel = va.y_vel;
+    vel = hypot(x_vel, y_vel) * Physics::PIXELS_PER_METER;
+}
 
-    vel = hypot(x_vel, y_vel) * pixels_per_meter;
-
-    // calculate new position
-    x_pos += (x_vel * DT + .5 * va.x_accel * DT * DT) * pixels_per_meter;
-    y_pos += (y_vel * DT + .5 * va.y_accel * DT * DT) * pixels_per_meter;
+void Lander::get_lines(std::vector<Line>& lines_out) {
+    update_lines();
+    lines_out.push_back(lines[0]);
+    lines_out.push_back(lines[1]);
+    lines_out.push_back(lines[2]);
 }
 
 void Lander::draw_status(Screen& s) {
@@ -368,60 +371,18 @@ void Lander::draw(Screen& s) {
 }
 
 bool Lander::is_safe_landing() {
-    printf("x_vel = %f, y_vel = %f\n", x_vel * pixels_per_meter, y_vel * pixels_per_meter);
+    thrusting = false;
+    torque = 0.;
+    printf("x_vel = %f, y_vel = %f\n",
+            x_vel * Physics::PIXELS_PER_METER,
+            y_vel * Physics::PIXELS_PER_METER);
     printf("velocity:    %f <= %f pixels per second\norientation: %f < %f radians\n",
            vel, safe_vel, fabs(orientation - 3 * M_PI_2), safe_orientation);
     return vel <= safe_vel && fabs(orientation - 3 * M_PI_2) < safe_orientation;
 }
 
-bool Lander::is_colliding(const Ground& ground) {
-    Vector p1(p1x, p1y);
-    Vector p2(p2x, p2y);
-    Vector p3(p3x, p3y);
-
-    Vector p1_to_p2 = Vector::minus(p2, p1);
-    Vector p2_to_p3 = Vector::minus(p3, p2);
-    Vector p3_to_p1 = Vector::minus(p1, p3);
-
-    bool left_collide = Vector::segments_intersect(p1,
-                                                   p1_to_p2,
-                                                   ground.begin,
-                                                   ground.segment);
-    bool right_collide = Vector::segments_intersect(p2,
-                                                    p2_to_p3,
-                                                    ground.begin,
-                                                    ground.segment);
-    bool bot_collide = Vector::segments_intersect(p3,
-                                                  p3_to_p1,
-                                                  ground.begin,
-                                                  ground.segment);
-    if (left_collide || right_collide || bot_collide) {
-        thrusting = false;
-        torque = 0.;
-        return true;
-    }
-    return false;
-}
-
 void Lander::explode() {
     exploded = true;
-}
-
-World::CollisionResult Lander::check_collision(World& w) {
-    // first, recalculate collision points
-    update_corners();
-
-    for (unsigned int i = 0; i < w.grounds.size(); i++) {
-        Ground& gd = w.grounds[i];
-        if (is_colliding(gd)) {
-            if (gd.is_pad && is_safe_landing()) {
-                return World::WIN;
-            } else {
-                return World::LOSE;
-            }
-        }
-    }
-    return World::NO_COLLISION;
 }
 
 Lander::~Lander() {

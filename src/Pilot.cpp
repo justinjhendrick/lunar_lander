@@ -107,9 +107,9 @@ void Pilot::fly(Lander& l, World& world) {
     int x_pos = Utils::nearest_int(l.x_pos) + l.rot_abt.x;
     int y_pos = Utils::nearest_int(l.y_pos) + l.rot_abt.y;
     double y_dist_to_stop = ((pad.get_top() - STOP_ABOVE_PAD) - y_pos) /
-                          l.pixels_per_meter;
+                          Physics::PIXELS_PER_METER;
     double x_dist_to_stop = (pad.get_center() - x_pos) /
-                          l.pixels_per_meter;
+                          Physics::PIXELS_PER_METER;
     double dist_to_stop = hypot(x_dist_to_stop, y_dist_to_stop);
 
     if (state == BEGIN) {
@@ -117,7 +117,7 @@ void Pilot::fly(Lander& l, World& world) {
         // Which way do we need to burn to get a trajectory to the pad?
         double fall_t = fall_time(l.y_vel, y_dist_to_stop);
         double x_pos_pred = l.x_pos + l.rot_abt.x +
-                           l.x_vel * fall_t * l.pixels_per_meter;
+                           l.x_vel * fall_t * Physics::PIXELS_PER_METER;
         if (x_pos_pred < pad.get_center() - MAX_XDIST_FROM_PAD_CENTER) {
             state = ROT_HORIZ;
             target_orientation = 0.;
@@ -138,7 +138,7 @@ void Pilot::fly(Lander& l, World& world) {
         l.thrusting = true;
         double fall_t = fall_time(l.y_vel, y_dist_to_stop);
         double x_pos_pred = l.x_pos + l.rot_abt.x +
-                           l.x_vel * fall_t * l.pixels_per_meter;
+                           l.x_vel * fall_t * Physics::PIXELS_PER_METER;
         if (fabs(x_pos_pred - pad.get_center()) < MAX_XDIST_FROM_PAD_CENTER) {
             l.thrusting = false;
             state = FALL_TO_PAD;
@@ -183,7 +183,7 @@ void Pilot::fly(Lander& l, World& world) {
         double next_y_vel = l.y_vel + World::g * DT;
         double next_vel = hypot(l.x_vel, next_y_vel);
         if (next_vel > l.safe_vel * LANDING_VEL_SAFETY_MARGIN /
-                       l.pixels_per_meter) {
+                       Physics::PIXELS_PER_METER) {
             l.thrust = (l.dry_mass + l.fuel) * World::g;
             l.thrusting = true;
         }
