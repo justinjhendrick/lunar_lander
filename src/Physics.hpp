@@ -22,7 +22,7 @@ class Physics {
         } VelAccel;
         
     public:
-        Physics();
+        Physics(double _x_pos, double _y_pos, double _x_vel, double _y_vel);
         virtual ~Physics();
         void move();
 

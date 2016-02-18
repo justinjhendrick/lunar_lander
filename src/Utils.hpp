@@ -45,6 +45,15 @@ class Utils {
         
         // keys that windowing managers use, etc.
         static bool is_mod_key(SDL_Keycode k);
+
+        // return an angle in radians (0 .. 2pi)
+        // that represents an orientation where
+        // thrusters point in the direction of travel
+        static double compute_retrograde(double x_vel, double y_vel);
+
+        // rotate the point p by angle
+        static std::pair<double, double> rotate(double x, double y,
+                                                double angle);
 };
 
 #endif

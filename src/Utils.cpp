@@ -56,10 +56,34 @@ bool Utils::is_mod_key(SDL_Keycode k) {
         case SDLK_LCTRL:
         case SDLK_RCTRL:
         case SDLK_TAB:
-        case SDLK_LGUI: // aka, super, meta, windows, command (apple)
+        case SDLK_LGUI: // aka super, meta, windows, command (apple)
         case SDLK_RGUI:
             return true;
         default:
             return false;
     }
+}
+
+// return an angle in radians (0 .. 2pi)
+// that represents an orientation where
+// thrusters point in the direction of travel
+double Utils::compute_retrograde(double x_vel, double y_vel) {
+    double retrograde = atan2(y_vel, x_vel);
+    retrograde += M_PI;
+    if (retrograde >= 2 * M_PI) {
+        retrograde -= 2 * M_PI;
+    }
+    return retrograde;
+}
+
+std::pair<double, double> Utils::rotate(double x, double y,
+                                        double angle) {
+    // apply a rotation matrix
+    // https://en.wikipedia.org/wiki/Rotation_matrix
+    std::pair<double, double> result;
+    double s = sin(angle);
+    double c = cos(angle);
+    result.first  = c * x - s * y;
+    result.second = s * x + c * y;
+    return result;
 }

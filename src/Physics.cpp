@@ -1,6 +1,11 @@
 #include "Physics.hpp"
+#include "World.hpp"
 
-Physics::Physics() {
+Physics::Physics(double _x_pos, double _y_pos, double _x_vel, double _y_vel) {
+    x_pos = _x_pos;
+    y_pos = _y_pos;
+    x_vel = _x_vel;
+    y_vel = _y_vel;
 }
 
 void Physics::move() {
@@ -15,10 +20,10 @@ void Physics::move() {
 
 Physics::VelAccel Physics::next_vel_accel(bool real) {
     VelAccel result;
-    result.x_vel = 0.;
-    result.y_vel = 0.;
     result.x_accel = 0.;
-    result.y_accel = 0.;
+    result.y_accel = World::g;
+    result.x_vel = x_vel;
+    result.y_vel = y_vel + result.y_accel * DT;
     return result;
 }
 

@@ -34,11 +34,8 @@ Lander::Lander(Screen* s,
        double _dry_mass,
        double _init_fuel,
        double _max_thrust,
-       double _exhaust_vel) {
-    x_pos = _x_pos;
-    y_pos = _y_pos;
-    x_vel = _x_vel;
-    y_vel = _y_vel;
+       double _exhaust_vel) :
+    Physics(_x_pos, _y_pos, _x_vel, _y_vel) {
     orientation = _orientation;
     spin_rate = _spin_rate;
     fuel = _init_fuel;
@@ -133,20 +130,22 @@ void Lander::handle(SDL_Event* e) {
 }
 
 void Lander::update_lines() {
-    // first update the corners
-    // apply a rotation matrix
-    // https://en.wikipedia.org/wiki/Rotation_matrix
-    double s = sin(3 * M_PI_2 + orientation);
-    double c = cos(3 * M_PI_2 + orientation);
-    p1x = c * sc_p1x - s * sc_p1y + WIDTH / 2 + x_pos;
-    p1y = s * sc_p1x + c * sc_p1y + COLLISION_HEIGHT + y_pos;
+    // first update all three corners
+    std::pair<double, double> p;
 
-    p2x = c * sc_p2x - s * sc_p2y + WIDTH / 2 + x_pos;
-    p2y = s * sc_p2x + c * sc_p2y + COLLISION_HEIGHT + y_pos;
+    p = Utils::rotate(sc_p1x, sc_p1y, 3 * M_PI_2 + orientation);
+    p1x = p.first + WIDTH / 2 + x_pos;
+    p1y = p.second + COLLISION_HEIGHT + y_pos;
 
-    p3x = c * sc_p3x - s * sc_p3y + WIDTH / 2 + x_pos;
-    p3y = s * sc_p3x + c * sc_p3y + COLLISION_HEIGHT + y_pos;
+    p = Utils::rotate(sc_p2x, sc_p2y, 3 * M_PI_2 + orientation);
+    p2x = p.first + WIDTH / 2 + x_pos;
+    p2y = p.second + COLLISION_HEIGHT + y_pos;
 
+    p = Utils::rotate(sc_p3x, sc_p3y, 3 * M_PI_2 + orientation);
+    p3x = p.first + WIDTH / 2 + x_pos;
+    p3y = p.second + COLLISION_HEIGHT + y_pos;
+
+    // then update the lines
     lines[0] = Line(p1x, p1y, p2x, p2y);
     lines[1] = Line(p2x, p2y, p3x, p3y);
     lines[2] = Line(p3x, p3y, p1x, p1y);

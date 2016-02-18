@@ -71,6 +71,10 @@ class Pilot {
         // that represents an orientation where
         // thrusters point in the direction of travel
         double compute_retrograde(double x_vel, double y_vel);
+
+        // checks our current ballistic trajectory
+        // returns true if we will hit something that is not the pad
+        bool predict_fall(Lander& l, World& world);
     public:
         Pilot();
         void fly(Lander& l, World& world);

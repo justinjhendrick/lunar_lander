@@ -23,7 +23,7 @@ class World {
         // gravitational acceleration, meters/s^2
         constexpr static const double g = 1.62;
         static const int SEGMENT_WIDTH = 40; // pixels
-        static const int MAX_DY = 40; // pixels
+        static const int MAX_DY = 120; // pixels
 
         World();
 

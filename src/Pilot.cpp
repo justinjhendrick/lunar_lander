@@ -5,24 +5,13 @@
 #include "constants.hpp"
 #include "Utils.hpp"
 #include "PID.hpp"
+#include "FallingLine.hpp"
 
 Pilot::Pilot() :
     pid(DT, Lander::MAX_TORQUE, -Lander::MAX_TORQUE, PID_KP, PID_KD, PID_KI) {
     state = BEGIN;
     rot_state = START;
     frame = 0;
-}
-
-// return an angle in radians (0 .. 2pi)
-// that represents an orientation where
-// thrusters point in the direction of travel
-double Pilot::compute_retrograde(double x_vel, double y_vel) {
-    double retrograde = atan2(y_vel, x_vel);
-    retrograde += M_PI;
-    if (retrograde >= 2 * M_PI) {
-        retrograde -= 2 * M_PI;
-    }
-    return retrograde;
 }
 
 // point craft in direction opposite our velocity ==
@@ -32,7 +21,8 @@ double Pilot::compute_retrograde(double x_vel, double y_vel) {
 // That way, next_velocity is correct.
 void Pilot::point_retrograde(Lander& l, bool landing) {
     std::pair<double, double> next_vel = l.next_velocity();
-    double next_retro = compute_retrograde(next_vel.first, next_vel.second);
+    double next_retro = Utils::compute_retrograde(next_vel.first,
+                                                  next_vel.second);
     // calculate(desired, current)
     double pid_output = pid.calculate(next_retro, l.orientation);
     //printf("%f, %f, %f\n", next_retro, l.orientation, pid_output);
@@ -98,6 +88,27 @@ double Pilot::fall_time(double y_vel, double y_dist_of_fall) {
     return (-b + sqrt(b * b - 4. * a * c)) / (2. * a);
 }
 
+// checks our current ballistic trajectory for obstacles
+// returns true if we will hit something that is not the pad
+bool Pilot::predict_fall(Lander& l, World& world) {
+    FallingLine path_tester(Lander::WIDTH,
+                            l.x_pos + Lander::WIDTH / 2,
+                            l.y_pos + Lander::COLLISION_HEIGHT,
+                            l.x_vel, l.y_vel);
+    World::CollisionResult cr = World::NO_COLLISION;
+    //double pad = world.get_pad().get_top();
+    while (cr == World::NO_COLLISION) {// && fabs(pad - path_tester.y_pos
+        path_tester.move();
+        cr = world.check_collision(path_tester);
+    }
+    if (cr == World::PAD) {
+        return false;
+    } else {
+        path_tester.print();
+        return true;
+    }
+}
+
 // the pilot is a state machine.
 // see enum Pilot::State in Pilot.hpp for more details
 void Pilot::fly(Lander& l, World& world) {
@@ -142,6 +153,8 @@ void Pilot::fly(Lander& l, World& world) {
         if (fabs(x_pos_pred - pad.get_center()) < MAX_XDIST_FROM_PAD_CENTER) {
             l.thrusting = false;
             state = FALL_TO_PAD;
+            bool obstacle_ahead = predict_fall(l, world);
+            printf("obstacle_ahead = %d\n", obstacle_ahead);
         }
     } else if (state == FALL_TO_PAD) {
         // When do we turn on the thruster?
