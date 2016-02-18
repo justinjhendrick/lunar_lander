@@ -38,8 +38,8 @@ void Pilot::rotate_to(Lander& l, double tgt_orientation) {
         // choose which direction to rotate
         init_orientation = l.orientation;
         bool through_zero = Utils::abs_angle_diff(tgt_orientation,
-                                              init_orientation,
-                                              &d_theta
+                                                  init_orientation,
+                                                  &d_theta
         );
         int correction = through_zero ? -1 : 1;
 
@@ -152,9 +152,29 @@ void Pilot::fly(Lander& l, World& world) {
                            l.x_vel * fall_t * Physics::PIXELS_PER_METER;
         if (fabs(x_pos_pred - pad.get_center()) < MAX_XDIST_FROM_PAD_CENTER) {
             l.thrusting = false;
-            state = FALL_TO_PAD;
             bool obstacle_ahead = predict_fall(l, world);
             printf("obstacle_ahead = %d\n", obstacle_ahead);
+            if (obstacle_ahead) {
+                state = AVOID;
+            } else {
+                state = FALL_TO_PAD;
+            }
+        }
+    } else if (state == AVOID) {
+        // This doesn't work. It avoids the first obstacle,
+        // but never turns off the thruster.
+        rotate_to(l, 3 * M_PI_2);
+        if (rot_state == DONE) {
+            l.thrusting = true;
+            bool obstacle_ahead = predict_fall(l, world);
+            if (!obstacle_ahead) {
+                // After we dodge the obstacle,
+                // we're on a new path that doesn't intersect the pad.
+                // So, the code below never runs.
+                l.thrusting = false;
+                rot_state = START;
+                state = FALL_TO_PAD;
+            }
         }
     } else if (state == FALL_TO_PAD) {
         // When do we turn on the thruster?

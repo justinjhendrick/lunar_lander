@@ -7,9 +7,8 @@
 
 class Pilot {
     private:
-        // Use a PID controller 
-        // (https://en.wikipedia.org/wiki/PID_controller)
-        // for point_retrograde()
+        // Use a PID controller for point_retrograde()
+        // https://en.wikipedia.org/wiki/PID_controller
         PID pid;
         constexpr static const double PID_KP = 10.0;
         constexpr static const double PID_KD = 5.0;
@@ -36,6 +35,7 @@ class Pilot {
             BEGIN,
             ROT_HORIZ,      // rotate to horizontal
             X_BURN,         // put us on trajectory to pad
+            AVOID,          // an optional state to avoid obstacles
             FALL_TO_PAD,    // fall and rotate for burn
                             // (actually we target a point just above the pad)
             SUICIDE_BURN,   // kill velocity
