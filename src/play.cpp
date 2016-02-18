@@ -119,10 +119,10 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
         gettimeofday(&now, NULL);
         struct timeval diff = {0, 0};
         timersub(&now, &start, &diff);
-        unsigned int sleep_time = FRAME_TIME -
-            ((unsigned int) diff.tv_usec / 1000);
+        long sleep_time = ((long) FRAME_TIME) -
+            ((long) diff.tv_usec / 1000);
         if (sleep_time > 0) {
-            SDL_Delay(sleep_time);
+            SDL_Delay((unsigned int) sleep_time);
         } else {
             printf("tired\n");
         }
