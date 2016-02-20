@@ -12,11 +12,12 @@
 
 /***************** TODO *******************************************************
  * Make Pilot aware of Ground obstacles
- *     bool collide_p1 Physics::send(Particle lander.p1, World w);
- *     bool collide_p2 Physics::send(particle lander.p2, World w);
- *     bool collide_p3 Physics::send(particle lander.p3, World w);
- *     return collide_p1 || collide_p2 || collide_p3;
- * }
+ *      to do this, we need torque. Real torque.
+ *      Then make pilot aware of how many frames a rotation will take
+ *      Use this to simulate ENTIRE trip to pad.
+ *
+ *      if that ^ says crash. Edit the burn formerly known as X_BURN
+ *      New name: BURN_PRE_BALLISTIC_ARC
  *
  * More testing
  * Better design pattern compliance
