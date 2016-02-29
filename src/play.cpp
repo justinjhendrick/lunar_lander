@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <sys/time.h>
+#include <cmath>
 #include "Screen.hpp"
 #include "Lander.hpp"
 #include "constants.hpp"
@@ -45,9 +46,42 @@ EndGameOpt end_game(Screen& s,
     }
 }
 
-PlayResult::PlayResult(bool _win, EndGameOpt _choice) {
+PlayResult::PlayResult(bool _win, EndGameOpt _choice, unsigned int _score) {
     win = _win;
     choice = _choice;
+    score = _score;
+}
+
+// x must be > 0
+unsigned int exponential_decay(double scale, double stretch, double x) {
+    return (unsigned int) Utils::nearest_int(scale * pow(2., - x / stretch));
+}
+
+unsigned int compute_score(bool win,
+                           unsigned long frames,
+                           double fuel_percent) {
+    if (!win) {
+        // You get nothing! You lose! Good day, sir!
+        return 0;
+    }
+    
+    const unsigned int WIN_BONUS = 100;
+    const double TIME_SCALE = 248.5;
+    const double TIME_STRETCH = 3.02;
+    // The two above values were chosen by experimentation
+    // I played a good game and a bad game and decided how many
+    // points I deserved for each. Then solved for an exponential function
+    // that intersects both of those points.
+    const double MAX_FUEL_SCORE = 70.;
+
+    double seconds_elapsed = frames * DT;
+    unsigned int time_bonus =
+        exponential_decay(TIME_SCALE, TIME_STRETCH, (double) seconds_elapsed);
+
+    unsigned int fuel_bonus =
+        (unsigned int) Utils::nearest_int(fuel_percent * MAX_FUEL_SCORE);
+
+    return WIN_BONUS + time_bonus + fuel_bonus;
 }
 
 // play the game defined by the seed.
@@ -61,6 +95,7 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
     Lander lander(s);
 
     SDL_Event e;
+    unsigned long frames = 0;
     while (true) {
         struct timeval start = {0, 0};
         gettimeofday(&start, NULL);
@@ -68,7 +103,7 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
         // Handle all events on queue
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
-                return PlayResult(false, QUIT);
+                return PlayResult(false, QUIT, 0.);
             }
             if (pilot == NULL) {
                 lander.handle(&e);
@@ -81,29 +116,27 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
         lander.move();
 
         World::CollisionResult r = world.check_collision(lander);
-        if (r == World::CollisionResult::PAD) {
-            bool safe = lander.is_safe_landing();
-            if (safe) {
+        if (r != World::CollisionResult::NO_COLLISION) {
+            bool win = r == World::CollisionResult::PAD &&
+                       lander.is_safe_landing();
+            if (win) {
                 printf("win\n");
-                if (s != NULL) {
-                    return PlayResult(true, end_game(*s, world, lander, true));
-                } else {
-                    return PlayResult(true, NEW_GAME);
-                }
             } else {
-                r = World::CollisionResult::LOSE;
+                printf("lose\n");
             }
-        } 
-        
-        if (r == World::CollisionResult::LOSE) {
-            printf("lose\n");
+            unsigned int score = compute_score(win,
+                                               frames,
+                                               lander.fuel_remaining());
+            printf("score = %u\n", score);
+            EndGameOpt decision;
             if (s != NULL) {
-                return PlayResult(false, end_game(*s, world, lander, false));
+                decision = end_game(*s, world, lander, win);
             } else {
-                return PlayResult(false, NEW_GAME);
-            }
+                decision = NEW_GAME;
+            } 
+            return PlayResult(win, decision, score);
         }
-
+        
         if (s != NULL) {
             s->clear();
             lander.draw(*s);
@@ -126,5 +159,6 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
         } else {
             printf("tired\n");
         }
+        frames++;
     }
 }

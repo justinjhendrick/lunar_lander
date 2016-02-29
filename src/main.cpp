@@ -23,7 +23,6 @@
  *     Like hiding internal details inside classes
  *     Split physics out of the lander?
  * Competition
- *     Score for time and fuel used
  *     compete against computer and/or other humans
  * Make Lander::torque actually torque, not angular acceleration
  *     compute STOP_ABOVE_PAD based on rotation time
@@ -131,7 +130,7 @@ int main(int argc, char** argv) {
     if (p == NULL) {
         again = menu(s);
     }
-    PlayResult result(false, QUIT);
+    PlayResult result(false, QUIT, 0);
     while (again) {
 
         // play the game

@@ -1,7 +1,6 @@
 #include "Physics.hpp"
 
-Physics::Physics() {
-}
+Physics::Physics() {}
 
 void Physics::move() {
     perturb();
@@ -25,5 +24,4 @@ Physics::VelAccel Physics::next_vel_accel(bool real) {
 void Physics::get_lines(std::vector<Line>& lines_out) {}
 void Physics::perturb() {}
 
-Physics::~Physics() {
-}
+Physics::~Physics() {}

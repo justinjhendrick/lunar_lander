@@ -127,6 +127,9 @@ class Lander : public Physics {
         // for changing the texture to an explosion
         void explode();
 
+        // amount of fuel remaining as a percent of initial
+        double fuel_remaining();
+
         friend Pilot;
 };
 

@@ -15,8 +15,8 @@ Lander::Lander(Screen* s) :
            0.,                             // y_vel
            3 * M_PI_2,                     // orientation
            0.,                             // spin_rate
-           2150.,                          // dry_mass
-           100.,                           // init_fuel
+           2200.,                          // dry_mass
+           50.,                            // init_fuel
            30000.,                         // max_thrust
            3050.                           // exhaust velocity
     ) {
@@ -175,6 +175,11 @@ Physics::VelAccel Lander::next_vel_accel(bool real) {
                           hypot(va.x_accel * DT, va.y_accel * DT) - thrust) /
                           exhaust_vel;
             fuel += dmdt * DT;
+
+            if (fuel < 0.) {
+                fuel = 0.;
+                thrusting = false;
+            }
         }
     }
     va.y_accel += World::g;
@@ -383,6 +388,10 @@ bool Lander::is_safe_landing() {
 
 void Lander::explode() {
     exploded = true;
+}
+
+double Lander::fuel_remaining() {
+    return fuel / init_fuel;
 }
 
 Lander::~Lander() {

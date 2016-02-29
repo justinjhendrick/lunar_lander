@@ -39,6 +39,7 @@ class Physics {
         // Put nothing in lines to make an uncollidable object
         virtual void get_lines(std::vector<Line>& lines_out);
 
+        // Allow overriding objects to perturb their trajectory
         virtual void perturb();
 
         static const int PIXELS_PER_METER = 10;
