@@ -176,7 +176,7 @@ Physics::VelAccel Lander::next_vel_accel(bool real) {
                           exhaust_vel;
             fuel += dmdt * DT;
 
-            if (fuel < 0.) {
+            if (fuel <= 0.) {
                 fuel = 0.;
                 thrusting = false;
             }
