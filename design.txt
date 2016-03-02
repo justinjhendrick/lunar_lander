@@ -15,15 +15,26 @@ go horizontal and choose a trajectory that intersects the pad
 need point_retrograde() so we can kill velocity near pad
   (need time to rotate to straight up sometimes, Aim above the pad for this)
 
+  If we point retrograde during the entire fall, we'll be ready to turn on the
+  thrusters at any time. This simplifies the suicide burn.
+
 First point_retrograde implementation:
   if (fabs(lander.orientation - retrograde) > MAX_DEVIATION) {
-    rotate_to(lander.orientation)
+    rotate_to(retrograde);
   }
 
 Problems with above approach:
-high RCS fuel use
+  high RCS fuel use
+
   high frequency stop-start rotation when tracking moving retrograde vector
   TODO: Create animation
+
+  Highly susceptible to outliers. This was a problem at the end of the suicide
+  burn. The lander's velocity was low, so the retrograde vector could easily be
+  far from pointing up. When we're about to land is when we need to stay
+  pointing mostly up.
+
+I knew I needed to use a smarter approach.
 
 I once saw my roomate work on a robot that had to follow a black line on the
 floor (with a downward facing camera).  I saw a similarity here, in that we want
