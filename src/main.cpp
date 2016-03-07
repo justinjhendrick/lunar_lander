@@ -18,6 +18,14 @@
  *     return collide_p1 || collide_p2 || collide_p3;
  * }
  *
+ * Menu
+ *     Quick play
+ *     How to play
+ *     versus mode -- compete against friends and/or the autopilot
+ *     Watch auto pilot
+ * Versus mode
+ *     Score calculation screen
+ *     colors for each player
  * More testing
  * Better design pattern compliance
  *     Like hiding internal details inside classes

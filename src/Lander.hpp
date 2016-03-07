@@ -39,6 +39,8 @@ class Lander : public Physics {
         SDL_Texture* txtr_explosion = NULL;
         SDL_Texture* txtr_torque_cw = NULL;
         SDL_Texture* txtr_torque_ccw = NULL;
+        SDL_Texture* txtr_torque_cw_low = NULL;
+        SDL_Texture* txtr_torque_ccw_low = NULL;
         // text textures
         SDL_Texture* fuel_txtr = NULL;
         SDL_Texture* thrust_txtr = NULL;

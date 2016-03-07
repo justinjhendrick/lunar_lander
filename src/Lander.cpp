@@ -62,6 +62,8 @@ Lander::Lander(Screen* s,
         txtr_explosion = s->load_texture("sprites/explosion.bmp");
         txtr_torque_cw = s->load_texture("sprites/torque_cw.bmp");
         txtr_torque_ccw = s->load_texture("sprites/torque_ccw.bmp");
+        txtr_torque_cw_low = s->load_texture("sprites/torque_cw_low.bmp");
+        txtr_torque_ccw_low = s->load_texture("sprites/torque_ccw_low.bmp");
 
         // text textures
         fuel_txtr = s->create_text_texture("FUEL ", NULL);
@@ -354,12 +356,20 @@ void Lander::draw(Screen& s) {
         dest.h = 5;
         dest.w = 9;
 
-        SDL_Texture* torque_txtr;
+        SDL_Texture* torque_txtr = NULL;
         if (torque > 0.) {
-            torque_txtr = txtr_torque_cw;
+            if (torque > MAX_TORQUE / 2.) {
+                torque_txtr = txtr_torque_cw;
+            } else {
+                torque_txtr = txtr_torque_cw_low;
+            }
             rcs_rot_abt.x = rot_abt.x;
         } else {
-            torque_txtr = txtr_torque_ccw;
+            if (torque < -MAX_TORQUE / 2.) {
+                torque_txtr = txtr_torque_ccw;
+            } else {
+                torque_txtr = txtr_torque_ccw_low;
+            }
             dest.x += WIDTH / 2 + 2;
             rcs_rot_abt.x = rot_abt.x - (WIDTH / 2 + 2);
         }
