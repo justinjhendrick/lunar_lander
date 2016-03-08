@@ -72,11 +72,15 @@ int main(int argc, char** argv) {
             }
         }
     }
+
+    Screen screen;
     if (any_args) {
-        Menu::quick_play(pilot, seed);
+        Menu::quick_play(screen, pilot, seed);
+        return 0;
     }
-    Menu::MenuOption choice = Menu::menu();
+
+    Menu::MenuOption choice = Menu::menu(screen);
     if (choice == Menu::QUICK_PLAY) {
-        Menu::quick_play(pilot, seed);
+        Menu::quick_play(screen, pilot, seed);
     }
 }

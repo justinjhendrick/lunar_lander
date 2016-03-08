@@ -3,9 +3,95 @@
 #include "play.hpp"
 #include "Utils.hpp"
 
-Menu::MenuOption Menu::menu() {
-    // TODO
-    return MenuOption::QUICK_PLAY;
+Menu::MenuOption Menu::menu(Screen& s) {
+
+    SDL_Rect where;
+    where.w = Screen::WIDTH / 2;
+    where.h = Screen::HEIGHT / 16;
+    where.x = Screen::WIDTH / 2 - where.w / 2;
+    // where.y is set in the loop
+
+    int padding = where.h / 2;
+
+    // create text textures
+    const int NUM_LINES = 5;
+    SDL_Texture* title_text[NUM_LINES];
+    title_text[0] = s.create_text_texture(
+            "Quick Play     ", NULL);
+    title_text[1] = s.create_text_texture(
+            "How to Play    ", NULL);
+    title_text[2] = s.create_text_texture(
+            "Versus Mode    ", NULL);
+    title_text[3] = s.create_text_texture(
+            "Watch the Pilot", NULL);
+    title_text[4] = s.create_text_texture(
+            "Quit           ", NULL);
+
+    const int first_y = Screen::HEIGHT / 2 - (where.h * NUM_LINES) / 2;
+
+    int selection = 0;
+    MenuOption options[] = {QUICK_PLAY, HOW_TO_PLAY, VERSUS, WATCH_PILOT, EXIT};
+    SDL_Rect selection_box;
+    selection_box.x = where.x - 10;
+    selection_box.w = where.w + 20;
+    selection_box.h = where.h + padding;
+    // selection_box.y is set in the loop
+
+    SDL_Event e;
+    while (true) {
+        // write text to the screen
+        s.clear();
+        where.y = first_y;
+        for (int i = 0; i < NUM_LINES; i++) {
+            SDL_RenderCopy(s.renderer, title_text[i], NULL, &where);
+            where.y += where.h + padding;
+        }
+
+        // draw a box around selected option
+        // save old color
+        Uint8 old_r, old_g, old_b, old_a;
+        SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
+        SDL_SetRenderDrawColor(s.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+        selection_box.y = selection * selection_box.h + 
+                          first_y - padding / 2;
+        SDL_RenderDrawRect(s.renderer, &selection_box);
+
+        // reset old color
+        SDL_SetRenderDrawColor(s.renderer, old_r, old_g, old_b, old_a);
+
+        s.flip();
+
+        // Read input
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                return EXIT;
+           } else if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_ESCAPE ||
+                    e.key.keysym.sym == SDLK_q) {
+                    return EXIT;
+                } else if (e.key.keysym.sym == SDLK_SPACE ||
+                           e.key.keysym.sym == SDLK_RETURN ||
+                           e.key.keysym.sym == SDLK_KP_ENTER) {
+                    return options[selection];
+                } else if (e.key.keysym.sym == SDLK_UP) {
+                    selection--;
+                    if (selection < 0) {
+                        // wraparound
+                        selection = NUM_LINES - 1;
+                    }
+                } else if (e.key.keysym.sym == SDLK_DOWN) {
+                    selection++;
+                    if (selection == NUM_LINES) {
+                        // wraparound
+                        selection = 0;
+                    }
+                }
+            }
+        }
+        SDL_Delay(100);
+    }
+    
 }
 
 // How to play and press any key to begin.
@@ -22,9 +108,11 @@ bool Menu::how_to_play(Screen& s) {
     where.w = 3 * Screen::WIDTH / 4;
     where.h = Screen::HEIGHT / 16;
     where.x = Screen::WIDTH / 2 - where.w / 2;
+    // where.y is set in the loop
 
     // create text textures
-    SDL_Texture* title_text[7];
+    const int NUM_LINES = 7;
+    SDL_Texture* title_text[NUM_LINES];
     title_text[0] = s.create_text_texture( "Lunar Lander", NULL);
     title_text[1] = s.create_text_texture(
             "left  or a     apply torque counterclockwise", NULL);
@@ -44,11 +132,12 @@ bool Menu::how_to_play(Screen& s) {
         // write text to the screen
         s.clear();
         where.y = Screen::HEIGHT / 6 - where.h / 2;
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < NUM_LINES; i++) {
             SDL_Rect rect = (i == 0 ? title : where);
             SDL_RenderCopy(s.renderer, title_text[i], NULL, &rect);
             where.y += rect.h;
-            if (i == 5) {
+            if (i == NUM_LINES - 2) {
+                // skip a line for "press any key to start"
                 where.y += rect.h;
             }
         }
@@ -61,6 +150,8 @@ bool Menu::how_to_play(Screen& s) {
             } else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
                     return false;
+                // filter out keys that shouldn't count
+                // as a keypress, like control
                 } else if (!Utils::is_mod_key(e.key.keysym.sym)) {
                     return true;
                 }
@@ -70,9 +161,8 @@ bool Menu::how_to_play(Screen& s) {
     }
 }
 
-void Menu::quick_play(Pilot* pilot, unsigned int seed) {
+void Menu::quick_play(Screen& s, Pilot* pilot, unsigned int seed) {
     // initialize, then call play() in a loop
-    Screen s;
     bool again = true;
     if (pilot == NULL) {
         again = how_to_play(s);

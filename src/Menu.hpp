@@ -10,13 +10,14 @@ class Menu {
             QUICK_PLAY,
             HOW_TO_PLAY,
             VERSUS,
-            WATCH_PILOT
+            WATCH_PILOT,
+            EXIT
         };
 
-        static MenuOption menu();
+        static MenuOption menu(Screen& s);
 
         static bool how_to_play(Screen& s);
-        static void quick_play(Pilot* pilot, unsigned int seed);
+        static void quick_play(Screen& s, Pilot* pilot, unsigned int seed);
 };
 
 #endif
