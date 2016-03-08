@@ -7,8 +7,9 @@
 #include "Utils.hpp"
 #include "World.hpp"
 
-Lander::Lander(Screen* s) :
+Lander::Lander(Screen* s, Lander::PlayerColor col) :
     Lander(s,
+           col,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
            Screen::HEIGHT / 4,             // y_pos
            Utils::rand_double(-5., 5.),    // x_vel
@@ -24,7 +25,9 @@ Lander::Lander(Screen* s) :
     // https://en.wikipedia.org/wiki/Apollo_Lunar_Module
 }
 
-Lander::Lander(Screen* s,
+Lander::Lander(
+       Screen* s,
+       PlayerColor col,
        double _x_pos,
        double _y_pos,
        double _x_vel,
@@ -35,6 +38,7 @@ Lander::Lander(Screen* s,
        double _init_fuel,
        double _max_thrust,
        double _exhaust_vel) {
+    player_color = col;
     x_pos = _x_pos;
     y_pos = _y_pos;
     x_vel = _x_vel;
@@ -53,12 +57,26 @@ Lander::Lander(Screen* s,
     rot_abt.x = WIDTH / 2;
     rot_abt.y = COLLISION_HEIGHT;
 
+    const char* lander_filename = nullptr;
+    if (player_color == PlayerColor::WHITE) {
+        lander_filename = "sprites/lander_white.bmp";
+    } else if (player_color == PlayerColor::GREEN) {
+        lander_filename = "sprites/lander_green.bmp";
+    } else if (player_color == PlayerColor::ORANGE) {
+        lander_filename = "sprites/lander_orange.bmp";
+    }
+
     if (s != NULL) {
         // bmp textures
-        txtr = s->load_texture("sprites/lander.bmp");
-        txtr_fire_low = s->load_texture("sprites/lander_fire_low.bmp");
-        txtr_fire_med = s->load_texture("sprites/lander_fire_med.bmp");
-        txtr_fire_high = s->load_texture("sprites/lander_fire_high.bmp");
+        txtr = s->load_texture(lander_filename);
+
+        // reload the lander again so we can add the fire on top
+        SDL_Surface* lander_surf = Screen::load_bmp(lander_filename);
+        txtr_fire_low  = add_fire(*s, lander_surf, LOW);
+        txtr_fire_med  = add_fire(*s, lander_surf, MED);
+        txtr_fire_high = add_fire(*s, lander_surf, HIGH);
+        SDL_FreeSurface(lander_surf);
+
         txtr_explosion = s->load_texture("sprites/explosion.bmp");
         txtr_torque_cw = s->load_texture("sprites/torque_cw.bmp");
         txtr_torque_ccw = s->load_texture("sprites/torque_ccw.bmp");
@@ -72,6 +90,28 @@ Lander::Lander(Screen* s,
         SDL_Color green = {0x33, 0xFF, 0x33, 0xFF};
         vel_txtr_green = s->create_text_texture("VEL ", &green);
     }
+}
+
+SDL_Texture* Lander::add_fire(Screen& screen,
+                              SDL_Surface* to,
+                              Lander::ThrusterLevel level) {
+    SDL_Surface* from = NULL;
+    if (level == ThrusterLevel::LOW) {
+        from = Screen::load_bmp("sprites/fire_low.bmp");
+    } else if (level == ThrusterLevel::MED) {
+        from = Screen::load_bmp("sprites/fire_med.bmp");
+    } else if (level == ThrusterLevel::HIGH) {
+        from = Screen::load_bmp("sprites/fire_high.bmp");
+    }
+    SDL_Rect target;
+    target.x = 0;
+    target.y = COLLISION_HEIGHT;
+    target.w = WIDTH;
+    target.h = HEIGHT - COLLISION_HEIGHT;
+    SDL_BlitSurface(from, NULL, to, &target);
+
+    SDL_Texture* result = screen.surf_to_txtr(to);
+    return result;
 }
 
 void Lander::handle(SDL_Event* e) {
@@ -413,6 +453,8 @@ Lander::~Lander() {
         SDL_DestroyTexture(txtr_explosion);
         SDL_DestroyTexture(txtr_torque_cw);
         SDL_DestroyTexture(txtr_torque_ccw);
+        SDL_DestroyTexture(txtr_torque_cw_low);
+        SDL_DestroyTexture(txtr_torque_ccw_low);
         SDL_DestroyTexture(fuel_txtr);
         SDL_DestroyTexture(thrust_txtr);
         SDL_DestroyTexture(vel_txtr);

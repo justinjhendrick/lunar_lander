@@ -77,15 +77,8 @@ void Screen::clear() {
 
 // create a surface, then convert to a texture
 SDL_Texture* Screen::load_texture(const char filename[]) {
-    SDL_Surface* surf = SDL_LoadBMP(filename);
-    if (surf == NULL) {
-        fprintf(stderr, "%s\n", SDL_GetError());
-        return NULL;
-    }
-    SDL_Texture* result = SDL_CreateTextureFromSurface(renderer, surf);
-    if (result == NULL) {
-        fprintf(stderr, "no convert to texture: %s\n", SDL_GetError());
-    }
+    SDL_Surface* surf = load_bmp(filename);
+    SDL_Texture* result = surf_to_txtr(surf);
     SDL_FreeSurface(surf);
     return result;
 }
@@ -102,10 +95,23 @@ SDL_Texture* Screen::create_text_texture(const char text[],
         fprintf(stderr, "%s\n", SDL_GetError());
         return NULL;
     }
+    SDL_Texture* result = surf_to_txtr(surf);
+    SDL_FreeSurface(surf);
+    return result;
+}
+
+SDL_Surface* Screen::load_bmp(const char filename[]) {
+    SDL_Surface* surf = SDL_LoadBMP(filename);
+    if (surf == NULL) {
+        fprintf(stderr, "%s\n", SDL_GetError());
+    }
+    return surf;
+}
+
+SDL_Texture* Screen::surf_to_txtr(SDL_Surface* surf) {
     SDL_Texture* result = SDL_CreateTextureFromSurface(renderer, surf);
     if (result == NULL) {
         fprintf(stderr, "no convert to texture: %s\n", SDL_GetError());
     }
-    SDL_FreeSurface(surf);
     return result;
 }

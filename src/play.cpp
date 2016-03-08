@@ -92,7 +92,7 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
     Utils::seed_random(seed);
 
     World world;
-    Lander lander(s);
+    Lander lander(s, Lander::PlayerColor::WHITE);
 
     SDL_Event e;
     unsigned long frames = 0;

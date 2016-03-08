@@ -47,6 +47,10 @@ class Screen {
         // if color is NULL, white is used.
         SDL_Texture* create_text_texture(const char text[],
                                          SDL_Color* color);
+
+        // print to stderr on failure
+        static SDL_Surface* load_bmp(const char filename[]);
+        SDL_Texture* surf_to_txtr(SDL_Surface* s);
 };
 
 #endif

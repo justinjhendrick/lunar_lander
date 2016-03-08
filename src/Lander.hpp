@@ -47,6 +47,19 @@ class Lander : public Physics {
         SDL_Texture* vel_txtr = NULL;
         SDL_Texture* vel_txtr_green = NULL;
 
+        // This enum is only for cosmetic
+        enum ThrusterLevel {
+            LOW,
+            MED,
+            HIGH
+        };
+        // add fire to the surface and convert to a Texture
+        SDL_Texture* add_fire(Screen& screen,
+                              SDL_Surface* surf,
+                              Lander::ThrusterLevel level
+        );
+
+
         // the center of mass of the craft
         SDL_Point rot_abt;
 
@@ -92,11 +105,16 @@ class Lander : public Physics {
 
         bool exploded = false; // hopefully we can keep it that way!
 
-        bool is_colliding(const Ground& ground);
-
     public:
-        Lander(Screen* s);
+        enum PlayerColor {
+            WHITE,
+            GREEN,
+            ORANGE
+        };
+
+        Lander(Screen* s, PlayerColor col);
         Lander(Screen* s,
+               PlayerColor col,
                double _x_pos,
                double _y_pos,
                double _x_vel,
@@ -109,6 +127,8 @@ class Lander : public Physics {
                double _exhaust_vel
         );
         ~Lander();
+
+        PlayerColor player_color;
 
         void draw(Screen& s);
 
