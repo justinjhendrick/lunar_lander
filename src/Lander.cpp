@@ -110,6 +110,7 @@ SDL_Texture* Lander::add_fire(Screen& screen,
     target.h = HEIGHT - COLLISION_HEIGHT;
     SDL_BlitSurface(from, NULL, to, &target);
 
+    SDL_FreeSurface(from);
     SDL_Texture* result = screen.surf_to_txtr(to);
     return result;
 }

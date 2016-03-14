@@ -5,16 +5,36 @@
 
 Menu::MenuOption Menu::menu(Screen& s) {
 
-    SDL_Rect where;
-    where.w = Screen::WIDTH / 2;
-    where.h = Screen::HEIGHT / 16;
-    where.x = Screen::WIDTH / 2 - where.w / 2;
-    // where.y is set in the loop
+    SDL_Rect logo_box;
+    SDL_Texture* logo = s.load_texture("imgs/logo.bmp");
 
-    int padding = where.h / 2;
+    // get logo_box width and height from texture
+    Uint32 unused_format;
+    int unused_access;
+    if (SDL_QueryTexture(logo,
+                         &unused_format,
+                         &unused_access,
+                         &logo_box.w,
+                         &logo_box.h) != 0) {
+        printf("test\n");
+        fprintf(stderr, "cannot read width and height from texture\n");
+        logo_box.w = Screen::WIDTH / 2;
+        logo_box.h = Screen::HEIGHT / 8;
+    }
+    logo_box.x = Screen::WIDTH / 2 - logo_box.w / 2;
+    logo_box.y = Screen::HEIGHT / 16;
+
+    const int NUM_LINES = 5;
+    SDL_Rect text_box;
+    text_box.w = Screen::WIDTH / 2;
+    text_box.h = Screen::HEIGHT / 16;
+    text_box.x = Screen::WIDTH / 2 - text_box.w / 2;
+    const int first_y = Screen::HEIGHT / 2 - (text_box.h * NUM_LINES) / 2;
+    // text_box.y is set in the loop (starting with first_y)
+
+    int padding = text_box.h / 2;
 
     // create text textures
-    const int NUM_LINES = 5;
     SDL_Texture* title_text[NUM_LINES];
     title_text[0] = s.create_text_texture(
             "Quick Play     ", NULL);
@@ -27,24 +47,22 @@ Menu::MenuOption Menu::menu(Screen& s) {
     title_text[4] = s.create_text_texture(
             "Quit           ", NULL);
 
-    const int first_y = Screen::HEIGHT / 2 - (where.h * NUM_LINES) / 2;
-
     int selection = 0;
     MenuOption options[] = {QUICK_PLAY, HOW_TO_PLAY, VERSUS, WATCH_PILOT, EXIT};
     SDL_Rect selection_box;
-    selection_box.x = where.x - 10;
-    selection_box.w = where.w + 20;
-    selection_box.h = where.h + padding;
+    selection_box.x = text_box.x - 10;
+    selection_box.w = text_box.w + 20;
+    selection_box.h = text_box.h + padding;
     // selection_box.y is set in the loop
 
-    SDL_Event e;
     while (true) {
         // write text to the screen
         s.clear();
-        where.y = first_y;
+        SDL_RenderCopy(s.renderer, logo, NULL, &logo_box);
+        text_box.y = first_y;
         for (int i = 0; i < NUM_LINES; i++) {
-            SDL_RenderCopy(s.renderer, title_text[i], NULL, &where);
-            where.y += where.h + padding;
+            SDL_RenderCopy(s.renderer, title_text[i], NULL, &text_box);
+            text_box.y += text_box.h + padding;
         }
 
         // draw a box around selected option
@@ -63,6 +81,7 @@ Menu::MenuOption Menu::menu(Screen& s) {
         s.flip();
 
         // Read input
+        SDL_Event e;
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 return EXIT;
@@ -89,7 +108,7 @@ Menu::MenuOption Menu::menu(Screen& s) {
                 }
             }
         }
-        SDL_Delay(100);
+        SDL_Delay(50);
     }
     
 }
