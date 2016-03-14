@@ -1,7 +1,7 @@
 <p align="center">
   <img
   src="https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/logo.bmp"
-  width="125%"
+  width="100%"
   />
 </div>
 
