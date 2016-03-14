@@ -1,5 +1,8 @@
 <p align="center">
-  <img src = "https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/logo.bmp" />
+  <img
+  src="https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/logo.bmp"
+  width="200%"
+  />
 </div>
 
 Can you land on the moon in one piece?
