@@ -1,4 +1,5 @@
-# lunar_lander
+![logo](https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/logo.bmp)
+
 Can you land on the moon in one piece?
 
 ## Dependencies
