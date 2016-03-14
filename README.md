@@ -1,4 +1,6 @@
-<div style="text-align:center"><img src ="https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/logo.bmp" /></div>
+<p align="center">
+  <img src = "https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/logo.bmp" />
+</div>
 
 Can you land on the moon in one piece?
 
