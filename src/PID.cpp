@@ -3,71 +3,52 @@
 #include "PID.hpp"
 #include "Utils.hpp"
 
-// downloaded from 
+// downloaded in part from 
 // https://gist.github.com/bradley219/5373998
-using namespace std;
-
-PID::PID( double dt, double max, double min, double Kp, double Kd, double Ki )
-{
-    pimpl = new PIDImpl(dt,max,min,Kp,Kd,Ki);
-}
-double PID::calculate( double setpoint, double pv )
-{
-    return pimpl->calculate(setpoint,pv);
-}
-PID::~PID() 
-{
-    delete pimpl;
-}
-
-
-/**
- * Implementation
- */
-PIDImpl::PIDImpl( double dt, double max, double min, double Kp, double Kd, double Ki ) :
-    _dt(dt),
-    _max(max),
-    _min(min),
-    _Kp(Kp),
-    _Kd(Kd),
-    _Ki(Ki),
-    _pre_error(0),
-    _integral(0)
-{
+PID::PID(double _dt,
+         double _max,
+         double _min,
+         double _Kp,
+         double _Kd,
+         double _Ki) {
+    dt = _dt;
+    max = _max;
+    min = _min;
+    Kp = _Kp;
+    Kd = _Kd;
+    Ki = _Ki;
+    pre_error = 0.;
+    integral = 0.;
 }
 
-double PIDImpl::calculate( double setpoint, double pv )
-{
+double PID::calculate( double setpoint, double pv ) {
     // Calculate error
     double error;
     Utils::angle_diff(setpoint, pv, &error);
 
     // Proportional term
-    double Pout = _Kp * error;
+    double Pout = Kp * error;
 
     // Integral term
-    _integral += error * _dt;
-    double Iout = _Ki * _integral;
+    integral += error * dt;
+    double Iout = Ki * integral;
 
     // Derivative term
-    double derivative = (error - _pre_error) / _dt;
-    double Dout = _Kd * derivative;
+    double derivative = (error - pre_error) / dt;
+    double Dout = Kd * derivative;
 
     // Calculate total output
     double output = Pout + Iout + Dout;
 
     // Restrict to max/min
-    if( output > _max )
-        output = _max;
-    else if( output < _min )
-        output = _min;
+    if (output > max) {
+        output = max;
+    } else if(output < min) {
+        output = min;
+    }
 
     // Save error to previous error
-    _pre_error = error;
+    pre_error = error;
 
     return output;
-}
-
-PIDImpl::~PIDImpl()
-{
 }

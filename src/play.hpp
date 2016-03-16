@@ -7,6 +7,7 @@
 enum EndGameOpt {
     NEW_GAME,
     REPLAY,
+    RETURN_TO_MENU,
     QUIT
 };
 

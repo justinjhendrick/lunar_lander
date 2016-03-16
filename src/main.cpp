@@ -79,8 +79,22 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    Menu::MenuOption choice = Menu::menu(screen);
-    if (choice == Menu::QUICK_PLAY) {
-        Menu::quick_play(screen, pilot, seed);
+    Menu::QuitType quit_type = Menu::NO_QUIT;
+    while (quit_type != Menu::END_PROGRAM) {
+        Menu::MenuOption choice = Menu::menu(screen);
+        if (choice == Menu::QUICK_PLAY) {
+            quit_type = Menu::quick_play(screen, NULL, seed);
+        } else if (choice == Menu::HOW_TO_PLAY) {
+            quit_type = Menu::how_to_play(screen, false);
+        } else if (choice == Menu::VERSUS) {
+            printf("TODO: versus\n");
+        } else if (choice == Menu::WATCH_PILOT) {
+            pilot = new Pilot();
+            quit_type = Menu::quick_play(screen, pilot, seed);
+        } else if (choice == Menu::EXIT) {
+            quit_type = Menu::END_PROGRAM;
+        }
+        
+        seed = (unsigned int) time(NULL);
     }
 }

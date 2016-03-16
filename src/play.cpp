@@ -38,7 +38,7 @@ EndGameOpt end_game(Screen& s,
                 } else if (e.key.keysym.sym == SDLK_r) {
                     return REPLAY;
                 } else if (e.key.keysym.sym == SDLK_q) {
-                    return QUIT;
+                    return RETURN_TO_MENU;
                 }
             }
         }
@@ -98,15 +98,17 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
     unsigned long frames = 0;
     while (true) {
         struct timeval start = {0, 0};
-        gettimeofday(&start, NULL);
 
-        // Handle all events on queue
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                return PlayResult(false, QUIT, 0.);
-            }
-            if (pilot == NULL) {
-                lander.handle(&e);
+        if (s != NULL) {
+            gettimeofday(&start, NULL);
+            // Handle all events on queue
+            while (SDL_PollEvent(&e) != 0) {
+                if (e.type == SDL_QUIT) {
+                    return PlayResult(false, QUIT, 0.);
+                }
+                if (pilot == NULL) {
+                    lander.handle(&e);
+                }
             }
         }
         if (pilot != NULL) {
@@ -142,22 +144,22 @@ PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
             lander.draw(*s);
             world.draw(*s);
             s->flip();
-        }
 
-        // sleep so that a frame takes FRAME_TIME
-        // This is important for the physics simulations.
-        // If all frames take the same amout of time,
-        // the physics is independent of the framerate.
-        struct timeval now = {0, 0};
-        gettimeofday(&now, NULL);
-        struct timeval diff = {0, 0};
-        timersub(&now, &start, &diff);
-        long sleep_time = ((long) FRAME_TIME) -
-            ((long) diff.tv_usec / 1000);
-        if (sleep_time > 0) {
-            SDL_Delay((unsigned int) sleep_time);
-        } else {
-            printf("tired\n");
+            // sleep so that a frame takes FRAME_TIME
+            // This is important for the physics simulations.
+            // If all frames take the same amout of time,
+            // the physics is independent of the framerate.
+            struct timeval now = {0, 0};
+            gettimeofday(&now, NULL);
+            struct timeval diff = {0, 0};
+            timersub(&now, &start, &diff);
+            long sleep_time = ((long) FRAME_TIME) -
+                              ((long) diff.tv_usec / 1000);
+            if (sleep_time > 0) {
+                SDL_Delay((unsigned int) sleep_time);
+            } else {
+                printf("tired\n");
+            }
         }
         frames++;
     }

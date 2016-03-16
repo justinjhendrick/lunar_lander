@@ -115,49 +115,54 @@ Menu::MenuOption Menu::menu(Screen& s) {
 
 // How to play and press any key to begin.
 // returning true means play and false means quit
-bool Menu::how_to_play(Screen& s) {
-    // set up rectangles for text
-    SDL_Rect title;
-    title.w = Screen::WIDTH / 4;
-    title.h = 3 * Screen::HEIGHT / 16;
-    title.x = Screen::WIDTH / 2 - title.w / 2;
-    title.y = Screen::HEIGHT / 16;
-    
+//
+// if playing_next is true, this screen also serves as
+// a start screen
+Menu::QuitType Menu::how_to_play(Screen& s, bool playing_next) {
+    // set up rectangle for text
     SDL_Rect where;
     where.w = 3 * Screen::WIDTH / 4;
     where.h = Screen::HEIGHT / 16;
     where.x = Screen::WIDTH / 2 - where.w / 2;
+    const int NUM_LINES = 7;
+    int first_y = Screen::HEIGHT / 2 - where.h * (NUM_LINES + 1) / 2;
     // where.y is set in the loop
 
     // create text textures
-    const int NUM_LINES = 7;
-    SDL_Texture* title_text[NUM_LINES];
-    title_text[0] = s.create_text_texture( "Lunar Lander", NULL);
-    title_text[1] = s.create_text_texture(
+    SDL_Texture* text[NUM_LINES];
+    text[0] = s.create_text_texture(
+            "               HOW TO PLAY                  ", NULL);
+    text[1] = s.create_text_texture(
             "left  or a     apply torque counterclockwise", NULL);
-    title_text[2] = s.create_text_texture(
+    text[2] = s.create_text_texture(
             "right or d     apply torque clockwise       ", NULL);
-    title_text[3] = s.create_text_texture(
+    text[3] = s.create_text_texture(
             "Spacebar       fire thruster                ", NULL);
-    title_text[4] = s.create_text_texture(
+    text[4] = s.create_text_texture(
             "up    or w     increase thrust              ", NULL);
-    title_text[5] = s.create_text_texture(
+    text[5] = s.create_text_texture(
             "down  or s     decrease thrust              ", NULL);
-    title_text[6] = s.create_text_texture(
+
+    if (playing_next) {
+        text[6] = s.create_text_texture(
             "            Press any key to start          ", NULL);
+    } else {
+        text[6] = s.create_text_texture(
+            "      Press any key to return to menu       ", NULL);
+    }
+
 
     SDL_Event e;
     while (true) {
         // write text to the screen
         s.clear();
-        where.y = Screen::HEIGHT / 6 - where.h / 2;
+        where.y = first_y;
         for (int i = 0; i < NUM_LINES; i++) {
-            SDL_Rect rect = (i == 0 ? title : where);
-            SDL_RenderCopy(s.renderer, title_text[i], NULL, &rect);
-            where.y += rect.h;
+            SDL_RenderCopy(s.renderer, text[i], NULL, &where);
+            where.y += where.h;
             if (i == NUM_LINES - 2) {
-                // skip a line for "press any key to start"
-                where.y += rect.h;
+                // skip a line before "press any key"
+                where.y += where.h;
             }
         }
         s.flip();
@@ -165,14 +170,14 @@ bool Menu::how_to_play(Screen& s) {
         // Read input
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
-                return false;
+                return END_PROGRAM;
             } else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
-                    return false;
+                    return TO_MENU;
                 // filter out keys that shouldn't count
                 // as a keypress, like control
                 } else if (!Utils::is_mod_key(e.key.keysym.sym)) {
-                    return true;
+                    return NO_QUIT;
                 }
             }
         }
@@ -180,21 +185,23 @@ bool Menu::how_to_play(Screen& s) {
     }
 }
 
-void Menu::quick_play(Screen& s, Pilot* pilot, unsigned int seed) {
+Menu::QuitType Menu::quick_play(Screen& s, Pilot* pilot, unsigned int seed) {
     // initialize, then call play() in a loop
-    bool again = true;
+    QuitType quit_type = NO_QUIT;
     if (pilot == NULL) {
-        again = how_to_play(s);
+        quit_type = how_to_play(s, true);
     }
     PlayResult result(false, QUIT, 0);
 
-    while (again) {
+    while (quit_type == NO_QUIT) {
         // play the game
         result = play(&s, pilot, seed);
 
-        // read their choice (Quit, New game, or replay)
+        // read their choice (Quit, return to menu, New game, or replay)
         if (result.choice == QUIT) {
-            again = false;
+            quit_type = END_PROGRAM;
+        } else if (result.choice == RETURN_TO_MENU) {
+            quit_type = TO_MENU;
         } else if (result.choice == NEW_GAME) {
             seed = (unsigned int) time(NULL);
         }
@@ -202,10 +209,12 @@ void Menu::quick_play(Screen& s, Pilot* pilot, unsigned int seed) {
         // recreate the Pilot if we need to
         if (pilot != NULL) {
             delete pilot;
-            if (again) {
+            if (quit_type == NO_QUIT) {
                 pilot = new Pilot();
             }
         }
     }
+
+    return quit_type;
 }
 

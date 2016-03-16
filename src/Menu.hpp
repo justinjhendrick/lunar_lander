@@ -14,10 +14,18 @@ class Menu {
             EXIT
         };
 
+        enum QuitType {
+            NO_QUIT, // don't quit
+            TO_MENU,
+            END_PROGRAM
+        };
+
         static MenuOption menu(Screen& s);
 
-        static bool how_to_play(Screen& s);
-        static void quick_play(Screen& s, Pilot* pilot, unsigned int seed);
+        static QuitType how_to_play(Screen& s, bool playing_next);
+
+        // return value of false means kill the program (X button was clicked)
+        static QuitType quick_play(Screen& s, Pilot* pilot, unsigned int seed);
 };
 
 #endif
