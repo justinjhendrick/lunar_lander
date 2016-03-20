@@ -19,19 +19,13 @@
  * }
  *
  * Menu
- *     Quick play
- *     How to play
  *     versus mode -- compete against friends and/or the autopilot
- *     Watch auto pilot
  * Versus mode
  *     Score calculation screen
  *     colors for each player
  * More testing
  * Better design pattern compliance
  *     Like hiding internal details inside classes
- *     Split physics out of the lander?
- * Competition
- *     compete against computer and/or other humans
  * Make Lander::torque actually torque, not angular acceleration
  *     compute STOP_ABOVE_PAD based on rotation time
  ******************************************************************************/
