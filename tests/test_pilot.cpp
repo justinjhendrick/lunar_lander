@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <time.h>
 #include <assert.h>
-#include "../src/play.hpp"
+#include "../src/Play.hpp"
 
 void test_pilot(unsigned int n_trials) {
     unsigned int seed = (unsigned int) time(NULL);

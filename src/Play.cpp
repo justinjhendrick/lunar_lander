@@ -8,15 +8,15 @@
 #include "World.hpp"
 #include "Pilot.hpp"
 #include "Utils.hpp"
-#include "play.hpp"
+#include "Play.hpp"
 
 // Show player endgame screen and read their response
 // The endgame screen prompts them to replay (r), start a
 // new game (n) or quit (q)
-EndGameOpt end_game(Screen& s,
-              World& world,
-              Lander& lander,
-              bool win) {
+Play::EndGameOpt Play::end_game(Screen& s,
+                                World& world,
+                                Lander& lander,
+                                bool win) {
     if (!win) {
         lander.explode();
     }
@@ -46,20 +46,21 @@ EndGameOpt end_game(Screen& s,
     }
 }
 
-PlayResult::PlayResult(bool _win, EndGameOpt _choice, unsigned int _score) {
+Play::PlayResult::PlayResult(bool _win, EndGameOpt _choice, unsigned int _score) {
     win = _win;
     choice = _choice;
     score = _score;
 }
 
 // x must be > 0
-unsigned int exponential_decay(double scale, double stretch, double x) {
+// scale * 2 ^ (-x / stretch)
+unsigned int Play::exponential_decay(double scale, double stretch, double x) {
     return (unsigned int) Utils::nearest_int(scale * pow(2., - x / stretch));
 }
 
-unsigned int compute_score(bool win,
-                           unsigned long frames,
-                           double fuel_percent) {
+unsigned int Play::compute_score(bool win,
+                                 unsigned long frames,
+                                 double fuel_percent) {
     if (!win) {
         // You get nothing! You lose! Good day, sir!
         return 0;
@@ -87,7 +88,7 @@ unsigned int compute_score(bool win,
 // play the game defined by the seed.
 // A NULL pilot is a human player
 // a NULL screen means headless mode. (used for testing)
-PlayResult play(Screen* s, Pilot* pilot, unsigned int seed) {
+Play::PlayResult Play::play(Screen* s, Pilot* pilot, unsigned int seed) {
     printf("seed = %u\n", seed);
     Utils::seed_random(seed);
 

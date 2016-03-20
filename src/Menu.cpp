@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include "Menu.hpp"
-#include "play.hpp"
+#include "Play.hpp"
 #include "Utils.hpp"
 
 Menu::MenuOption Menu::menu(Screen& s) {
@@ -191,25 +191,25 @@ Menu::QuitType Menu::quick_play(Screen& s, Pilot* pilot, unsigned int seed) {
     if (pilot == NULL) {
         quit_type = how_to_play(s, true);
     }
-    PlayResult result(false, QUIT, 0);
+    Play::PlayResult result(false, Play::EndGameOpt::QUIT, 0); // dummy values
 
     while (quit_type == NO_QUIT) {
         // play the game
-        result = play(&s, pilot, seed);
+        result = Play::play(&s, pilot, seed);
 
         // read their choice (Quit, return to menu, New game, or replay)
-        if (result.choice == QUIT) {
-            quit_type = END_PROGRAM;
-        } else if (result.choice == RETURN_TO_MENU) {
-            quit_type = TO_MENU;
-        } else if (result.choice == NEW_GAME) {
+        if (result.choice == Play::EndGameOpt::QUIT) {
+            quit_type = QuitType::END_PROGRAM;
+        } else if (result.choice == Play::EndGameOpt::RETURN_TO_MENU) {
+            quit_type = QuitType::TO_MENU;
+        } else if (result.choice == Play::EndGameOpt::NEW_GAME) {
             seed = (unsigned int) time(NULL);
         }
 
         // recreate the Pilot if we need to
         if (pilot != NULL) {
             delete pilot;
-            if (quit_type == NO_QUIT) {
+            if (quit_type == QuitType::NO_QUIT) {
                 pilot = new Pilot();
             }
         }
