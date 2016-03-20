@@ -5,6 +5,7 @@
 #include "Screen.hpp"
 #include "Ground.hpp"
 #include "World.hpp"
+#include "Colors.hpp"
 
 // forward declare Pilot so it can be a friend
 class Pilot;
@@ -106,15 +107,9 @@ class Lander : public Physics {
         bool exploded = false; // hopefully we can keep it that way!
 
     public:
-        enum PlayerColor {
-            WHITE,
-            GREEN,
-            ORANGE
-        };
-
-        Lander(Screen* s, PlayerColor col);
+        Lander(Screen* s, Colors::PlayerColor col);
         Lander(Screen* s,
-               PlayerColor col,
+               Colors::PlayerColor player_color,
                double _x_pos,
                double _y_pos,
                double _x_vel,
@@ -128,7 +123,7 @@ class Lander : public Physics {
         );
         ~Lander();
 
-        PlayerColor player_color;
+        Colors::PlayerColor player_color;
 
         void draw(Screen& s);
 

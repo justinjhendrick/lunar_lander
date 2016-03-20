@@ -1,6 +1,8 @@
 #ifndef _PID_H_
 #define _PID_H_
 
+// https://en.wikipedia.org/wiki/PID_controller
+//
 // downloaded in part from
 // https://gist.github.com/bradley219/5373998
 class PID {

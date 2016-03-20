@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "Ground.hpp"
+#include "Colors.hpp"
 
 Ground::Ground(bool _is_pad, int x1, int y1, int x2, int y2) :
     Line(x1, y1, x2, y2) {
@@ -13,7 +14,11 @@ void Ground::draw(Screen& s) {
         SDL_GetRenderDrawColor(s.renderer, &old_r, &old_g, &old_b, &old_a);
 
         // 398ee7 is blue
-        SDL_SetRenderDrawColor(s.renderer, 0x39, 0x8E, 0xE7, 0xFF);
+        SDL_SetRenderDrawColor(s.renderer,
+                               Colors::PAD.r,
+                               Colors::PAD.g,
+                               Colors::PAD.b,
+                               Colors::PAD.a);
         SDL_Rect r;
         r.x = (int) begin.x;
         r.y = (int) begin.y;

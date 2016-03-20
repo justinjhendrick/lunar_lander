@@ -6,8 +6,9 @@
 #include "constants.hpp"
 #include "Utils.hpp"
 #include "World.hpp"
+#include "Colors.hpp"
 
-Lander::Lander(Screen* s, Lander::PlayerColor col) :
+Lander::Lander(Screen* s, Colors::PlayerColor col) :
     Lander(s,
            col,
            Screen::WIDTH / 2 - WIDTH / 2,  // x_pos
@@ -27,7 +28,7 @@ Lander::Lander(Screen* s, Lander::PlayerColor col) :
 
 Lander::Lander(
        Screen* s,
-       PlayerColor col,
+       Colors::PlayerColor player_color,
        double _x_pos,
        double _y_pos,
        double _x_vel,
@@ -38,7 +39,6 @@ Lander::Lander(
        double _init_fuel,
        double _max_thrust,
        double _exhaust_vel) {
-    player_color = col;
     x_pos = _x_pos;
     y_pos = _y_pos;
     x_vel = _x_vel;
@@ -58,11 +58,11 @@ Lander::Lander(
     rot_abt.y = COLLISION_HEIGHT;
 
     const char* lander_filename = nullptr;
-    if (player_color == PlayerColor::WHITE) {
+    if (player_color == Colors::PlayerColor::WHITE) {
         lander_filename = "sprites/lander_white.bmp";
-    } else if (player_color == PlayerColor::GREEN) {
+    } else if (player_color == Colors::PlayerColor::GREEN) {
         lander_filename = "sprites/lander_green.bmp";
-    } else if (player_color == PlayerColor::ORANGE) {
+    } else if (player_color == Colors::PlayerColor::ORANGE) {
         lander_filename = "sprites/lander_orange.bmp";
     }
 

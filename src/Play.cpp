@@ -9,6 +9,7 @@
 #include "Pilot.hpp"
 #include "Utils.hpp"
 #include "Play.hpp"
+#include "Player.hpp"
 
 // Show player endgame screen and read their response
 // The endgame screen prompts them to replay (r), start a
@@ -93,7 +94,7 @@ Play::PlayResult Play::play(Screen* s, Pilot* pilot, unsigned int seed) {
     Utils::seed_random(seed);
 
     World world;
-    Lander lander(s, Lander::PlayerColor::WHITE);
+    Lander lander(s, Colors::PlayerColor::WHITE);
 
     SDL_Event e;
     unsigned long frames = 0;
