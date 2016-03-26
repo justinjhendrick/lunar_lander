@@ -123,8 +123,6 @@ class Lander : public Physics {
         );
         ~Lander();
 
-        Colors::PlayerColor player_color;
-
         void draw(Screen& s);
 
         bool is_safe_landing();
