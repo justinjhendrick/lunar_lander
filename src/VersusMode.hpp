@@ -6,9 +6,10 @@
 
 class VersusMode {
     private:
-        std::vector<Player> versus_menu(Screen& screen);
+        static std::vector<Player> player_select(Screen& screen);
     public:
-        Menu::QuitType versus(Screen& screen, unsigned int seed);
+        static const unsigned char N_ROUNDS = 3;
+        static Menu::QuitType versus(Screen& screen, unsigned int seed);
 };
 
 #endif
