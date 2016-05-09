@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cmath>
 #include "PID.hpp"
 #include "Utils.hpp"
