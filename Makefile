@@ -18,7 +18,10 @@ nowarn:
 	clang++ -g src/*.cpp -std=c++11 $(LIBS) -o lunar_lander
 
 windows:
-	clang++ -target x86_64-intel-win32-msvc src/*.cpp -std=c++11 $(LIBS) -o lunar_lander
+	clang++ -v -target x86_64-intel-win32-msvc src/*.cpp -std=c++11 $(LIBS) -o lunar_lander -Xlinker -static
+
+linux:
+	g++ src/*.cpp -std=c++11 $(LIBS) -o lunar_lander -static
 
 clean:
 	rm lunar_lander
