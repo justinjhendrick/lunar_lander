@@ -9,7 +9,7 @@ Can you land on the moon in one piece?
 
 ## Download
 
-[64 bit linux](lunar_lander_linux64.zip)
+[64 bit linux](https://github.com/justinjhendrick/lunar_lander/raw/master/imgs/lunar_lander_linux64.zip)
 
 Downloads for other systems coming soon.
 
