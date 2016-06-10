@@ -7,14 +7,22 @@
 # Lunar Lander
 Can you land on the moon in one piece?
 
-## Dependencies
+## Download
+
+### 64 bit Linux
+[download for 64 linux](https://github.com/justinjhendrick/lunar_lander/blob/master/lunar_lander_linux64.zip)
+
+## Build from Source
+
+### Dependencies
 clang 3.3 or later (or a version of gcc that supports c++11), libsdl2-dev, libsdl2-ttf-dev
 
-## How to run
 ```
 $ make
 $ ./lunar_lander
 ```
+
+Use `make gcc` to build with gcc.
 
 ## How to play
 ```

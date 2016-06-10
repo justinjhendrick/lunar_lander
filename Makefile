@@ -11,17 +11,14 @@ gcc:
 test:
 	clang++ -g tests/*.cpp $(NON_MAIN_SRCS) -std=c++11 $(LIBS) -o test.exe
 
-nodebug:
+prod:
 	clang++ -O3 src/*.cpp -std=c++11 $(LIBS) -o lunar_lander
 
 nowarn:
 	clang++ -g src/*.cpp -std=c++11 $(LIBS) -o lunar_lander
 
 windows:
-	clang++ -v -target x86_64-intel-win32-msvc src/*.cpp -std=c++11 $(LIBS) -o lunar_lander -Xlinker -static
-
-linux:
-	g++ src/*.cpp -std=c++11 $(LIBS) -o lunar_lander -static
+	clang++ --gcc-toolchain=/usr/include -v -target x86_64-intel-win32-msvc src/*.cpp -std=c++11 $(LIBS) -o lunar_lander -Xlinker -static
 
 clean:
 	rm lunar_lander
