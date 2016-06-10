@@ -4,21 +4,31 @@ Lunar Lander
 Auto-Pilot timeline:
 ---------------------
 
-Solve y axis first (Suicide burn)
-next, add random init_x velocity
+At first, there was no initial x velocity, so I only had to focus on the Y axis.
+I calculated the distance required to slow down to zero velocity,
+then waited for the right time to start the suicide burn.
 
-go horizontal, get to center, kill x_vel
-For this, I needed rotate_to(double angle)
+next, I added random initial x velocity to make this harder and more
+interesting. Right now, The landing pad was still fixed in the center.
+The first simple trajectory is to rotate horizontal, burn towards center, rotate
+180 degrees and kill all x velocity.
+
+For this, I needed rotate_to(double angle). This wasn't very hard. The
+implementation is quick (in time) but fuel expensive. It accelerates (angularly)
+until half of the rotation is completed, then decelerates until the lander
+is no longer spinning.
 
 better trajectory:
-go horizontal and choose a trajectory that intersects the pad
-need point_retrograde() so we can kill velocity near pad
-  (need time to rotate to straight up sometimes, Aim above the pad for this)
-
+rotate to horizontal and then burn to choose a parabolic trajectory that
+intersects the pad. This trajectory needs point_retrograde() so we can kill
+velocity near the landing pad.
   If we point retrograde during the entire fall, we'll be ready to turn on the
   thrusters at any time. This simplifies the suicide burn.
 
-First point_retrograde implementation:
+  But, the lander needs time to rotate to straight up if the parabola was
+  especially flat. The lander aims above the landing pad to account for this.
+
+First naive point_retrograde implementation:
   if (fabs(lander.orientation - retrograde) > MAX_DEVIATION) {
     rotate_to(retrograde);
   }
@@ -27,29 +37,27 @@ Problems with above approach:
   high RCS fuel use
 
   high frequency stop-start rotation when tracking moving retrograde vector
-  TODO: Create animation
 
   Highly susceptible to outliers. This was a problem at the end of the suicide
   burn. The lander's velocity was low, so the retrograde vector could easily be
   far from pointing up. When we're about to land is when we need to stay
   pointing mostly up.
 
-I knew I needed to use a smarter approach.
+I knew I needed to use a smarter approach, I once saw my roomate work on a robot
+that had to follow a black line on the floor (with a downward facing camera).  I
+saw a similarity here, in that we want to smoothly correct without
+over-correcting. I asked him what his control logic was and he pointed me to PID
+controllers (https://en.wikipedia.org/wiki/PID_controller).
 
-I once saw my roomate work on a robot that had to follow a black line on the
-floor (with a downward facing camera).  I saw a similarity here, in that we want
-to smoothly correct without over-correcting. I asked him what his control logic 
-was and he pointed me to PID controllers
-(https://en.wikipedia.org/wiki/PID_controller).
-
-PID controllers work really well. TODO: Show plots!
+PID controllers work really well and are currently used by the auto-pilot. See
+the plot in analysis/tune_pid.pdf for more details.
 
 
 Testing
 --------
 
-All initial conditions are specified by a seed to the random number generator
-Run the autopilot for many trials. Note which seeds cause failure. Then, I
-replay those seeds and learn from my mistakes.
+All initial conditions are specified by a seed to the random number generator.
+Run the autopilot for many trials with different seeds. Note which seeds cause
+failure. Then, I replay those seeds and learn from my mistakes.
 
 Test because failure is when we learn the most.
