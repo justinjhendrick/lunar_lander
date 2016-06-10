@@ -18,8 +18,13 @@ nowarn:
 	clang++ -g src/*.cpp -std=c++11 $(LIBS) -o lunar_lander
 
 windows:
-	clang++ --gcc-toolchain=/usr/include -v -target x86_64-intel-win32-msvc src/*.cpp -std=c++11 $(LIBS) -o lunar_lander -Xlinker -static
+	clang++ -v -target x86_64-intel-win32-msvc src/*.cpp -std=c++11 $(LIBS) -o lunar_lander
+
+linux64:
+	clang++ -O3 src/*.cpp -std=c++11 $(LIBS) -o lunar_lander
+	zip lunar_lander_linux64.zip lunar_lander sprites/* imgs/logo.bmp COPYING COPYING_FONTS README.md UbuntuMono-R.ttf
 
 clean:
 	rm lunar_lander
 	rm test.exe
+	rm lunar_lander_linux64.zip
