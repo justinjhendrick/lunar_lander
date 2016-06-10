@@ -24,12 +24,12 @@ Screen::Screen() {
     // create text textures
     win_text = create_text_texture("You win!", NULL);
     lose_text = create_text_texture("You lose.", NULL);
-    newgame_text = create_text_texture(
-            "press n to play a new level     ", NULL);
     replay_text = create_text_texture(
-            "press r to replay the same level", NULL);
+            "press enter to replay             ", NULL);
+    newgame_text = create_text_texture(
+            "press n to play a random new level", NULL);
     quit_text = create_text_texture(
-            "press q to quit                 ", NULL);
+            "press q to quit                   ", NULL);
 }
 
 void Screen::put_endgame_text(bool win) {
@@ -43,10 +43,10 @@ void Screen::put_endgame_text(bool win) {
     SDL_RenderCopy(renderer, win_or_lose, NULL, &where);
 
     where.y += Screen::HEIGHT / 8;
-    SDL_RenderCopy(renderer, newgame_text, NULL, &where);
+    SDL_RenderCopy(renderer, replay_text, NULL, &where);
 
     where.y += Screen::HEIGHT / 8;
-    SDL_RenderCopy(renderer, replay_text, NULL, &where);
+    SDL_RenderCopy(renderer, newgame_text, NULL, &where);
 
     where.y += Screen::HEIGHT / 8;
     SDL_RenderCopy(renderer, quit_text, NULL, &where);

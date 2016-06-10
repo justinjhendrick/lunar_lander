@@ -12,7 +12,7 @@
 #include "Player.hpp"
 
 // Show player endgame screen and read their response
-// The endgame screen prompts them to replay (r), start a
+// The endgame screen prompts them to replay (enter), start a
 // new game (n) or quit (q)
 Play::EndGameOpt Play::end_game(Screen& s,
                                 World& world,
@@ -36,7 +36,7 @@ Play::EndGameOpt Play::end_game(Screen& s,
             } else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_n) {
                     return NEW_GAME;
-                } else if (e.key.keysym.sym == SDLK_r) {
+                } else if (e.key.keysym.sym == SDLK_RETURN) {
                     return REPLAY;
                 } else if (e.key.keysym.sym == SDLK_q) {
                     return RETURN_TO_MENU;
