@@ -13,20 +13,6 @@ Can you land on the moon in one piece?
 
 Downloads for other systems coming soon.
 
-## Build from Source
-
-### Dependencies
-clang 3.3 or later (or a version of gcc that supports c++11), libsdl2-dev, libsdl2-ttf-dev
-
-
-### Build
-```
-$ make
-$ ./lunar_lander
-```
-
-Use `make gcc` to build with gcc.
-
 ## How to play
 ```
 left  or a     apply torque counterclockwise
@@ -41,6 +27,21 @@ Spacebar       turn on your thruster
 You don't play, just watch the flight computer do its work.
 
 ![flight computer lands](https://github.com/justinjhendrick/lunar_lander/blob/master/imgs/landing.gif)
+
+## Build from Source
+
+### Dependencies
+clang 3.3 or later (or a version of gcc that supports c++11), libsdl2-dev, libsdl2-ttf-dev
+
+
+### Build
+```
+$ make
+$ ./lunar_lander
+```
+
+Use `make gcc` to build with gcc.
+
 
 ### Command line arguments
 ```
