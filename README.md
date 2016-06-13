@@ -58,6 +58,10 @@ $ ./test.exe
 `test.exe` takes an optional argument,
 the number of trials to run the auto-pilot. Default is 1.
 
+## Unimplemented parts
+Versus Mode appears on the main menu but has yet to be implemented.
+It will allow competition against the computer and other humans.
+
 ## Attribution
 All files except `UbuntuMono-R.ttf` are under Creative Commons Attribution (CC BY).
 See `COPYING` for more details

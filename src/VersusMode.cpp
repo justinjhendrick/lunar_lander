@@ -16,4 +16,5 @@ Menu::QuitType VersusMode::versus(Screen& screen, unsigned int seed) {
             // refactor all the code t use players anywhere a pilot is used
         }
     }
+    return Menu::TO_MENU;
 }
